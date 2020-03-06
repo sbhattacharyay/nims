@@ -1,4 +1,14 @@
+%% Authors: Shubhayu Bhattacharyay, B.S. Candidate, Matthew Wang, B.S. Candidate
+% Department of Biomedical Engineering
+% Department of Applied Mathematics and Statistics
+% Whiting School of Engineering, Johns Hopkins University
+% email address: shubhayu@jhu.edu
+% March 2019; Last revision: 20-Feb-2020
+%% ------------- BEGIN CODE --------------
 % Feature collection and organization script
+
+cd ..
+cd motion_feature_data/
 
 sensors = cell(7,6);
 directory = dir;
