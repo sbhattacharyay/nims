@@ -1,4 +1,4 @@
-%% 1). Clinical Data Extraction
+%% Clinical Data Extraction
 % Decoding Quantitative Motor Features for Classification and Prediction
 % in Severe Acquired Brain Injury
 %
@@ -10,15 +10,18 @@
 % March 2019; Last revision: 29-January-2020
 %% ------------- BEGIN CODE --------------
 % Load data from most recent patient clinical data spreadsheet
-cd 'C:\Users\Shubhayu\OneDrive - Johns Hopkins\BIMS Project\clinical_data'
+cd ..
+cd clinical_data
+
 patientData = readtable('Final_QMACP.xlsx','TreatAsEmpty',{'.','NA'});
 
 % Assign variable names to patient datasheet
-patientData.Properties.VariableNames([64 66 17 18 20 21 22 23 1 2 7 25 ...
-    35 62 53 34 3 43 44 76]) = {'gose' 'death' 'hlm_en' 'hlm_dis' ....
-    'ampac_en_r' 'ampac_en_t' 'ampac_dis_r' 'ampac_dis_t' .....
-    'pNum' 'gender' 'los' 'apache' 'gcs_en' 'jfk_dis' 'jfk_en' ......
-    'gcs_m_en' 'age' 'gcs_m_dis' 'gcs_dis' 'gose_12mo'};
+patientData.Properties.VariableNames([1:3,7,13:18,24:25,27:30,32,41:42, ...
+    50:51,60,69,71,73,83,85])={'pNum','gender','age','los','stroke', ....
+    'ich','sah','bt','sdh','tbi','hlm_en','hlm_dis','ampac_en_r', .....
+    'ampac_en_t','ampac_dis_r','ampac_dis_t','apache','gcs_m_en', ......
+    'gcs_en','gcs_m_dis','gcs_dis','jfk_en','jfk_dis','gose', .......
+    'death','gose_12mo','outcome_12mo'};
 
 % Remove extraneous cells in spreadsheet
 excluded = isnan(patientData.pNum);
@@ -42,7 +45,7 @@ gose_scores = str2double(gose_scores(studyPatients));
 
 % Extract outcome scores (GOSE) at 12 months (for patients for which data
 % is available).
-yr_outcome_code = str2num(cell2mat(patientData.Outcome12Months));
+yr_outcome_code = str2num(cell2mat(patientData.outcome_12mo));
 yr_outcome_code = yr_outcome_code(studyPatients);
 
 gose_12months = patientData.gose_12mo;
@@ -85,8 +88,17 @@ yr_death(noYearOutcomeAvailable) = NaN;
 females = categorical(patientData.gender(studyPatients))~= 'M';
 gender = (-1).^females;
 
+% Diagnosis codes
+stroke = -((-1).^str2double(patientData.stroke(studyPatients)));
+ich = -((-1).^str2double(patientData.ich(studyPatients)));
+sah = -((-1).^str2double(patientData.sah(studyPatients)));
+bt = -((-1).^str2double(patientData.bt(studyPatients)));
+sdh = -((-1).^str2double(patientData.sdh(studyPatients)));
+tbi = -((-1).^str2double(patientData.tbi(studyPatients)));
+
 % Impute missing clinical variables with Weighted k-NN (code below)
-dataset = [age gender apache_scores gcs_scores_en gcs_scores_dis];
+dataset = [age gender stroke ich sah bt sdh tbi apache_scores ...
+    gcs_scores_en gcs_scores_dis];
 imputeDataset = wKNN_impute(dataset);
 
 % % AMPAC at enrollment:
@@ -100,6 +112,7 @@ imputeDataset = wKNN_impute(dataset);
 % % JFK at enrollment:
 % [jfk_en,lam_jfk_en]=boxcox(patientData.jfk_en(studyPatients));
 % [jfk_en,mu_jfk_en,sig_jfk_en]=zscore(jfk_en);
+
 %% Prepare predictor matrices:
 
 % Penultimate column is death and final column is GOSE
