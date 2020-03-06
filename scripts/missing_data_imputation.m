@@ -25,8 +25,6 @@ studyPatientsPY = [2, 3,	4,	5,	6,	7,	8,	9,	10,	11,	12,	13, ...
     47,	48,	50,	52,	53,	54,	55,	56,	57,	59,	60,	61,	62,	63,	64,	65, ......
     67,	68];
 
-% Test for Git
-
 % Get Time Point Labels (in datenum format)
 cd band_power
 load('band_power02.mat')
