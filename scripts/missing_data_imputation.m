@@ -24,7 +24,8 @@ studyPatientsPY = [2, 3,	4,	5,	6,	7,	8,	9,	10,	11,	12,	13, ...
     31,	32,	33,	34,	35,	36,	37,	38,	39,	40,	41,	42,	43,	49,	51,	46, .....
     47,	48,	50,	52,	53,	54,	55,	56,	57,	59,	60,	61,	62,	63,	64,	65, ......
     67,	68];
-%% Get Time Point Labels (in datenum format)
+
+% Get Time Point Labels (in datenum format)
 cd band_power
 load('band_power02.mat')
 t = bandPower{2, 1};
@@ -63,130 +64,9 @@ plot_TOD_Diff(t,TOD_Diff)
 plot_TOD_Hist(TOD_Means)
 
 %% Finding no motion thresholds for each feature based on SMA:
+SMA_threshold=0.1;
+feature_thresholds=find_noMotion_thresholds(SMA_threshold,sensors,feature_names);
 
-% In order to impute the missing data, we first need to understand how
-% "no motion" manifests in each of the given feature types.
-
-% We assume that SMA is our ground truth in calculating No Motion
-% thresholds.
-SMA_threshold = 0.1;
-SMA_nm_percentages = cellfun(@(x) noMotion_th(x,SMA_threshold),...
-    sensors(:,6),'UniformOutput',false);
-
-% Warning: Elapsed Time is 19.35 seconds
-
-tic
-% Based on the SMA_nm_percentages, we will derive thresholds that allow us
-% to most closely match the percentages from SMA:
-
-sma_idx = find(feature_names == "sma");
-mf_idx = find(feature_names == "med_freq");
-
-feature_thresholds = NaN(dim_of_sensors(2),1);
-feature_thresholds(sma_idx) = SMA_threshold;
-
-% Finding Band Power threshold:
-j=1;
-temp_feature_data = sensors(:,j);
-min_norm = realmax;
-opt_k = NaN;
-
-for k = 0:0.001:0.15
-    feat_percentages = cellfun(@(x) noMotion_th(x,k),...
-        temp_feature_data,'UniformOutput',false);
-    curr_norm=norm_calc(feat_percentages,SMA_nm_percentages);
-    if curr_norm < min_norm
-        opt_k = k;
-        min_norm = curr_norm;
-    end
-end
-feature_thresholds(j) = opt_k;
-
-% Finding Freq Entropy threshold:
-j=2;
-temp_feature_data = sensors(:,j);
-min_norm = realmax;
-opt_k = NaN;
-
-for k = 1.66:0.001:1.7
-    feat_percentages = cellfun(@(x) noMotionFE_th(x,k),...
-        temp_feature_data,'UniformOutput',false);
-    curr_norm=norm_calc(feat_percentages,SMA_nm_percentages);
-    if curr_norm < min_norm
-        opt_k = k;
-        min_norm = curr_norm;
-    end
-end
-feature_thresholds(j) = opt_k;
-
-% Finding Freq Pairs 1 threshold:
-j=3;
-temp_feature_data = sensors(:,j);
-min_norm = realmax;
-opt_k = NaN;
-
-for k = 0.003:0.001:0.02
-    feat_percentages = cellfun(@(x) noMotion_th(x,k),...
-        temp_feature_data,'UniformOutput',false);
-    curr_norm=norm_calc(feat_percentages,SMA_nm_percentages);
-    if curr_norm < min_norm
-        opt_k = k;
-        min_norm = curr_norm;
-    end
-end
-feature_thresholds(j) = opt_k;
-
-% Finding Freq Pairs 2 threshold:
-j=4;
-temp_feature_data = sensors(:,j);
-min_norm = realmax;
-opt_k = NaN;
-
-for k = 0.001:0.0001:0.006
-    feat_percentages = cellfun(@(x) noMotion_th(x,k),...
-        temp_feature_data,'UniformOutput',false);
-    curr_norm=norm_calc(feat_percentages,SMA_nm_percentages);
-    if curr_norm < min_norm
-        opt_k = k;
-        min_norm = curr_norm;
-    end
-end
-feature_thresholds(j) = opt_k;
-
-% Finding Med Freq threshold:
-j=5;
-temp_feature_data = sensors(:,j);
-min_norm = realmax;
-opt_k = NaN;
-
-for k = 2.5:0.01:3.5
-    feat_percentages = cellfun(@(x) noMotionFE_th(x,k),...
-        temp_feature_data,'UniformOutput',false);
-    curr_norm=norm_calc(feat_percentages,SMA_nm_percentages);
-    if curr_norm < min_norm
-        opt_k = k;
-        min_norm = curr_norm;
-    end
-end
-feature_thresholds(j) = opt_k;
-
-% Finding Wavelet threshold:
-j=7;
-temp_feature_data = sensors(:,j);
-min_norm = realmax;
-opt_k = NaN;
-
-for k = 1:0.1:15
-    feat_percentages = cellfun(@(x) noMotion_th(x,k),...
-        temp_feature_data,'UniformOutput',false);
-    curr_norm=norm_calc(feat_percentages,SMA_nm_percentages);
-    if curr_norm < min_norm
-        opt_k = k;
-        min_norm = curr_norm;
-    end
-end
-feature_thresholds(j) = opt_k;
-toc
 %% Impute the totally-missing rows
 %First, given our newly derived thresholds, we calculate the "no motion"
 %for each of our patients per sensor per feature:
