@@ -30,6 +30,8 @@ t = bandPower{2, 1};
 t_copy = t;
 clear bandPower
 cd ..
+cd .. 
+cd scripts/
 %% Identify rows that are completely missing data (and replace with NaN)
 totallyMissingIdxs = [];
 %contains indices of the totally missing time series as follows:
@@ -1305,7 +1307,7 @@ bp_nm_range = [0 feature_thresholds(1)];
 fe_nm_range = [0 feature_thresholds(6)];
 sma_nm_range = [0 feature_thresholds(6)];
 sma_nm_range = [0 feature_thresholds(6)];
-_nm_range = [0 feature_thresholds(6)];
+sma_nm_range=[0 feature_thresholds(6)];
 sma_nm_range = [0 feature_thresholds(6)];
 wav_nm_range = [0 feature_thresholds(7)];
 
@@ -1317,5 +1319,5 @@ for i = 1:dim_TM(2)
     curr_perc=nm_percentages_for_features{featIdx,1}{sensIdx,1};
     NM_imputes=draws<curr_perc(ptIdx);
     curr_mat=sensors{sensIdx,featIdx};
-    curr_mat(ptIdx,NM_imputes)= ?????;
+    curr_mat(ptIdx,NM_imputes)= 0;
 end
