@@ -71,7 +71,10 @@ feature_thresholds=find_noMotion_thresholds(SMA_threshold,sensors,feature_names)
 %First, given our newly derived thresholds, we calculate the "no motion"
 %for each of our patients per sensor per feature:
 
+%Then, fit the values above the threshold to a decaying exponential
+
 nm_percentages_for_features = {};
+lambda_for_features = {};
 
 for j = 1:dim_of_sensors(2)
     temp_feature_data = sensors(:,j);
@@ -83,6 +86,9 @@ for j = 1:dim_of_sensors(2)
         nm_percentages_for_features{j,1}=cellfun(@(x) noMotion_th(x,k), ...
             temp_feature_data,'UniformOutput',false);
     end
+    
+    lambda_for_features{j,1}=cellfun(@(x) fit_exp(x,feature_thresholds(j)), ...
+        temp_feature_data,'UniformOutput',false);
 end
 
 
