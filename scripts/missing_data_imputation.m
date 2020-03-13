@@ -124,13 +124,23 @@ for i = 1:dim_of_sensors(2)
             'NewVariableNames',new_var);
     end
 end
+%%
+
+catVariables=patient_table.Properties.VariableNames(2:8);
+
+predictor_vars=patient_table.Properties.VariableNames([1:10,16,18:22]);
+
+mdl=fitglm(patient_table,'Distribution','binomial','ResponseVar',...
+    'noMotion_band_power_2','CategoricalVars',catVariables,....
+    'PredictorVars',predictor_vars);
+
 %% Create a regression to parameters
 % We will regress available clinical parameters and available nm_data and
 % exp_data to unavailable parameters.
 %
 % NOTE: we will only regress to relevant feature/sensor pairs
 %
-% logit(\pi) 
+% logit(\pi) ~ 
 
 pi_regressionFits = {};
 lam_regressionFits = {};
