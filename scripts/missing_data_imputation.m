@@ -33,6 +33,9 @@ t_copy = t;
 clear bandPower
 cd ..
 cd ..
+cd clinical_data/
+load('clinical_extraction_output.mat')
+cd ..
 cd scripts/
 %% Identify rows that are completely missing data (and replace with NaN)
 %contains indices of the totally missing time series as follows:
@@ -64,6 +67,7 @@ plot_TOD_Diff(t,TOD_Diff)
 plot_TOD_Hist(TOD_Means)
 
 %% Finding no motion thresholds for each feature based on SMA:
+
 SMA_threshold=0.1;
 feature_thresholds=find_noMotion_thresholds(SMA_threshold,sensors,feature_names);
 
@@ -95,8 +99,22 @@ end
 toc
 
 %% Create a regression to parameters
-% We will regress 
+% We will regress available clinical parameters and available nm_data and
+% exp_data to unavailable parameters.
+%
+% NOTE: we will only regress to relevant feature/sensor pairs
+%
+% logit(\pi) 
 
+pi_regressionFits = {};
+lam_regressionFits = {};
+
+ptIndices = totallyMissingIdxs(3,:);
+
+for j = unique(ptIndices)
+    find(ptIndices(ptIndices == j))
+    
+end
 %% Cycle through totally missing recordings and impute
 
 rng(1)
@@ -119,7 +137,7 @@ for i = 1:dim_TM(2)
     draws=rand(1,length(t));
     
     if featIdx == 2 || featIdx == 5
-    else 
+    else
     end
     
     curr_perc=nm_percentages_for_features{featIdx,1}{sensIdx,1};
