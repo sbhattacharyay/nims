@@ -19,11 +19,13 @@ dim_of_sensors=size(sensors);
 sensor_count = dim_of_sensors(1);
 feature_count = dim_of_sensors(2);
 
-studyPatientsPY = [2, 3,	4,	5,	6,	7,	8,	9,	10,	11,	12,	13, ...
+studyPatientsPY = [2,3,4,5,	6,	7,	8,	9,	10,	11,	12,	13, ...
     14,	15,	16,	17,	18,	19,	20,	21,	22,	23,	24,	26,	27,	28,	29,	30, ....
     31,	32,	33,	34,	35,	36,	37,	38,	39,	40,	41,	42,	43,	49,	51,	46, .....
     47,	48,	50,	52,	53,	54,	55,	56,	57,	59,	60,	61,	62,	63,	64,	65, ......
     67,	68];
+
+[~,sort_order] = sort(studyPatientsPY);
 
 % Get Time Point Labels (in datenum format)
 cd band_power
@@ -105,12 +107,23 @@ toc
 for i = 1:dim_of_sensors(2)
     for j = 1:dim_of_sensors(1)
         curr_col_pi = nm_percentages_for_features{i,1}{j,1};
+        sorted_col_pi = curr_col_pi(sort_order);
         new_var = sprintf("noMotion_%s_%d",feature_names(i),j);
-        patient_table=addvars(patient_table,curr_col_pi,...
+        patient_table=addvars(patient_table,sorted_col_pi,...
             'NewVariableNames',new_var);
     end
 end
 
+
+for i = 1:dim_of_sensors(2)
+    for j = 1:dim_of_sensors(1)
+        curr_col_lam = lambda_for_features{i,1}{j,1};
+        sorted_col_lam = curr_col_lam(sort_order);
+        new_var = sprintf("lambda_%s_%d",feature_names(i),j);
+        patient_table=addvars(patient_table,sorted_col_lam,...
+            'NewVariableNames',new_var);
+    end
+end
 %% Create a regression to parameters
 % We will regress available clinical parameters and available nm_data and
 % exp_data to unavailable parameters.
