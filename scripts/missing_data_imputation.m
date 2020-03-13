@@ -33,9 +33,6 @@ t_copy = t;
 clear bandPower
 cd ..
 cd ..
-cd clinical_data/
-load('clinical_extraction_output.mat')
-cd ..
 cd scripts/
 %% Identify rows that are completely missing data (and replace with NaN)
 %contains indices of the totally missing time series as follows:
@@ -71,7 +68,14 @@ plot_TOD_Hist(TOD_Means)
 SMA_threshold=0.1;
 feature_thresholds=find_noMotion_thresholds(SMA_threshold,sensors,feature_names);
 
-%% Impute the totally-missing rows
+%% Calculate no motion values for each feature set and sensor
+
+cd ..
+cd clinical_data/
+load('clinical_extraction_output.mat')
+cd ..
+cd scripts/
+
 %First, given our newly derived thresholds, we calculate the "no motion"
 %for each of our patients per sensor per feature:
 
@@ -97,6 +101,15 @@ for j = 1:dim_of_sensors(2)
     end
 end
 toc
+
+for i = 1:dim_of_sensors(2)
+    for j = 1:dim_of_sensors(1)
+        curr_col_pi = nm_percentages_for_features{i,1}{j,1};
+        new_var = sprintf("noMotion_%s_%d",feature_names(i),j);
+        patient_table=addvars(patient_table,curr_col_pi,...
+            'NewVariableNames',new_var);
+    end
+end
 
 %% Create a regression to parameters
 % We will regress available clinical parameters and available nm_data and
