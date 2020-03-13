@@ -32,7 +32,7 @@ t = bandPower{2, 1};
 t_copy = t;
 clear bandPower
 cd ..
-cd .. 
+cd ..
 cd scripts/
 %% Identify rows that are completely missing data (and replace with NaN)
 %contains indices of the totally missing time series as follows:
@@ -73,6 +73,7 @@ feature_thresholds=find_noMotion_thresholds(SMA_threshold,sensors,feature_names)
 
 %Then, fit the values above the threshold to a decaying exponential
 
+tic
 nm_percentages_for_features = {};
 lambda_for_features = {};
 
@@ -80,26 +81,33 @@ for j = 1:dim_of_sensors(2)
     temp_feature_data = sensors(:,j);
     k = feature_thresholds(j);
     if j == 2 || j == 5
-        nm_percentages_for_features{j,1}=cellfun(@(x) noMotionFE_th(x,k), ...
+        nm_percentages_for_features{j,1}=cellfun(@(x) noMotion_th_neg(x,k), ...
+            temp_feature_data,'UniformOutput',false);
+        lambda_for_features{j,1}=cellfun(@(x) fit_exp(x,k), ...
             temp_feature_data,'UniformOutput',false);
     else
         nm_percentages_for_features{j,1}=cellfun(@(x) noMotion_th(x,k), ...
             temp_feature_data,'UniformOutput',false);
+        lambda_for_features{j,1}=cellfun(@(x) fit_exp_neg(x,k), ...
+            temp_feature_data,'UniformOutput',false);
     end
-    
-    lambda_for_features{j,1}=cellfun(@(x) fit_exp(x,feature_thresholds(j)), ...
-        temp_feature_data,'UniformOutput',false);
 end
+toc
 
+%% Create a regression to parameters
+% We will regress 
 
-% Then, we cycle through the completely missing time series
+%% Cycle through totally missing recordings and impute
+
+rng(1)
+
 dim_TM = size(totallyMissingIdxs);
 
 bp_nm_range = [0 feature_thresholds(1)];
-fe_nm_range = [0 feature_thresholds(6)];
-sma_nm_range = [0 feature_thresholds(6)];
-sma_nm_range = [0 feature_thresholds(6)];
-sma_nm_range=[0 feature_thresholds(6)];
+fe_nm_range = [feature_thresholds(2) 1.707];
+fp1_nm_range = [0 feature_thresholds(3)];
+fp2_nm_range = [0 feature_thresholds(4)];
+mf_nm_range = [feature_thresholds(5) 3.2];
 sma_nm_range = [0 feature_thresholds(6)];
 wav_nm_range = [0 feature_thresholds(7)];
 
@@ -107,7 +115,13 @@ for i = 1:dim_TM(2)
     sensIdx = totallyMissingIdxs(1,i);
     featIdx = totallyMissingIdxs(2,i);
     ptIdx = totallyMissingIdxs(3,i);
+    
     draws=rand(1,length(t));
+    
+    if featIdx == 2 || featIdx == 5
+    else 
+    end
+    
     curr_perc=nm_percentages_for_features{featIdx,1}{sensIdx,1};
     NM_imputes=draws<curr_perc(ptIdx);
     curr_mat=sensors{sensIdx,featIdx};
