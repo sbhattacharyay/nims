@@ -67,10 +67,14 @@ plot_TOD_Hist(TOD_Means)
 
 %% Finding no motion thresholds for each feature based on SMA:
 
+%NOTE: section takes about 20 seconds to run
+
 SMA_threshold=0.1;
 feature_thresholds=find_noMotion_thresholds(SMA_threshold,sensors,feature_names);
 
-%% Calculate no motion values for each feature set and sensor
+%% Fit Zero-inflated poisson distribution to all feature spaces
+
+% NOTE: takes about 4.5 seconds to run
 
 cd ..
 cd clinical_data/
@@ -78,52 +82,7 @@ load('clinical_extraction_output.mat')
 cd ..
 cd scripts/
 
-%First, given our newly derived thresholds, we calculate the "no motion"
-%for each of our patients per sensor per feature:
-
-%Then, fit the values above the threshold to a decaying exponential
-
-tic
-nm_percentages_for_features = {};
-lambda_for_features = {};
-
-for j = 1:dim_of_sensors(2)
-    temp_feature_data = sensors(:,j);
-    k = feature_thresholds(j);
-    if j == 2 || j == 5
-        nm_percentages_for_features{j,1}=cellfun(@(x) noMotion_th_neg(x,k), ...
-            temp_feature_data,'UniformOutput',false);
-        lambda_for_features{j,1}=cellfun(@(x) fit_exp(x,k), ...
-            temp_feature_data,'UniformOutput',false);
-    else
-        nm_percentages_for_features{j,1}=cellfun(@(x) noMotion_th(x,k), ...
-            temp_feature_data,'UniformOutput',false);
-        lambda_for_features{j,1}=cellfun(@(x) fit_exp_neg(x,k), ...
-            temp_feature_data,'UniformOutput',false);
-    end
-end
-toc
-
-for i = 1:dim_of_sensors(2)
-    for j = 1:dim_of_sensors(1)
-        curr_col_pi = nm_percentages_for_features{i,1}{j,1};
-        sorted_col_pi = curr_col_pi(sort_order);
-        new_var = sprintf("noMotion_%s_%d",feature_names(i),j);
-        patient_table=addvars(patient_table,sorted_col_pi,...
-            'NewVariableNames',new_var);
-    end
-end
-
-
-for i = 1:dim_of_sensors(2)
-    for j = 1:dim_of_sensors(1)
-        curr_col_lam = lambda_for_features{i,1}{j,1};
-        sorted_col_lam = curr_col_lam(sort_order);
-        new_var = sprintf("lambda_%s_%d",feature_names(i),j);
-        patient_table=addvars(patient_table,sorted_col_lam,...
-            'NewVariableNames',new_var);
-    end
-end
+[all_pis,all_lambdas,patient_table] = fit_zip(sensors,patient_table,feature_thresholds,sort_order,feature_names);
 %%
 
 catVariables=patient_table.Properties.VariableNames(2:8);
