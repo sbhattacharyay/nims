@@ -88,15 +88,22 @@ clearvars dc_dataset yr_dataset dc_dataset_labels ...
 patient_table = fit_zip(sensors,patient_table,feature_thresholds,...
     sort_order,feature_names);
 %% Regression Strategy:
-% since we assume n
+% logit(\pi_SMA ~ 1 + Age )
+
+% NOTES:
+% - for Wrist and Elbow, the other arm sensor is the best predictor
+% - for leg and bed, i will need to try something else
+% - We should use pis and lambdas as predictive features themselves!
 
 catVariables=patient_table.Properties.VariableNames(2:8);
 
-predictor_vars=patient_table.Properties.VariableNames([1:10,16,18:22]);
+predictor_vars=patient_table.Properties.VariableNames([56]);
 
 mdl=fitglm(patient_table,'Distribution','binomial','ResponseVar',...
-    'pi_band_power_2','CategoricalVars',catVariables,....
+    'pi_sma_7','CategoricalVars',catVariables,....
     'PredictorVars',predictor_vars);
+
+ypred=predict(mdl,patient_table(isnan(patient_table.pi_sma_7),:))
 
 %% Create a regression to parameters
 % We will regress available clinical parameters and available nm_data and
