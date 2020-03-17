@@ -10,8 +10,6 @@ addpath('functions/')
 tic
 cd ..
 cd motion_feature_data
-path = pwd;
-directory = dir;
 load('complete_sensor_data.mat');
 toc
 
@@ -70,7 +68,8 @@ plot_TOD_Hist(TOD_Means)
 %NOTE: section takes about 20 seconds to run
 
 SMA_threshold=0.1;
-feature_thresholds=find_noMotion_thresholds(SMA_threshold,sensors,feature_names);
+feature_thresholds=find_noMotion_thresholds(SMA_threshold,sensors,...
+    feature_names);
 
 %% Fit Zero-inflated poisson distribution to all feature spaces
 
@@ -82,15 +81,21 @@ load('clinical_extraction_output.mat')
 cd ..
 cd scripts/
 
-[all_pis,all_lambdas,patient_table] = fit_zip(sensors,patient_table,feature_thresholds,sort_order,feature_names);
-%%
+clearvars dc_dataset yr_dataset dc_dataset_labels ...
+    yr_dataset_labels boxcox_lambdas zscore_mus zscore_sigs ....
+    imputeDataset
+
+patient_table = fit_zip(sensors,patient_table,feature_thresholds,...
+    sort_order,feature_names);
+%% Regression Strategy:
+% since we assume n
 
 catVariables=patient_table.Properties.VariableNames(2:8);
 
 predictor_vars=patient_table.Properties.VariableNames([1:10,16,18:22]);
 
 mdl=fitglm(patient_table,'Distribution','binomial','ResponseVar',...
-    'noMotion_band_power_2','CategoricalVars',catVariables,....
+    'pi_band_power_2','CategoricalVars',catVariables,....
     'PredictorVars',predictor_vars);
 
 %% Create a regression to parameters
