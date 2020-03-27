@@ -134,18 +134,27 @@ mf_nm_range = [feature_thresholds(5) 3.2];
 sma_nm_range = [0 feature_thresholds(6)];
 wav_nm_range = [0 feature_thresholds(7)];
 
+nm_ranges = {bp_nm_range,fe_nm_range,fp1_nm_range,fp2_nm_range,...
+    mf_nm_range,sma_nm_range,wav_nm_range};
+
 for i = 1:dim_TM(2)
-    sensIdx = totallyMissingIdxs(1,i);
-    featIdx = totallyMissingIdxs(2,i);
-    ptIdx = totallyMissingIdxs(3,i);
+    curr_sensorIdx = totallyMissingIdxs(1,i);
+    curr_featureIdx = totallyMissingIdxs(2,i);
+    curr_pt_PY_Idx = totallyMissingIdxs(3,i);
+    
+    pt_table_Idx=find(studyPatients==curr_pt_PY_Idx)
     
     draws=rand(1,length(t));
     
-    if featIdx == 2 || featIdx == 5
-    else
-    end
+    curr_range = nm_ranges{i};
     
     curr_perc=nm_percentages_for_features{featIdx,1}{sensIdx,1};
+    
+    pi_var = ['pi_' char(feature_names(curr_featureIdx)) '_' ...
+        num2str(curr_sensorIdx)];
+    lambda_var = ['pi_' char(feature_names(curr_featureIdx)) '_' ...
+        num2str(curr_sensorIdx)];    
+    
     NM_imputes=draws<curr_perc(ptIdx);
     curr_mat=sensors{sensIdx,featIdx};
     curr_mat(ptIdx,NM_imputes)= 0;
