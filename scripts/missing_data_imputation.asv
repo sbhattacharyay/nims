@@ -105,12 +105,7 @@ patient_table=wrist_elbow_Regression(patient_table,wrist_Idx,elbow_Idx,...
 % - for leg and bed, i will need to try something else
 
 
-% - for bed imputation, I will simply take the average of all the available
-% data:
-bed_Idx = 1;
-
-patient_table = bed_imputation(patient_table,bed_Idx,totallyMissingIdxs,...
-    feature_names);
+% - for bed imputation, I will simply 
 
 % - We should use pis and lambdas as predictive features themselves!
 
