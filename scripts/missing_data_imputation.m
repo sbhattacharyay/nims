@@ -91,19 +91,64 @@ patient_table = fit_zip(sensors,patient_table,feature_thresholds,...
 % logit(\pi_SMA ~ 1 + Age )
 
 % NOTES:
-% - for Wrist and Elbow, the other arm sensor is the best predictor
+% - for Wrist and Elbow, we use the other available arm sensor as the best
+% predictor
+
+% wrist indices (default 4 and 7):
+wrist_Idx = [4,7];
+% elbow indices (defult 3 and 6):
+elbow_Idx = [3,6];
+
+% Totally missing indices with a missing arm (elbow or wrist) parameter
+arm_TMI = totallyMissingIdxs(:,ismember(totallyMissingIdxs(1,:),[wrist_Idx,elbow_Idx]));
+temp_dim = size(arm_TMI);
+
+for i=1:temp_dim(2)
+    curr_sensorIdx = arm_TMI(1,i);
+    curr_featureIdx = arm_TMI(2,i);
+    if ismember(curr_sensorIdx,wrist_Idx)
+        
+        responseVar1 = ['pi_' char(feature_names(curr_featureIdx)) '_' ...
+            num2str(curr_sensorIdx)];
+        responseVar2 = ['lambda_' char(feature_names(curr_featureIdx)) '_' ...
+            num2str(curr_sensorIdx)];
+        predictorVar1 = ['pi_' char(feature_names(curr_featureIdx)) '_' ...
+            num2str(curr_sensorIdx-1)];
+        predictorVar2 = ['lambda_' char(feature_names(curr_featureIdx)) '_' ...
+            num2str(curr_sensorIdx-1)];
+        mdl1=fitglm(patient_table,'Distribution','binomial','ResponseVar',...
+            responseVar1,'PredictorVars',predictorVar1);
+        mdl2=fitglm(patient_table,'Distribution','binomial','ResponseVar',...
+            responseVar2,'PredictorVars',predictorVar2);
+        curr_miss_Idx1 = isnan(patient_table.(responseVar1));
+        curr_miss_Idx2 = isnan(patient_table.(responseVar2));
+        
+        patient_table{curr_miss_Idx1,responseVar1}=predict(mdl1,...
+            patient_table(curr_miss_Idx1,{predictorVar1}));
+        patient_table{curr_miss_Idx2,responseVar2}=predict(mdl2,...
+            patient_table(curr_miss_Idx2,{predictorVar2}));        
+        
+    elseif ismember(curr_sensorIdx,elbow_Idx)
+        responseVar1 = ['pi_' char(feature_names(curr_featureIdx)) '_' ...
+            num2str(curr_sensorIdx)];
+        responseVar2 = ['lambda_' char(feature_names(curr_featureIdx)) '_' ...
+            num2str(curr_sensorIdx)];
+        predictorVar1 = ['pi_' char(feature_names(curr_featureIdx)) '_' ...
+            num2str(curr_sensorIdx+1)];
+        predictorVar2 = ['lambda_' char(feature_names(curr_featureIdx)) '_' ...
+            num2str(curr_sensorIdx+1)];
+        mdl1=fitglm(patient_table,'Distribution','binomial','ResponseVar',...
+            responseVar1,'PredictorVars',predictorVar1);
+        mdl2=fitglm(patient_table,'Distribution','binomial','ResponseVar',...
+            responseVar2,'PredictorVars',predictorVar2);
+        
+    end
+end
+
 % - for leg and bed, i will need to try something else
+
+
 % - We should use pis and lambdas as predictive features themselves!
-
-catVariables=patient_table.Properties.VariableNames(2:8);
-
-predictor_vars=patient_table.Properties.VariableNames([56]);
-
-mdl=fitglm(patient_table,'Distribution','binomial','ResponseVar',...
-    'pi_sma_7','CategoricalVars',catVariables,....
-    'PredictorVars',predictor_vars);
-
-ypred=predict(mdl,patient_table(isnan(patient_table.pi_sma_7),:))
 
 %% Create a regression to parameters
 % We will regress available clinical parameters and available nm_data and
@@ -111,7 +156,7 @@ ypred=predict(mdl,patient_table(isnan(patient_table.pi_sma_7),:))
 %
 % NOTE: we will only regress to relevant feature/sensor pairs
 %
-% logit(\pi) ~ 
+% logit(\pi) ~
 
 pi_regressionFits = {};
 lam_regressionFits = {};
