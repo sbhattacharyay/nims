@@ -88,7 +88,8 @@ clearvars dc_dataset yr_dataset dc_dataset_labels ...
 patient_table = fit_zip(sensors,patient_table,feature_thresholds,...
     sort_order,feature_names);
 %% Regression Strategy:
-
+% Takes about 3-4 seconds to run
+tic
 % NOTES:
 % - for Wrist and Elbow, we use the other available arm sensor as the best
 % predictor
@@ -101,11 +102,14 @@ elbow_Idx = [3,6];
 patient_table=wrist_elbow_Regression(patient_table,wrist_Idx,elbow_Idx,...
     totallyMissingIdxs,feature_names);
 
-% - for ankle
+% - for ankle, it seems like none of the available predictors pass the
+% predictor t-test, so we will simply use wrist, elbow, and interaction
+% terms of the available side
+
 ankle_Idx = [2,5];
 
-mdl_trial=fitglm(patient_table,'pi_sma_2~pi_sma_3:pi_sma_4','Distribution','binomial','ResponseVar',...
-            'pi_sma_2','PredictorVars',{'pi_sma_1','pi_sma_3','pi_sma_4','pi_sma_5','pi_sma_6','pi_sma_7'});
+patient_table = ankle_Regression(patient_table,ankle_Idx,...
+    totallyMissingIdxs,feature_names);
 
 % - for bed imputation, I will simply take the average of all the available
 % data:
@@ -115,7 +119,7 @@ patient_table = bed_imputation(patient_table,bed_Idx,totallyMissingIdxs,...
     feature_names);
 
 % - We should use pis and lambdas as predictive features themselves!
-
+toc
 %% Cycle through totally missing recordings and impute
 
 rng(1)
