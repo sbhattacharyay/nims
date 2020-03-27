@@ -1,5 +1,5 @@
 function patient_table_output = wrist_elbow_Regression(patient_table,...
-    wrist_Idx,elbow_Idx,totallyMissingIdxs)
+    wrist_Idx,elbow_Idx,totallyMissingIdxs,feature_names)
 
 patient_table_output=patient_table;
 
