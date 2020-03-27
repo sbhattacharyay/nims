@@ -1,9 +1,0 @@
-function patient_table_output = missing_bed_data_imputation(...
-    patient_table,bed_Idx,totallyMissingIdxs)
-patient_table_output=patient_table;
-
-arm_TMI = totallyMissingIdxs(:,ismember(totallyMissingIdxs(1,:),[wrist_Idx,elbow_Idx]));
-temp_dim = size(arm_TMI);
-
-end
-
