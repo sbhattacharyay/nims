@@ -42,6 +42,36 @@ cd scripts/
 %through 62)
 [totallyMissingIdxs, sensors]=get_totallyMissingIdxs(sensor_count,...
     feature_count,sensors);
+
+%% Characterize percentage of missing data per time-series recording
+[missing_percentages,missing_time_series]
+
+missing_percentages=cellfun(@(x) sum(isnan(x),2)/length(t),sensors,'UniformOutput',false);
+
+stacked_matrix=[];
+sensors_missing=zeros(length(studyPatientsPY),length(t));
+
+for i = 1:(dim_of_sensors(1)-1)
+    curr_matrix = sensors{i+1,6};
+    stacked_matrix = [stacked_matrix; curr_matrix];
+    sensors_missing = sensors_missing+isnan(curr_matrix);
+end
+missing_time_series=sum(isnan(stacked_matrix))/(length(studyPatientsPY)*(dim_of_sensors(1)-1));
+
+x = [t(1) t(end)];
+y = [1 length(studyPatientsPY)];
+colormap(flipud(pink))
+
+image(x,y,sensors_missing,'CDataMapping','scaled')
+ax = gca;
+ax.FontSize = 14;
+datetick('x','HH PM');
+set(gca, 'FontName', 'Myriad Pro');
+h=colorbar;
+ylabel(h, 'No. of Sensors Missing','FontSize',14)
+set(gcf, 'Units', 'Inches', 'Position', [0, 0, 10, 10], 'PaperUnits', 'Inches', 'PaperSize', [10, 10])
+xlabel('Time of Day','FontWeight','bold','FontSize',20);
+ylabel('Patient No.','FontWeight','bold','FontSize',20);
 %% Identifying distributions of the features:
 % We first wish to identify whether the feature datapoints have any
 % association with time of day. We begin my calculating the mean and
@@ -126,4 +156,4 @@ sensors=impute_totallyMissingData(sensors,patient_table,...
     totallyMissingIdxs,feature_names,feature_thresholds,studyPatients,....
     studyPatientsPY,sortedPY,t);
 
-%% For the non-totally missing recordings, 
+%% For the non-totally missing recordings, we scrape the last 
