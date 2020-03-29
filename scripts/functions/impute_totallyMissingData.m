@@ -1,6 +1,6 @@
 function sensors_output = impute_totallyMissingData(sensors,...
     patient_table,totallyMissingIdxs,feature_names,feature_thresholds,....
-    studyPatients,studyPatientsPY,sortedPY,t)
+    studyPatientsPY,sortedPY,t)
 
 tic
 rng(1,'twister')
@@ -31,14 +31,14 @@ for i = 1:dim_TM(2)
     pi_var = ['pi_' char(feature_names(curr_featureIdx)) '_' ...
         num2str(curr_sensorIdx)];
     lambda_var = ['lambda_' char(feature_names(curr_featureIdx)) '_' ...
-        num2str(curr_sensorIdx)]; 
+        num2str(curr_sensorIdx)];
     
     curr_pi=patient_table{curr_pt_tableIdx,pi_var};
     curr_lambda=patient_table{curr_pt_tableIdx,lambda_var};
     
     draws=rand(1,length(t));
     curr_range = nm_ranges{curr_featureIdx};
-
+    
     NM_imputes=draws<curr_pi;
     NM_count = sum(NM_imputes);
     exp_imputes=~NM_imputes;

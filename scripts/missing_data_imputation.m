@@ -44,34 +44,10 @@ cd scripts/
     feature_count,sensors);
 
 %% Characterize percentage of missing data per time-series recording
-[missing_percentages,missing_time_series]
-
-missing_percentages=cellfun(@(x) sum(isnan(x),2)/length(t),sensors,'UniformOutput',false);
-
-stacked_matrix=[];
-sensors_missing=zeros(length(studyPatientsPY),length(t));
-
-for i = 1:(dim_of_sensors(1)-1)
-    curr_matrix = sensors{i+1,6};
-    stacked_matrix = [stacked_matrix; curr_matrix];
-    sensors_missing = sensors_missing+isnan(curr_matrix);
-end
-missing_time_series=sum(isnan(stacked_matrix))/(length(studyPatientsPY)*(dim_of_sensors(1)-1));
-
-x = [t(1) t(end)];
-y = [1 length(studyPatientsPY)];
-colormap(flipud(pink))
-
-image(x,y,sensors_missing,'CDataMapping','scaled')
-ax = gca;
-ax.FontSize = 14;
-datetick('x','HH PM');
-set(gca, 'FontName', 'Myriad Pro');
-h=colorbar;
-ylabel(h, 'No. of Sensors Missing','FontSize',14)
-set(gcf, 'Units', 'Inches', 'Position', [0, 0, 10, 10], 'PaperUnits', 'Inches', 'PaperSize', [10, 10])
-xlabel('Time of Day','FontWeight','bold','FontSize',20);
-ylabel('Patient No.','FontWeight','bold','FontSize',20);
+tic
+[missing_percentages,missing_time_series,missingIdxs] = ...
+    characterize_missing_data(sensors,t,studyPatientsPY,true);
+toc
 %% Identifying distributions of the features:
 % We first wish to identify whether the feature datapoints have any
 % association with time of day. We begin my calculating the mean and
@@ -150,10 +126,97 @@ patient_table = bed_imputation(patient_table,bed_Idx,totallyMissingIdxs,...
 
 % - We should use pis and lambdas as predictive features themselves!
 toc
-%% Cycle through totally missing recordings and impute
+%% Totally missing data imputation
 
 sensors=impute_totallyMissingData(sensors,patient_table,...
-    totallyMissingIdxs,feature_names,feature_thresholds,studyPatients,....
+    totallyMissingIdxs,feature_names,feature_thresholds,....
     studyPatientsPY,sortedPY,t);
 
-%% For the non-totally missing recordings, we scrape the last 
+%% Quasi-missing data imputation
+% for recordings with more than (50%) missing data, we impute by a similar
+% manner as the totally missing data:
+quasi_threshold=0.5;
+
+sensors = impute_quasiMissingData(sensors,patient_table,quasi_threshold,...
+    missing_percentages,missingIdxs,feature_names,feature_thresholds,....
+    studyPatientsPY,sortedPY);
+
+%% Remaining missing data imputation
+
+rng(1,'twister')
+
+tic
+rmngMissing=cellfun(@(x) x<quasi_threshold & x~=0, missing_percentages,...
+    'UniformOutput', false);
+dim_of_sensors=size(sensors);
+sensors_output=sensors;
+
+bp_nm_range = [0 feature_thresholds(1)];
+fe_nm_range = [feature_thresholds(2) 1.707];
+fp1_nm_range = [0 feature_thresholds(3)];
+fp2_nm_range = [0 feature_thresholds(4)];
+mf_nm_range = [feature_thresholds(5) 3.2];
+sma_nm_range = [0 feature_thresholds(6)];
+wav_nm_range = [0 feature_thresholds(7)];
+
+nm_ranges = {bp_nm_range,fe_nm_range,fp1_nm_range,fp2_nm_range,...
+    mf_nm_range,sma_nm_range,wav_nm_range};
+
+for sensIdx = 1:dim_of_sensors(1)
+    for featIdx = 1:dim_of_sensors(2)
+        curr_mat = sensors{sensIdx,featIdx};
+        curr_range = nm_ranges{featIdx};
+        pi_nam=['pi_' char(feature_names(featIdx)) '_' num2str(sensIdx)];
+        lambda_nam=['lambda_',char(feature_names(featIdx)),'_',...
+            num2str(sensIdx)];
+        currRmngMissing=rmngMissing{sensIdx,featIdx};
+        locA=find(currRmngMissing);
+        
+        currIdxArray=missingIdxs{sensIdx,featIdx}(currRmngMissing,:);
+        draws=rand(size(currIdxArray));
+        
+        for k = 1:length(locA)
+            missingTimes = t(currIdxArray(k,:));
+            nonMissingTimes=t(~currIdxArray(k,:));
+            
+            for l = 1:length(missingTimes)
+                [~,I]=mink(abs(missingTimes(l)-nonMissingTimes),720);
+                [~,trainIdx]=ismember(nonMissingTimes(I),t);
+                
+                train_vec=curr_mat(locA(k),trainIdx);
+                
+                if ismember(feature_names(featIdx),["freq_entropy","med_freq"])
+                    temp_pi=sum(train_vec>feature_thresholds(featIdx))/720;
+                    
+                    
+                else
+                    temp_pi=sum(train_vec<feature_thresholds(featIdx))/720;
+                    if draws(k,missingTimes(l))<temp_pi
+                        curr_mat(locA(k),missingTimes(l))=(curr_range(2)...
+                            -curr_range(1))*rand+curr_range(1);
+                        
+                    else
+                        
+                    end
+                end
+                
+            end
+            
+%             times_for_Fitting = arrayfun(@(x) find(abs(x-nonMissingTimes)==,720),missingTimes,'UniformOutput',false);
+%             
+%             nm_imputes = currIdxArray(k,:) & (draws(k,:)<pi_vars(k));
+%             exp_imputes = currIdxArray(k,:) & ~nm_imputes;
+%             curr_mat(locA(k),nm_imputes)=(curr_range(2)-curr_range(1))*...
+%                 rand(1,sum(nm_imputes))+curr_range(1);
+%             if ismember(feature_names(featIdx),["freq_entropy","med_freq"])
+%                 curr_mat(locA(k),exp_imputes)=curr_range(1)-random(...
+%                     'Exponential',lambda_vars(k),1,sum(exp_imputes));
+%             else
+%                 curr_mat(locA(k),exp_imputes)=random('Exponential',...
+%                     lambda_vars(k),1,sum(exp_imputes)) + curr_range(2);
+%             end
+        end
+        sensors_output{sensIdx,featIdx} = curr_mat;
+    end
+end
+toc
