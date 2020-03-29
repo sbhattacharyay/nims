@@ -143,80 +143,17 @@ sensors = impute_quasiMissingData(sensors,patient_table,quasi_threshold,...
 
 %% Remaining missing data imputation
 
-rng(1,'twister')
+% Warning: takes about ~15 minutes to run
 
-tic
-rmngMissing=cellfun(@(x) x<quasi_threshold & x~=0, missing_percentages,...
-    'UniformOutput', false);
-dim_of_sensors=size(sensors);
-sensors_output=sensors;
+trainWindow=60; % in minutes
 
-bp_nm_range = [0 feature_thresholds(1)];
-fe_nm_range = [feature_thresholds(2) 1.707];
-fp1_nm_range = [0 feature_thresholds(3)];
-fp2_nm_range = [0 feature_thresholds(4)];
-mf_nm_range = [feature_thresholds(5) 3.2];
-sma_nm_range = [0 feature_thresholds(6)];
-wav_nm_range = [0 feature_thresholds(7)];
+sensors = impute_rmngMissingData(sensors,quasi_threshold,trainWindow,...
+    missing_percentages,missingIdxs,feature_names,feature_thresholds,t);
 
-nm_ranges = {bp_nm_range,fe_nm_range,fp1_nm_range,fp2_nm_range,...
-    mf_nm_range,sma_nm_range,wav_nm_range};
+cd ..
+cd motion_feature_data/
 
-for sensIdx = 1:dim_of_sensors(1)
-    for featIdx = 1:dim_of_sensors(2)
-        curr_mat = sensors{sensIdx,featIdx};
-        curr_range = nm_ranges{featIdx};
-        pi_nam=['pi_' char(feature_names(featIdx)) '_' num2str(sensIdx)];
-        lambda_nam=['lambda_',char(feature_names(featIdx)),'_',...
-            num2str(sensIdx)];
-        currRmngMissing=rmngMissing{sensIdx,featIdx};
-        locA=find(currRmngMissing);
-        
-        currIdxArray=missingIdxs{sensIdx,featIdx}(currRmngMissing,:);
-        draws=rand(size(currIdxArray));
-        
-        for k = 1:length(locA)
-            missingTimes = t(currIdxArray(k,:));
-            nonMissingTimes=t(~currIdxArray(k,:));
-            
-            for l = 1:length(missingTimes)
-                [~,I]=mink(abs(missingTimes(l)-nonMissingTimes),720);
-                [~,trainIdx]=ismember(nonMissingTimes(I),t);
-                
-                train_vec=curr_mat(locA(k),trainIdx);
-                
-                if ismember(feature_names(featIdx),["freq_entropy","med_freq"])
-                    temp_pi=sum(train_vec>feature_thresholds(featIdx))/720;
-                    
-                    
-                else
-                    temp_pi=sum(train_vec<feature_thresholds(featIdx))/720;
-                    if draws(k,missingTimes(l))<temp_pi
-                        curr_mat(locA(k),missingTimes(l))=(curr_range(2)...
-                            -curr_range(1))*rand+curr_range(1);
-                        
-                    else
-                        
-                    end
-                end
-                
-            end
-            
-%             times_for_Fitting = arrayfun(@(x) find(abs(x-nonMissingTimes)==,720),missingTimes,'UniformOutput',false);
-%             
-%             nm_imputes = currIdxArray(k,:) & (draws(k,:)<pi_vars(k));
-%             exp_imputes = currIdxArray(k,:) & ~nm_imputes;
-%             curr_mat(locA(k),nm_imputes)=(curr_range(2)-curr_range(1))*...
-%                 rand(1,sum(nm_imputes))+curr_range(1);
-%             if ismember(feature_names(featIdx),["freq_entropy","med_freq"])
-%                 curr_mat(locA(k),exp_imputes)=curr_range(1)-random(...
-%                     'Exponential',lambda_vars(k),1,sum(exp_imputes));
-%             else
-%                 curr_mat(locA(k),exp_imputes)=random('Exponential',...
-%                     lambda_vars(k),1,sum(exp_imputes)) + curr_range(2);
-%             end
-        end
-        sensors_output{sensIdx,featIdx} = curr_mat;
-    end
-end
-toc
+save('imputed_complete_sensor_data.mat','sensors','feature_names');
+
+cd ..
+cd scripts/

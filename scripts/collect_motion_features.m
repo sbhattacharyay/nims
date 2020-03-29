@@ -51,3 +51,6 @@ feature_names = [feature_names(1:2),strcat(feature_names(3),"1"),strcat(feature_
 
 %%  Saving the data
 save('complete_sensor_data.mat','sensors','feature_names');
+
+cd ..
+cd scripts/
