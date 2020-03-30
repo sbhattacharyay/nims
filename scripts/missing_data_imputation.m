@@ -141,6 +141,11 @@ sensors = impute_quasiMissingData(sensors,patient_table,quasi_threshold,...
     missing_percentages,missingIdxs,feature_names,feature_thresholds,....
     studyPatientsPY,sortedPY);
 
+cd ..
+cd clinical_data/
+save('patient_table.mat','patient_table');
+cd ..
+cd scripts/
 %% Remaining missing data imputation
 
 % Warning: takes about ~15 minutes to run
