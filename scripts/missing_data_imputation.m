@@ -10,8 +10,6 @@ addpath('functions/')
 tic
 cd ..
 cd motion_feature_data
-path = pwd;
-directory = dir;
 load('complete_sensor_data.mat');
 toc
 
@@ -19,13 +17,13 @@ dim_of_sensors=size(sensors);
 sensor_count = dim_of_sensors(1);
 feature_count = dim_of_sensors(2);
 
-studyPatientsPY = [2, 3,	4,	5,	6,	7,	8,	9,	10,	11,	12,	13, ...
+studyPatientsPY = [2,3,4,5,	6,	7,	8,	9,	10,	11,	12,	13, ...
     14,	15,	16,	17,	18,	19,	20,	21,	22,	23,	24,	26,	27,	28,	29,	30, ....
     31,	32,	33,	34,	35,	36,	37,	38,	39,	40,	41,	42,	43,	49,	51,	46, .....
     47,	48,	50,	52,	53,	54,	55,	56,	57,	59,	60,	61,	62,	63,	64,	65, ......
     67,	68];
 
-% Test for Git
+[sortedPY,sort_order] = sort(studyPatientsPY);
 
 % Get Time Point Labels (in datenum format)
 cd band_power
@@ -34,7 +32,7 @@ t = bandPower{2, 1};
 t_copy = t;
 clear bandPower
 cd ..
-cd .. 
+cd ..
 cd scripts/
 %% Identify rows that are completely missing data (and replace with NaN)
 %contains indices of the totally missing time series as follows:
@@ -44,6 +42,12 @@ cd scripts/
 %through 62)
 [totallyMissingIdxs, sensors]=get_totallyMissingIdxs(sensor_count,...
     feature_count,sensors);
+
+%% Characterize percentage of missing data per time-series recording
+tic
+[missing_percentages,missing_time_series,missingIdxs] = ...
+    characterize_missing_data(sensors,t,studyPatientsPY,true);
+toc
 %% Identifying distributions of the features:
 % We first wish to identify whether the feature datapoints have any
 % association with time of day. We begin my calculating the mean and
@@ -66,46 +70,95 @@ plot_TOD_Diff(t,TOD_Diff)
 plot_TOD_Hist(TOD_Means)
 
 %% Finding no motion thresholds for each feature based on SMA:
+
+%NOTE: section takes about 20 seconds to run
+
 SMA_threshold=0.1;
-feature_thresholds=find_noMotion_thresholds(SMA_threshold,sensors,feature_names);
+feature_thresholds=find_noMotion_thresholds(SMA_threshold,sensors,...
+    feature_names);
 
-%% Impute the totally-missing rows
-%First, given our newly derived thresholds, we calculate the "no motion"
-%for each of our patients per sensor per feature:
+%% Fit Zero-inflated poisson distribution to all feature spaces
 
-nm_percentages_for_features = {};
+% NOTE: takes about 4.5 seconds to run
 
-for j = 1:dim_of_sensors(2)
-    temp_feature_data = sensors(:,j);
-    k = feature_thresholds(j);
-    if j == 2 || j == 5
-        nm_percentages_for_features{j,1}=cellfun(@(x) noMotionFE_th(x,k), ...
-            temp_feature_data,'UniformOutput',false);
-    else
-        nm_percentages_for_features{j,1}=cellfun(@(x) noMotion_th(x,k), ...
-            temp_feature_data,'UniformOutput',false);
-    end
-end
+cd ..
+cd clinical_data/
+load('clinical_extraction_output.mat')
+cd ..
+cd scripts/
 
+clearvars dc_dataset yr_dataset dc_dataset_labels ...
+    yr_dataset_labels boxcox_lambdas zscore_mus zscore_sigs ....
+    imputeDataset
 
-% Then, we cycle through the completely missing time series
-dim_TM = size(totallyMissingIdxs);
+patient_table = fit_zip(sensors,patient_table,feature_thresholds,...
+    sort_order,feature_names);
+%% Regression Strategy:
+% Takes about 3-4 seconds to run
+tic
+% NOTES:
+% - for Wrist and Elbow, we use the other available arm sensor as the best
+% predictor
 
-bp_nm_range = [0 feature_thresholds(1)];
-fe_nm_range = [0 feature_thresholds(6)];
-sma_nm_range = [0 feature_thresholds(6)];
-sma_nm_range = [0 feature_thresholds(6)];
-sma_nm_range=[0 feature_thresholds(6)];
-sma_nm_range = [0 feature_thresholds(6)];
-wav_nm_range = [0 feature_thresholds(7)];
+% wrist indices (default 4 and 7):
+wrist_Idx = [4,7];
+% elbow indices (defult 3 and 6):
+elbow_Idx = [3,6];
 
-for i = 1:dim_TM(2)
-    sensIdx = totallyMissingIdxs(1,i);
-    featIdx = totallyMissingIdxs(2,i);
-    ptIdx = totallyMissingIdxs(3,i);
-    draws=rand(1,length(t));
-    curr_perc=nm_percentages_for_features{featIdx,1}{sensIdx,1};
-    NM_imputes=draws<curr_perc(ptIdx);
-    curr_mat=sensors{sensIdx,featIdx};
-    curr_mat(ptIdx,NM_imputes)= 0;
-end
+patient_table=wrist_elbow_Regression(patient_table,wrist_Idx,elbow_Idx,...
+    totallyMissingIdxs,feature_names);
+
+% - for ankle, it seems like none of the available predictors pass the
+% predictor t-test, so we will simply use wrist, elbow, and interaction
+% terms of the available side
+
+ankle_Idx = [2,5];
+
+patient_table = ankle_Regression(patient_table,ankle_Idx,...
+    totallyMissingIdxs,feature_names);
+
+% - for bed imputation, I will simply take the average of all the available
+% data:
+bed_Idx = 1;
+
+patient_table = bed_imputation(patient_table,bed_Idx,totallyMissingIdxs,...
+    feature_names);
+
+% - We should use pis and lambdas as predictive features themselves!
+toc
+%% Totally missing data imputation
+
+sensors=impute_totallyMissingData(sensors,patient_table,...
+    totallyMissingIdxs,feature_names,feature_thresholds,....
+    studyPatientsPY,sortedPY,t);
+
+%% Quasi-missing data imputation
+% for recordings with more than (50%) missing data, we impute by a similar
+% manner as the totally missing data:
+quasi_threshold=0.5;
+
+sensors = impute_quasiMissingData(sensors,patient_table,quasi_threshold,...
+    missing_percentages,missingIdxs,feature_names,feature_thresholds,....
+    studyPatientsPY,sortedPY);
+
+cd ..
+cd clinical_data/
+save('patient_table.mat','patient_table');
+cd ..
+cd scripts/
+%% Remaining missing data imputation
+
+% Warning: takes about ~15 minutes to run
+
+trainWindow=60; % in minutes
+
+sensors = impute_rmngMissingData(sensors,quasi_threshold,trainWindow,...
+    missing_percentages,missingIdxs,feature_names,feature_thresholds,t);
+
+cd ..
+cd motion_feature_data/
+
+save('imputed_complete_sensor_data.mat','sensors','feature_names');
+
+cd ..
+cd scripts/

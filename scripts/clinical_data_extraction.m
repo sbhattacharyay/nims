@@ -10,6 +10,7 @@
 % March 2019; Last revision: 29-January-2020
 %% ------------- BEGIN CODE --------------
 % Load data from most recent patient clinical data spreadsheet
+addpath('functions/')
 cd ..
 cd clinical_data
 
@@ -33,7 +34,6 @@ studyPatients = [2	3	4	5	6	7	8	9	10	11	12	13	14	15 ...
     16	17	18	19	20	21	22	23	24	26	27	28	29	30	31	32	33 ....
     34	35	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50 .....
     51	52	53	54	55	58	59	60	61	62	63	64	66	67];
-
 %% Extract Outcome Information from Patient Dataset
 
 fav_threshold = 4; % GOSE >= fav_threshold is favorable
@@ -123,9 +123,20 @@ yr_dataset = [imputeDataset(~noYearOutcomeAvailable,:) ...
     yr_death(~noYearOutcomeAvailable) ....
     yr_outcomes(~noYearOutcomeAvailable)];
 
-dc_dataset_labels=["Age" "Gender" "APACHE" "GCS_{en}" "Death" "GOSE"];
-yr_dataset_labels=["Age" "Gender" "APACHE" "GCS_{en}" "GCS_{dis}" ...
-    "Death" "GOSE"];
+all_patient_dataset = [imputeDataset,dc_death,dc_outcomes,yr_death, ...
+    yr_outcomes];
+
+dc_dataset_labels=["Age","Sex","CVA","ICH","SAH","BT","SDH","TBI",...
+    "APACHE","GCS_{en}","Death","GOSE"];
+yr_dataset_labels=["Age","Sex","CVA","ICH","SAH","BT","SDH","TBI",... 
+    "APACHE","GCS_{en}","GCS_{dis}","Death","GOSE"];
+
+patient_table_labels=["Age","Sex","CVA","ICH","SAH","BT","SDH","TBI",...
+    "APACHE","GCS_en","GCS_dis","Death","GOSE","Death_1yr", ....
+    "GOSE_1yr"];
+
+patient_table=array2table(all_patient_dataset,'VariableNames', ...
+    patient_table_labels,'RowNames',string(studyPatients));
 
 boxcox_lambdas = [lam_age,lam_apache,lam_gcs_en,lam_gcs_dis];
 zscore_mus = [mu_age,mu_apache,mu_gcs_en,mu_gcs_dis];
@@ -133,9 +144,12 @@ zscore_sigs = [sig_age,sig_apache,sig_gcs_en,sig_gcs_dis];
 
 clearvars -except dc_dataset yr_dataset dc_dataset_labels ...
     yr_dataset_labels boxcox_lambdas zscore_mus zscore_sigs ....
-    imputeDataset studyPatients
+    imputeDataset studyPatients patient_table
 
 save('clinical_extraction_output.mat')
+
+cd ..
+cd scripts
 %% Visualize distribution of transformed (Box-Cox) clinical variables
 figure
 for i =1:5
@@ -161,44 +175,5 @@ title('Died within 1 year of discharge')
 subplot(2,2,4);
 pie(categorical(yr_dataset(:,(end))))
 title('GOSE >= 4 within 1 year of discharge')
-%% Weighted KNN Function
-function filledMatrix = wKNN_impute(data)
-corrs =corrcoef(data,'Rows','pairwise');
-distances = zeros(length(data));
-for i = 1:length(data)
-    v_1 = data(i,:);
-    for j = 1:length(data)
-        v_2= data(j,:);
-        if i == j
-            continue
-        else
-            d_ij = abs(v_1 - v_2);
-            missVar = isnan(d_ij);
-            temp_corrs = corrs(~missVar,~missVar);
-            distances(i,j) = sqrt(d_ij(~missVar)*temp_corrs*d_ij(~missVar)');
-            distances(j,i) = sqrt(d_ij(~missVar)*temp_corrs*d_ij(~missVar)');
-        end
-    end
-end
-filledMatrix = data;
-[missRow, ~] = find(isnan(data));
-for i = 1:length(missRow)
-    [missRow, missCol] = find(isnan(data));
-    varMissing = missCol(i);
-    currPat = missRow(i);
-    missCol(i) = 0;
-    missRow(i) = 0;
-    tempDistances = distances;
-    tempDistances(missRow(find(missCol == varMissing)),:)=NaN;
-    tempDistances(:,missRow(find(missCol == varMissing)))=NaN;
-    [B,I] = mink(tempDistances(currPat,:),8);
-    B(find(I == currPat))=[];
-    I(find(I == currPat))=[];
-    weights = 1./(B.^2);
-    weights = weights./sum(weights);
-    imputeValue = dot(weights,data(I,varMissing));
-    filledMatrix(currPat,varMissing)=imputeValue;
-end
-end
 %------------- END OF CODE --------------
 

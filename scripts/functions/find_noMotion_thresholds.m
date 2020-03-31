@@ -47,7 +47,7 @@ min_norm = realmax;
 opt_k = NaN;
 
 for k = 1.66:0.001:1.7
-    feat_percentages = cellfun(@(x) noMotionFE_th(x,k),...
+    feat_percentages = cellfun(@(x) noMotion_th_neg(x,k),...
         temp_feature_data,'UniformOutput',false);
     curr_norm=norm_calc(feat_percentages,SMA_nm_percentages);
     if curr_norm < min_norm
@@ -98,7 +98,7 @@ min_norm = realmax;
 opt_k = NaN;
 
 for k = 2.5:0.01:3.5
-    feat_percentages = cellfun(@(x) noMotionFE_th(x,k),...
+    feat_percentages = cellfun(@(x) noMotion_th_neg(x,k),...
         temp_feature_data,'UniformOutput',false);
     curr_norm=norm_calc(feat_percentages,SMA_nm_percentages);
     if curr_norm < min_norm

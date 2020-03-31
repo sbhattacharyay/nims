@@ -1,4 +1,4 @@
-function nm_A = noMotionFE_th(A,th)
+function nm_A = noMotion_th_neg(A,th)
 %   Finds percentage of values in each row that are below threshold
 dimA = size(A);
 nm_A = NaN(dimA(1),1);
