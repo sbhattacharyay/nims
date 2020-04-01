@@ -56,7 +56,7 @@ for i = 1:dim_TM(2)
         curr_mat(curr_pt_PYIdx,exp_imputes)=random('Exponential',...
             curr_lambda,1,exp_count) + curr_range(2);
     end
-    
+    sensors{curr_sensorIdx,curr_featureIdx}=curr_mat;
     sensors_output{curr_sensorIdx,curr_featureIdx}=curr_mat;
 end
 toc

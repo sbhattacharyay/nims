@@ -46,7 +46,7 @@ cd scripts/
 %% Characterize percentage of missing data per time-series recording
 tic
 [missing_percentages,missing_time_series,missingIdxs] = ...
-    characterize_missing_data(sensors,t,studyPatientsPY,true);
+    characterize_missing_data(sensors,t,studyPatientsPY,false);
 toc
 %% Identifying distributions of the features:
 % We first wish to identify whether the feature datapoints have any
@@ -140,6 +140,7 @@ quasi_threshold=0.5;
 sensors = impute_quasiMissingData(sensors,patient_table,quasi_threshold,...
     missing_percentages,missingIdxs,feature_names,feature_thresholds,....
     studyPatientsPY,sortedPY);
+%% Save most updated clinical patient table
 
 cd ..
 cd clinical_data/

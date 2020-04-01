@@ -49,6 +49,7 @@ for sensIdx = 1:dim_of_sensors(1)
                     lambda_vars(k),1,sum(exp_imputes)) + curr_range(2);
             end 
         end
+        sensors{sensIdx,featIdx} = curr_mat;
         sensors_output{sensIdx,featIdx} = curr_mat;
     end
 end

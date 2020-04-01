@@ -74,6 +74,7 @@ for sensIdx = 1:dim_of_sensors(1)
                 end
             end
         end
+        sensors{sensIdx,featIdx} = curr_mat;        
         sensors_output{sensIdx,featIdx} = curr_mat;
     end
 end
