@@ -46,7 +46,7 @@ cd scripts/
 %% Characterize percentage of missing data per time-series recording
 tic
 [missing_percentages,missing_time_series,missingIdxs] = ...
-    characterize_missing_data(sensors,t,studyPatientsPY,false);
+    characterize_missing_data(sensors,t,studyPatientsPY,true);
 toc
 %% Identifying distributions of the features:
 % We first wish to identify whether the feature datapoints have any
