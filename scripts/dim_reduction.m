@@ -1,3 +1,10 @@
+%% Authors: Matthew Wang, B.S. Candidate, Shubhayu Bhattacharyay, B.S. Candidate
+% Department of Biomedical Engineering
+% Department of Applied Mathematics and Statistics
+% Whiting School of Engineering, Johns Hopkins University
+% email address: shubhayu@jhu.edu
+% March 2019; Last revision: 20-Feb-2020
+%% ------------- BEGIN CODE --------------
 clear; clc
 
 studyPatients = [2,3,4,5,6,7,8,9,10,11,12,13,14,15, ...
@@ -10,18 +17,18 @@ studyPatientsPY = [2,3,4,5,6,7,8,9,10,11,12,13, ...
   47,48,50,52,53,54,55,56,57,59,60,61,62,63,64,65, ......
   67,68];
 
-% Get the folder to complete_sensor_data.mat (motion_feature_data)
-path1 = uigetdir;
-% Get the folder to patient_table.mat (clinical_data)
-path2 = uigetdir;
+% % Get the folder to complete_sensor_data.mat (motion_feature_data)
+% path1 = uigetdir;
+% % Get the folder to patient_table.mat (clinical_data)
+% path2 = uigetdir;
 
 % Create an output directory for the figures
-output_dir = 'PCA Rank Death 1yr';
+output_dir = '../plots/PCA Rank Death 1yr';
 mkdir(output_dir)
 
 % Load in the imputed data and clinical table
-load([path1 filesep 'imputed_complete_sensor_data.mat'])
-load([path2 filesep 'patient_table.mat'])
+load('../motion_feature_data/imputed_complete_sensor_data.mat')
+load('../clinical_data/patient_table.mat')
 
 % Reorder to resolve the mismatch between accelerometer and clinical data
 [~,sortOrder]=sort(studyPatientsPY);
@@ -117,7 +124,7 @@ for i = 1:7
     close('all')
     clc
 end
-save([pwd filesep output_dir filesep 'explained.mat'],'tot_explained')
+save([output_dir '/explained.mat'],'tot_explained')
 
 % Run RICA model, return 3 features
 % Md1 = rica(band_power,3);
