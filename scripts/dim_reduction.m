@@ -18,12 +18,12 @@ studyPatientsPY = [2,3,4,5,6,7,8,9,10,11,12,13, ...
   67,68];
 
 % % Get the folder to complete_sensor_data.mat (motion_feature_data)
-% path1 = uigetdir;
+path1 = uigetdir;
 % % Get the folder to patient_table.mat (clinical_data)
-% path2 = uigetdir;
+path2 = uigetdir;
 
 % Create an output directory for the figures
-output_dir = '../plots/PCA Rank Death 1yr';
+output_dir = '../plots/Death 1yr';
 mkdir(output_dir)
 
 % Load in the imputed data and clinical table
@@ -55,7 +55,7 @@ colors(rowsToSetRed,1) = 1;
 %         curr_mat = sensors{row,col};
 %         
 %         % Ranks the matrix
-%         curr_mat = sort(curr_mat','descend')';
+%         % curr_mat = sort(curr_mat','descend')';
 %         
 %         [coeff,score,latent,tsquared,explained] = pca(curr_mat);
 % 
@@ -99,13 +99,13 @@ for row = 1:7
 end
 
 % Rank sort
-band_power = sort(band_power','descend')';
-freq_entropy = sort(freq_entropy','descend')';
-freq_pairs1 = sort(freq_pairs1','descend')';
-freq_pairs2 = sort(freq_pairs2','descend')';
-med_freq = sort(med_freq','descend')';
-sma = sort(sma','descend')';
-wavelets = sort(wavelets','descend')';
+% band_power = sort(band_power','descend')';
+% freq_entropy = sort(freq_entropy','descend')';
+% freq_pairs1 = sort(freq_pairs1','descend')';
+% freq_pairs2 = sort(freq_pairs2','descend')';
+% med_freq = sort(med_freq','descend')';
+% sma = sort(sma','descend')';
+% wavelets = sort(wavelets','descend')';
 
 all = {band_power; freq_entropy; freq_pairs1; freq_pairs2; med_freq; sma; wavelets};
 tot_explained = zeros(7,3);
