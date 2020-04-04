@@ -44,6 +44,8 @@ rowsToSetRed = death_1yr == 1;
 colors(rowsToSetBlue,3) = 1;
 colors(rowsToSetRed,1) = 1;
 
+%%
+
 % tot_explained = cell(7,7);
 % % Sensor by sensor analysis
 % for row = 2:7
@@ -73,6 +75,7 @@ colors(rowsToSetRed,1) = 1;
 % 
 % save([pwd filesep output_dir filesep 'explained.mat'],'tot_explained')
 
+%%
 
 % Aggregate all sensors together
 band_power = zeros(62,12959*7);
@@ -124,13 +127,40 @@ for i = 1:7
     close('all')
     clc
 end
-save([output_dir '/explained.mat'],'tot_explained')
+save([pwd filesep output_dir filesep 'explained.mat'],'tot_explained')
 
-% Run RICA model, return 3 features
-% Md1 = rica(band_power,3);
-% Md2 = rica(freq_entropy,3);
-% Md3 = rica(freq_pairs1,3);
-% Md4 = rica(freq_pairs2,3);
-% Md5 = rica(med_freq,3);
-% Md6 = rica(sma,3);
-% Md7 = rica(wavelets,3);
+%%
+
+% % Aggregate just the wrist and ankle
+% band_power_WA = zeros(62,12959*4);
+% freq_entropy_WA = zeros(62,12959*4);
+% freq_pairs1_WA = zeros(62,12959*4);
+% freq_pairs2_WA = zeros(62,12959*4);
+% med_freq_WA = zeros(62,12959*4);
+% sma_WA = zeros(62,12959*4);
+% wavelets_WA = zeros(62,12959*4);
+% 
+% counter = 1;
+% for row = [4 7]
+%     band_power_WA(:,(counter-1)*12959+1:counter*12959) = sensors{row,1};
+%     freq_entropy_WA(:,(counter-1)*12959+1:counter*12959) = sensors{row,2};
+%     freq_pairs1_WA(:,(counter-1)*12959+1:counter*12959) = sensors{row,3};
+%     freq_pairs2_WA(:,(counter-1)*12959+1:counter*12959) = sensors{row,4};
+%     med_freq_WA(:,(counter-1)*12959+1:counter*12959) = sensors{row,5};
+%     sma_WA(:,(counter-1)*12959+1:counter*12959) = sensors{row,6};
+%     wavelets_WA(:,(counter-1)*12959+1:counter*12959) = sensors{row,7};
+%     counter = counter + 1;
+% end
+% % Rank Sort
+% band_power_WA = sort(band_power_WA','descend')';
+% freq_entropy_WA = sort(freq_entropy_WA','descend')';
+% freq_pairs1_WA = sort(freq_pairs1_WA','descend')';
+% freq_pairs2_WA = sort(freq_pairs2_WA','descend')';
+% med_freq_WA = sort(med_freq_WA','descend')';
+% sma_WA = sort(sma_WA','descend')';
+% wavelets_WA = sort(wavelets_WA','descend')';
+% 
+% all_WA = {band_power_WA, freq_entropy_WA, freq_pairs1_WA, freq_pairs2_WA, med_freq_WA, sma_WA, wavelets_WA};
+% 
+% % Run RICA model, return 3 features
+% Md1 = rica(all_WA{1},3);
