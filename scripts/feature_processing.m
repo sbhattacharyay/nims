@@ -7,7 +7,7 @@
 %% ------------- BEGIN CODE --------------
 %Set Directory and Procure File Names
 tic
-cd 'C:\Users\Shubhayu\Documents\Shubhayu_Projects\Johns Hopkins University\ICU Motion Study\MATLAB\motion_feature_data'
+cd '..\motion_feature_data'
 path = pwd;
 directory = dir;
 [a,b,c,d,e,f]=directory(3:end).name;

@@ -77,6 +77,8 @@ SMA_threshold=0.1;
 feature_thresholds=find_noMotion_thresholds(SMA_threshold,sensors,...
     feature_names);
 
+save('../motion_feature_data/feature_thresholds.mat','feature_thresholds');
+
 %% Fit Zero-inflated poisson distribution to all feature spaces
 
 % NOTE: takes about 4.5 seconds to run
@@ -93,6 +95,7 @@ clearvars dc_dataset yr_dataset dc_dataset_labels ...
 
 patient_table = fit_zip(sensors,patient_table,feature_thresholds,...
     sort_order,feature_names);
+
 %% Regression Strategy:
 % Takes about 3-4 seconds to run
 tic
