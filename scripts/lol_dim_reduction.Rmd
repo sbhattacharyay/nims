@@ -16,6 +16,7 @@ library(tidyverse)
 library(ggplot2)
 library(plotly)
 library(naniar)
+library(MASS)
 if(!exists("sensors")) {
   sensors<-readMat('../motion_feature_data/imputed_complete_sensor_data.mat')$sensors
 }
@@ -110,5 +111,18 @@ ggplotly(viz)
 ```{r}
 plot_ly(x=data$x1, y=data$x2, z=data$x3, type="scatter3d", mode="markers", color=data$y)
 
+```
+
+```{r}
+liney<-lda(band_powerLOL_GOSE$Xr,PYpatient_table$GOSE)
+result <- predict(liney, band_powerLOL_GOSE$Xr)
+lhat <- 1 - sum(result$class == PYpatient_table$GOSE)/length(PYpatient_table$GOSE)
+
+data <- data.frame(x1=result$x[,1], y=PYpatient_table$GOSE)
+ggplot(data, aes(x=x1, fill=y)) +
+  geom_density(adjust=1.5, alpha=0.6) +
+  xlab("x1") +
+  ylab("Density") +
+  ggtitle(sprintf("LOL, LDA, L = %.2f", lhat))
 
 ```
