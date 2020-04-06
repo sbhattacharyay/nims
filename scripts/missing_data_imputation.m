@@ -145,6 +145,7 @@ sensors = impute_quasiMissingData(sensors,patient_table,quasi_threshold,...
 cd ..
 cd clinical_data/
 save('patient_table.mat','patient_table');
+writetable(patient_table,'patient_table.csv')
 cd ..
 cd scripts/
 %% Remaining missing data imputation
