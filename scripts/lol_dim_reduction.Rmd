@@ -18,7 +18,7 @@ library(plotly)
 library(naniar)
 library(MASS)
 if(!exists("sensors")) {
-  sensors<-readMat('../motion_feature_data/imputed_complete_sensor_data.mat')$sensors
+  sensors<-readMat('../motion_feature_data/bed_corrected_imputed_complete_sensor_data.mat')$bed.corrected.sensors
 }
 
 na_strings <- c("NA", "N A", "N / A", "N/A", "N/ A", "Not Available", "NOt available","NaN")
@@ -41,15 +41,24 @@ PY_1yr_patient_table<-PYpatient_table %>% drop_na(Death_1yr)
 
 ## Organize `sensors` data
 
-```{r}
-temp_var<-do.call(rbind,sensors)
+Please note that the following chunk takes about 4.5 minutes to run
 
-band_powerFeats<-do.call(cbind,temp_var[1:7])
-freq_entropyFeats<-do.call(cbind,temp_var[8:14])
-freq_pairsFeats<-do.call(cbind,temp_var[15:28])
-med_freqFeats<-do.call(cbind,temp_var[29:35])
-smaFeats<-do.call(cbind,temp_var[36:42])
-waveletsFeats<-do.call(cbind,temp_var[43:49])
+```{r}
+start_time <- Sys.time()
+
+temp_var<-do.call(rbind,sensors)
+ranked_temp_var<-lapply(temp_var, function(x) t(apply(x,1,sort,decreasing = TRUE)))
+fft_temp_var<-lapply(temp_var, function(x) abs(t(mvfft(t(x)))))
+
+band_powerFeats<-do.call(cbind,temp_var[1:6])
+freq_entropyFeats<-do.call(cbind,temp_var[7:12])
+freq_pairsFeats<-do.call(cbind,temp_var[13:24])
+med_freqFeats<-do.call(cbind,temp_var[25:30])
+smaFeats<-do.call(cbind,temp_var[31:36])
+waveletsFeats<-do.call(cbind,temp_var[37:42])
+
+end_time <- Sys.time()
+end_time - start_time
 ```
 
 ## Run Linear Optimal Low Rank Projection
