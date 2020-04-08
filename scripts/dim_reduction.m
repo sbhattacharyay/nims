@@ -23,11 +23,11 @@ path1 = uigetdir;
 path2 = uigetdir;
 
 % Create an output directory for the figures
-output_dir = '../plots/Death 1yr';
+output_dir = '../plots/Death_1yr';
 mkdir(output_dir)
 
 % Load in the imputed data and clinical table
-load('../motion_feature_data/imputed_complete_sensor_data.mat')
+load('../motion_feature_data/bed_corrected_imputed_complete_sensor_data.mat')
 load('../clinical_data/patient_table.mat')
 
 % Reorder to resolve the mismatch between accelerometer and clinical data
@@ -78,40 +78,41 @@ colors(rowsToSetRed,1) = 1;
 %%
 
 % Aggregate all sensors together
-band_power = zeros(62,12959*7);
-freq_entropy = zeros(62,12959*7);
-freq_pairs1 = zeros(62,12959*7);
-freq_pairs2 = zeros(62,12959*7);
-med_freq = zeros(62,12959*7);
-sma = zeros(62,12959*7);
-wavelets = zeros(62,12959*7);
+band_power = zeros(62,12959*6);
+freq_entropy = zeros(62,12959*6);
+freq_pairs1 = zeros(62,12959*6);
+freq_pairs2 = zeros(62,12959*6);
+med_freq = zeros(62,12959*6);
+sma = zeros(62,12959*6);
+wavelets = zeros(62,12959*6);
 
 counter = 1;
-for row = 1:7
-    band_power(:,(counter-1)*12959+1:counter*12959) = sensors{row,1};
-    freq_entropy(:,(counter-1)*12959+1:counter*12959) = sensors{row,2};
-    freq_pairs1(:,(counter-1)*12959+1:counter*12959) = sensors{row,3};
-    freq_pairs2(:,(counter-1)*12959+1:counter*12959) = sensors{row,4};
-    med_freq(:,(counter-1)*12959+1:counter*12959) = sensors{row,5};
-    sma(:,(counter-1)*12959+1:counter*12959) = sensors{row,6};
-    wavelets(:,(counter-1)*12959+1:counter*12959) = sensors{row,7};
+for row = 1:6
+    band_power(:,(counter-1)*12959+1:counter*12959) = bed_corrected_sensors{row,1};
+    freq_entropy(:,(counter-1)*12959+1:counter*12959) = bed_corrected_sensors{row,2};
+    freq_pairs1(:,(counter-1)*12959+1:counter*12959) = bed_corrected_sensors{row,3};
+    freq_pairs2(:,(counter-1)*12959+1:counter*12959) = bed_corrected_sensors{row,4};
+    med_freq(:,(counter-1)*12959+1:counter*12959) = bed_corrected_sensors{row,5};
+    sma(:,(counter-1)*12959+1:counter*12959) = bed_corrected_sensors{row,6};
+    wavelets(:,(counter-1)*12959+1:counter*12959) = bed_corrected_sensors{row,7};
     counter = counter + 1;
 end
 
+freq_pairs = [freq_pairs1 freq_pairs2];
 % Rank sort
-% band_power = sort(band_power','descend')';
-% freq_entropy = sort(freq_entropy','descend')';
-% freq_pairs1 = sort(freq_pairs1','descend')';
-% freq_pairs2 = sort(freq_pairs2','descend')';
-% med_freq = sort(med_freq','descend')';
-% sma = sort(sma','descend')';
-% wavelets = sort(wavelets','descend')';
+band_power = sort(band_power','descend')';
+freq_entropy = sort(freq_entropy','descend')';
+freq_pairs = sort(freq_pairs','descend')';
+med_freq = sort(med_freq','descend')';
+sma = sort(sma','descend')';
+wavelets = sort(wavelets','descend')';
 
-all = {band_power; freq_entropy; freq_pairs1; freq_pairs2; med_freq; sma; wavelets};
-tot_explained = zeros(7,3);
+all = {band_power; freq_entropy; freq_pairs; med_freq; sma; wavelets};
+feature_names = {'band_power'; 'freq_entropy'; 'freq_pairs'; 'med_freq'; 'sma'; 'wavelets'};
+tot_explained = zeros(6,3);
 % Run the PCA
-for i = 1:7
-    feature = feature_names(i);
+for i = 1:6
+    feature = feature_names{i};
     
     [coeff,score,latent,tsquared,explained] = pca(all{i});
     tot_explained(i,:) = explained(1:3);
