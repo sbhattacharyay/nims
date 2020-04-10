@@ -76,6 +76,14 @@ med_freqLOL_GOSE <- lol.project.lol(med_freqFeats, Y, r)
 smaLOL_GOSE <- lol.project.lol(smaFeats, Y, r)
 waveletsLOL_GOSE <- lol.project.lol(waveletsFeats, Y, r)
 
+# 5 fold cross validation
+bandPowerLOL_GOSE_kfold <- lol.xval.eval(band_powerFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+freq_entropyLOL_GOSE_kfold <- lol.xval.eval(freq_entropyFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+freq_pairsLOL_GOSE_kfold <- lol.xval.eval(freq_pairsFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+med_freqLOL_GOSE_kfold <- lol.xval.eval(med_freqFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+smaLOL_GOSE_kfold <- lol.xval.eval(smaFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+waveletsLOL_GOSE_kfold <- lol.xval.eval(waveletsFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+
 # GOSE 1 Year after Discharge
 r<-5
 Y<-PYpatient_table$GOSE_1yr
@@ -85,6 +93,15 @@ freq_pairsLOL_GOSE_1yr <- lol.project.lol(freq_pairsFeats[!is.na(Y),], Y[!is.na(
 med_freqLOL_GOSE_1yr <- lol.project.lol(med_freqFeats[!is.na(Y),], Y[!is.na(Y)], r)
 smaLOL_GOSE_1yr <- lol.project.lol(smaFeats[!is.na(Y),], Y[!is.na(Y)], r)
 waveletsLOL_GOSE_1yr <- lol.project.lol(waveletsFeats[!is.na(Y),], Y[!is.na(Y)], r)
+
+# 5 fold cross validation
+# bandPowerLOL_GOSE_1yr_kfold <- lol.xval.eval(band_powerFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+# freq_entropyLOL_GOSE_1yr_kfold <- lol.xval.eval(freq_entropyFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+# freq_pairsLOL_GOSE_1yr_kfold <- lol.xval.eval(freq_pairsFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+# med_freqLOL_GOSE_1yrkfold <- lol.xval.eval(med_freqFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+# smaLOL_GOSE_1yr_kfold <- lol.xval.eval(smaFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+# waveletsLOL_GOSE_1yr_kfold <- lol.xval.eval(waveletsFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+
 
 # Mortality at Discharge
 r<-5
@@ -96,6 +113,13 @@ med_freqLOL_Death <- lol.project.lol(med_freqFeats, Y, r)
 smaLOL_Death <- lol.project.lol(smaFeats, Y, r)
 waveletsLOL_Death <- lol.project.lol(waveletsFeats, Y, r)
 
+# 5 fold cross validation
+# bandPowerLOL_GOSE_Death_kfold <- lol.xval.eval(band_powerFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+# freq_entropyLOL_GOSE_Death_kfold <- lol.xval.eval(freq_entropyFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+# freq_pairsLOL_GOSE_Death_kfold <- lol.xval.eval(freq_pairsFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+# med_freqLOL_GOSE_Death_kfold <- lol.xval.eval(med_freqFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+# smaLOL_GOSE_Death_kfold <- lol.xval.eval(smaFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+# waveletsLOL_GOSE_Death_kfold <- lol.xval.eval(waveletsFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
 
 # Mortality within 1 Year after Discharge
 r<-5
@@ -107,9 +131,16 @@ med_freqLOL_Death_1yr <- lol.project.lol(med_freqFeats[!is.na(Y),], Y[!is.na(Y)]
 smaLOL_Death_1yr <- lol.project.lol(smaFeats[!is.na(Y),], Y[!is.na(Y)], r)
 waveletsLOL_Death_1yr <- lol.project.lol(waveletsFeats[!is.na(Y),], Y[!is.na(Y)], r)
 
+# 5 fold cross validation
+# bandPowerLOL_GOSE_Death_1yr_kfold <- lol.xval.eval(band_powerFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+# freq_entropyLOL_GOSE_Death_1yr_kfold <- lol.xval.eval(freq_entropyFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+# freq_pairsLOL_GOSE_Death_1yr_kfold <- lol.xval.eval(freq_pairsFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+# med_freqLOL_GOSE_Death_1yr_kfold <- lol.xval.eval(med_freqFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+# smaLOL_GOSE_Death_1yr_kfold <- lol.xval.eval(smaFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+# waveletsLOL_GOSE_Death_1yr_kfold <- lol.xval.eval(waveletsFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
 
-# band_powerLOL_GOSE <- lol.xval.eval(band_powerFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
 ```
+
 
 ## Visualize GOSE at Discharge LOL projections {#viz_GOSE}
 
@@ -128,6 +159,15 @@ viz<-ggplot(data, aes(x=x1, y=x2, color=y)) +
   labs(color = "GOSE_dis")
 ggplotly(viz)
 
+data <- data.frame(x1=bandPowerLOL_GOSE_kfold$model$Xr[,1], x2=bandPowerLOL_GOSE_kfold$model$Xr[,2], y=PYpatient_table$GOSE)
+data$y <- factor(data$y)
+ggplot(data, aes(x=x1, y=x2, color=y)) +
+  geom_point() +
+  xlab("Projection 1") +
+  ylab("Projection 2") +
+  labs(color = "GOSE_dis") + 
+  ggtitle(sprintf("Band Power GOSE 5 fold, L=%.2f", bandPowerLOL_GOSE_kfold$lhat))
+
 # freq_entropy
 
 data <- data.frame(x1=freq_entropyLOL_GOSE$Xr[,1], x2=freq_entropyLOL_GOSE$Xr[,2],x3=freq_entropyLOL_GOSE$Xr[,3],y=PYpatient_table$GOSE)
@@ -138,6 +178,15 @@ viz<-ggplot(data, aes(x=x1, y=x2, color=y)) +
   ggtitle("Freq Entropy GOSE") +
   labs(color = "GOSE_dis")
 ggplotly(viz)
+
+data <- data.frame(x1=freq_entropyLOL_GOSE_kfold$model$Xr[,1], x2=freq_entropyLOL_GOSE_kfold$model$Xr[,2], y=PYpatient_table$GOSE)
+data$y <- factor(data$y)
+ggplot(data, aes(x=x1, y=x2, color=y)) +
+  geom_point() +
+  xlab("Projection 1") +
+  ylab("Projection 2") +
+  labs(color = "GOSE_dis") +
+  ggtitle(sprintf("Freq Entropy GOSE 5 fold, L=%.2f", bandPowerLOL_GOSE_kfold$lhat))
 
 # freq_pairs
 
@@ -150,6 +199,15 @@ viz<-ggplot(data, aes(x=x1, y=x2, color=y)) +
   labs(color = "GOSE_dis")
 ggplotly(viz)
 
+data <- data.frame(x1=freq_pairsLOL_GOSE_kfold$model$Xr[,1], x2=freq_pairsLOL_GOSE_kfold$model$Xr[,2], y=PYpatient_table$GOSE)
+data$y <- factor(data$y)
+ggplot(data, aes(x=x1, y=x2, color=y)) +
+  geom_point() +
+  xlab("Projection 1") +
+  ylab("Projection 2") +
+  labs(color = "GOSE_dis") +
+  ggtitle(sprintf("Freq Pairs GOSE 5 fold, L=%.2f", freq_entropyLOL_GOSE_kfold$lhat))
+
 # med_freq
 
 data <- data.frame(x1=med_freqLOL_GOSE$Xr[,1], x2=med_freqLOL_GOSE$Xr[,2],x3=med_freqLOL_GOSE$Xr[,3],y=PYpatient_table$GOSE)
@@ -160,6 +218,15 @@ viz<-ggplot(data, aes(x=x1, y=x2, color=y)) +
   ggtitle("Med Freq GOSE") +
   labs(color = "GOSE_dis")
 ggplotly(viz)
+
+data <- data.frame(x1=med_freqLOL_GOSE_kfold$model$Xr[,1], x2=med_freqLOL_GOSE_kfold$model$Xr[,2], y=PYpatient_table$GOSE)
+data$y <- factor(data$y)
+ggplot(data, aes(x=x1, y=x2, color=y)) +
+  geom_point() +
+  xlab("Projection 1") +
+  ylab("Projection 2") +
+  labs(color = "GOSE_dis") +
+  ggtitle(sprintf("Med Freq GOSE 5 fold, L=%.2f", freq_pairsLOL_GOSE_kfold$lhat))
 
 # sma
 
@@ -172,6 +239,15 @@ viz<-ggplot(data, aes(x=x1, y=x2, color=y)) +
   labs(color = "GOSE_dis")
 ggplotly(viz)
 
+data <- data.frame(x1=smaLOL_GOSE_kfold$model$Xr[,1], x2=smaLOL_GOSE_kfold$model$Xr[,2], y=PYpatient_table$GOSE)
+data$y <- factor(data$y)
+ggplot(data, aes(x=x1, y=x2, color=y)) +
+  geom_point() +
+  xlab("Projection 1") +
+  ylab("Projection 2") +
+  labs(color = "GOSE_dis") +
+  ggtitle(sprintf("SMA GOSE 5 fold, L=%.2f", smaLOL_GOSE_kfold$lhat))
+
 # wavelets
 
 data <- data.frame(x1=waveletsLOL_GOSE$Xr[,1], x2=waveletsLOL_GOSE$Xr[,2],x3=waveletsLOL_GOSE$Xr[,3],y=PYpatient_table$GOSE)
@@ -182,6 +258,15 @@ viz<-ggplot(data, aes(x=x1, y=x2, color=y)) +
   ggtitle("Wavelets GOSE") +
   labs(color = "GOSE_dis")
 ggplotly(viz)
+
+data <- data.frame(x1=waveletsLOL_GOSE_kfold$model$Xr[,1], x2=waveletsLOL_GOSE_kfold$model$Xr[,2], y=PYpatient_table$GOSE)
+data$y <- factor(data$y)
+ggplot(data, aes(x=x1, y=x2, color=y)) +
+  geom_point() +
+  xlab("Projection 1") +
+  ylab("Projection 2") +
+  labs(color = "GOSE_dis") +
+  ggtitle(sprintf("Wavelets GOSE 5 fold, L=%.2f", waveletsLOL_GOSE_kfold$lhat))
 ```
 
 
