@@ -3,7 +3,6 @@
 % Department of Applied Mathematics and Statistics
 % Whiting School of Engineering, Johns Hopkins University
 % email address: shubhayu@jhu.edu
-% March 2019; Last revision: 23-May-2019
 %% ------------- BEGIN CODE --------------
 %Set Directory and Procure File Names
 tic
