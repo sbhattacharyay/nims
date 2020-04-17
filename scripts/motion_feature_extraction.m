@@ -7,7 +7,16 @@
 %% ------------- BEGIN CODE --------------
 %Set Directory and Procure File Names
 tic
-cd('/data/rsteven1/sensor_data')
+
+addpath('functions/')
+
+try
+    cd('~/data/accel_sensor_data')
+    marcc = true;
+catch
+    cd('../accel_sensor_data')
+    marcc = false;
+end
 %cd('D:/')
 path = pwd;
 directory = dir;
@@ -33,12 +42,17 @@ toc
 %WARNING: Elapsed Time: ~111.286133 seconds.
 %WARNING: Elapsed Time: ~1104.244113 seconds for mega streams.
 
-for patIdx = 27:length(folderNames)
+for patIdx = 1:length(folderNames)
     tic
-    folder_of_interest = ['/data/rsteven1/sensor_data/' folderNames{patIdx}];
-    %folder_of_interest = ['D:/' folderNames{patIdx}];
-    disp(['Patient No.' folder_of_interest(32:33) ' initiated.']);
-    %disp(['Patient No.' folder_of_interest(8:9) ' initiated.']);
+    
+    if marcc == true
+        folder_of_interest = ['~/data/accel_sensor_data/' folderNames{patIdx}];
+        disp(['Patient No. ' folder_of_interest(32:33) ' initiated.']);
+    else
+        folder_of_interest = ['../accel_sensor_data/' folderNames{patIdx}];
+        disp(['Patient No. ' folder_of_interest(26:27) ' initiated.']);
+    end
+
     try
         load(folder_of_interest)
     catch
@@ -81,7 +95,7 @@ for patIdx = 27:length(folderNames)
         date_change_Idx = date_change_Idx+1;
         time_dn_fixed = time_dn;
         if length(max_diffs) >= 1
-            disp('holla')
+            disp('Additional Day Detected for Current Sensor')
             for j = length(date_change_Idx)
                 time_dn_fixed(date_change_Idx(j):end) = time_dn_fixed(date_change_Idx(j):end)+1;
             end
@@ -231,109 +245,35 @@ for patIdx = 27:length(folderNames)
         
         freqEnt = [freqEnt {curr_freqEnt;times;lens}];
         %wavelets
-        cd('/data/rsteven1/sensor_data')
-        %         cd('D:/')
+        if marcc == true
+            cd('~/data/accel_sensor_data')
+        else
+            cd('../accel_sensor_data')
+        end
+        
         curr_wvlt = NaN(binCount,1);
         curr_wvlt(superMask)=cellfun(@(x,y,z) get_wavelets(x,y,z), ...
             X(superMask),Y(superMask),Z(superMask));
         
         wavelets = [wavelets {curr_wvlt;times;lens}];
     end
-    save(['/data/rsteven1/sensor_features/band_power' folder_of_interest(32:33) '.mat'],'bandPower','-v7.3');
-    save(['/data/rsteven1/sensor_features/freq_entropy' folder_of_interest(32:33) '.mat'],'freqEnt','-v7.3');
-    save(['/data/rsteven1/sensor_features/freq_pairs' folder_of_interest(32:33) '.mat'],'freqPairs','-v7.3');
-    save(['/data/rsteven1/sensor_features/med_freq' folder_of_interest(32:33) '.mat'],'medF','-v7.3');
-    save(['/data/rsteven1/sensor_features/sma' folder_of_interest(32:33) '.mat'],'SMA','-v7.3');
-    save(['/data/rsteven1/sensor_features/wavelets' folder_of_interest(32:33) '.mat'],'wavelets','-v7.3');
-    %     save(['D:/sensor_features/band_power' folder_of_interest(8:9) '.mat'],'bandPower','-v7.3');
-    %     save(['D:/sensor_features/freq_entropy' folder_of_interest(8:9) '.mat'],'freqEnt','-v7.3');
-    %     save(['D:/sensor_features/freq_pairs' folder_of_interest(8:9) '.mat'],'freqPairs','-v7.3');
-    %     save(['D:/sensor_features/med_freq' folder_of_interest(8:9) '.mat'],'medF','-v7.3');
-    %     save(['D:/sensor_features/sma' folder_of_interest(8:9) '.mat'],'SMA','-v7.3');
-    %     save(['D:/sensor_features/wavelets' folder_of_interest(8:9) '.mat'],'wavelets','-v7.3');
+    
+    if marcc == true
+        save(['~/data/motion_feature_data/band_power/band_power' folder_of_interest(32:33) '.mat'],'bandPower','-v7.3');
+        save(['~/data/motion_feature_data/freq_entropy/freq_entropy' folder_of_interest(32:33) '.mat'],'freqEnt','-v7.3');
+        save(['~/data/motion_feature_data/freq_pairs/freq_pairs' folder_of_interest(32:33) '.mat'],'freqPairs','-v7.3');
+        save(['~/data/motion_feature_data/med_freq/med_freq' folder_of_interest(32:33) '.mat'],'medF','-v7.3');
+        save(['~/data/motion_feature_data/sma/sma' folder_of_interest(32:33) '.mat'],'SMA','-v7.3');
+        save(['~/data/motion_feature_data/wavelets/wavelets' folder_of_interest(32:33) '.mat'],'wavelets','-v7.3');
+        disp(['Patient No. ' folder_of_interest(32:33) ' completed.']);
+    else
+        save(['../motion_feature_data/band_power/band_power' folder_of_interest(26:27) '.mat'],'bandPower','-v7.3');
+        save(['../motion_feature_data/freq_entropy/freq_entropy' folder_of_interest(26:27) '.mat'],'freqEnt','-v7.3');
+        save(['../motion_feature_data/freq_pairs/freq_pairs' folder_of_interest(26:27) '.mat'],'freqPairs','-v7.3');
+        save(['../motion_feature_data/med_freq/med_freq' folder_of_interest(26:27) '.mat'],'medF','-v7.3');
+        save(['../motion_feature_data/sma/sma' folder_of_interest(26:27) '.mat'],'SMA','-v7.3');
+        save(['../motion_feature_data/wavelets/wavelets' folder_of_interest(26:27) '.mat'],'wavelets','-v7.3');
+        disp(['Patient No. ' folder_of_interest(26:27) ' completed.']);
+    end
     toc
-    disp(['Patient No.' folder_of_interest(32:33) ' completed.']);
-    %disp(['Patient No.' folder_of_interest(8:9) ' completed.']);
-end
-
-function data = read_files()
-% READ_FILES captures the data from the patient's seven sensors.
-% read_files() returns an array of cell arrays with the data where each
-% cell array corresponds to one sensor.
-len = zeros(1,6);
-
-fid = fopen('dataLA.txt');
-C2 = textscan(fid,'%f %f %f %f %f %f %f %f %f %f %f %s');
-fclose(fid);
-len(1) = length(C2{1});
-
-fid = fopen('dataLE.txt');
-C3 = textscan(fid,'%f %f %f %f %f %f %f %f %f %f %f %s');
-fclose(fid);
-len(2) = length(C3{1});
-
-fid = fopen('dataLW.txt');
-C4 = textscan(fid,'%f %f %f %f %f %f %f %f %f %f %f %s');
-fclose(fid);
-len(3) = length(C4{1});
-
-fid = fopen('dataRA.txt');
-C5 = textscan(fid,'%f %f %f %f %f %f %f %f %f %f %f %s');
-fclose(fid);
-len(4) = length(C5{1});
-
-fid = fopen('dataRE.txt');
-C6 = textscan(fid,'%f %f %f %f %f %f %f %f %f %f %f %s');
-fclose(fid);
-len(5) = length(C6{1});
-
-fid = fopen('dataRW.txt');
-C7 = textscan(fid,'%f %f %f %f %f %f %f %f %f %f %f %s');
-fclose(fid);
-len(6) = length(C7{1});
-
-
-fid = fopen('databed.txt');
-C1 = textscan(fid,'%f %f %f %f %f %f %f %f %f %f %f %s');
-fclose(fid);
-
-data = [C1;C2;C3;C4;C5;C6;C7]';
-end
-function start_time = get_start(data)
-% Isolate the start time character arrays.
-start_t_char = {};
-i = 1;
-for C = data
-    start_t_char{i} = C{12}{1,1};
-    i = i + 1;
-end
-times = string(start_t_char);
-sortedTimes = sort(times);
-start_time = sortedTimes(end);
-end
-function end_time = get_end(data)
-end_t_char = {};
-i = 1;
-for C = data
-    end_t_char{i} = C{12}{end,1};
-    i = i + 1;
-end
-times = string(end_t_char);
-sortedTimes = sort(times);
-end_time = sortedTimes(1);
-end
-function waveOutput = get_wavelets(x,y,z)
-[c1,l1] = wavedec(x,6,'db5');
-[c2,l2] = wavedec(y,6,'db5');
-[c3,l3] = wavedec(z,6,'db5');
-xNorms = 0;
-yNorms = 0;
-zNorms = 0;
-
-for p = 2:6
-    xNorms=xNorms+norm(detcoef(c1,l1,p))^2;
-    yNorms=yNorms+norm(detcoef(c2,l2,p))^2;
-    zNorms=zNorms+norm(detcoef(c3,l3,p))^2;
-end
-waveOutput=rssq([xNorms,yNorms,zNorms]);
 end
