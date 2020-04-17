@@ -66,5 +66,5 @@ for i = 1:length(bed_corrected_sensors(1,:))
     bed_corrected_sensors(:,i)=curr_sens;
 end
 
-save('..\motion_feature_data\bed_corrected_imputed_complete_sensor_data.mat',...
+save('../motion_feature_data/bed_corrected_imputed_complete_sensor_data.mat',...
     'bed_corrected_sensors','feature_names');
