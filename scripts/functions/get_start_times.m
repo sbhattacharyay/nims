@@ -1,4 +1,4 @@
-function start_time = get_start(data)
+function sortedTimes = get_start_times(data)
 % Isolate the start time character arrays.
 start_t_char = {};
 i = 1;
@@ -8,5 +8,4 @@ for C = data
 end
 times = string(start_t_char);
 sortedTimes = sort(times);
-start_time = sortedTimes(end);
 end
