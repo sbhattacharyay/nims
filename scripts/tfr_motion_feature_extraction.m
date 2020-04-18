@@ -51,7 +51,7 @@ for patIdx = 1:length(folderNames)
         folder_of_interest = ['../accel_sensor_data/' folderNames{patIdx}];
         disp(['Patient No. ' folder_of_interest(26:27) ' initiated.']);
     end
-
+    
     try
         load(folder_of_interest)
     catch
@@ -71,14 +71,12 @@ for patIdx = 1:length(folderNames)
     %Filter Data (bworth 4-th order)
     fc = 0.2;
     fs = 10;
-    [b,a] = butter(4,fc/(fs/2),'high');
-    
-    dayLengths = [];
+    [b,a] = butter(4,fc/(fs/2),'high');    
     data_copy = data;
     score_1 = cellfun(@(x) double(length(x)>=864000), data(12,:));
     score_2 = cellfun(@(x) double(length(x)>=(864000*2)), data(12,:));
     dayLengths = score_1 + score_2;
-    
+    time_dn_fixed = {};
     for i = 1:length(data(1,:))
         curr = data(:,i);
         x = filter(b,a,curr{5});
@@ -88,21 +86,21 @@ for patIdx = 1:length(folderNames)
         time_cut = extractBefore(time,13);
         time_dn = datenum(time_cut,'HH:MM:SS:FFF');
         time_diff = (diff(time_dn));
-        max_diffs = [];
-        date_change_Idx = [];
-        [max_diffs,date_change_Idx] = findpeaks(-time_diff,'MinPeakHeight',.1,'MinPeakDistance',10);
+        [max_diffs,date_change_Idx] = findpeaks(-time_diff,...
+            'MinPeakHeight',.1,'MinPeakDistance',10);
         date_change_Idx = date_change_Idx+1;
-        time_dn_fixed = time_dn;
+        time_dn_fixed{i} = time_dn;
         if length(max_diffs) >= 1
             disp('Additional Day Detected for Current Sensor')
-            for j = 1:length(date_change_Idx)
-                time_dn_fixed(date_change_Idx(j):end) = time_dn_fixed(date_change_Idx(j):end)+1;
+            for j=1:length(date_change_Idx)
+                time_dn_fixed{i}(date_change_Idx(j):end) = ...
+                    time_dn_fixed{i}(date_change_Idx(j):end)+1;
             end
         end
         data_copy{5,i} = x;
         data_copy{6,i} = y;
         data_copy{7,i} = z;
-        data_copy{12,i}= time_dn_fixed;
+        data_copy{12,i}= time_dn_fixed{i};
     end
     
     %Delete Extraneous Rows
@@ -121,34 +119,27 @@ for patIdx = 1:length(folderNames)
     freqEnt = {};
     wavelets = {};
     
-    windowingStart = datenum('18:00:00:000','HH:MM:SS:FFF');
-    windowingEnd = datenum('12:00:00:000','HH:MM:SS:FFF')+1;
-    windowSize = 5; %in seconds
     second = datenum('00:00:01:000','HH:MM:SS:FFF')-datenum('00:00:00:000','HH:MM:SS:FFF');
+    windowSize = 5; %in seconds
     window = windowSize.*second;
     
-    timeSplit2 =windowingStart:window:windowingEnd;
-    timeSplit1 = timeSplit2-1;
-    timeSplit3 = timeSplit2+1;
-    timeSplit4 = timeSplit2+2;
-    
-    binCount = length(timeSplit2)-1;
-    binIdx = 1:binCount;
-    
     for j = 1:length(data_copy)
+        windowingStart = time_dn_fixed{j}(1);
+        windowingEnd = windowingStart+(1/3);
+        
+        timeSplit =windowingStart:window:windowingEnd;
+        
+        binCount = length(timeSplit)-1;
+        binIdx = 1:binCount;
+        
         split_Data = cell(binCount,4);
         D = data_copy{4,j};
         x_stream = data_copy{1,j};
         y_stream = data_copy{2,j};
         z_stream = data_copy{3,j};
         
-        [N2, ~, indices2] = histcounts(D,timeSplit2);
-        [N1, ~, indices1] = histcounts(D,timeSplit1);
-        [N3, ~, indices3] = histcounts(D,timeSplit3);
-        [N4, ~, indices4] = histcounts(D,timeSplit4);
-        
-        totalIdx = [indices1';indices2'; indices3'; indices4'];
-        NCounts = [N1;N2;N3;N4];
+        [NCounts, ~, indices] = histcounts(D,timeSplit);
+        totalIdx = indices';
         
         nonMP = NCounts>40;
         rowSizes=(sum(nonMP,2));
@@ -180,19 +171,17 @@ for patIdx = 1:length(folderNames)
         split_Data(multIdx,4) = arrayfun(@(mRow,mIdx) D(totalIdx(mRow,:)==mIdx),multRowSelect2,multIdx,'UniformOutput', false);
         
         lens = cellfun(@(x) length(x),split_Data(:,1));
-        times = [timeSplit1(2:end)'];
-        
-        totalIdxSet = 1:binCount;
-        
+        times=timeSplit(2:end)';
+                
         X = split_Data(:,1);
         Y = split_Data(:,2);
         Z = split_Data(:,3);
         W = split_Data(:,4);
         
-        maskx = totalIdxSet(cellfun(@(x) ~isempty(x), X));
-        masky = totalIdxSet(cellfun(@(y) ~isempty(y), Y));
-        maskz = totalIdxSet(cellfun(@(z) ~isempty(z), Z));
-        maskw = totalIdxSet(cellfun(@(w) ~isempty(w), W));
+        maskx = binIdx(cellfun(@(x) ~isempty(x), X));
+        masky = binIdx(cellfun(@(y) ~isempty(y), Y));
+        maskz = binIdx(cellfun(@(z) ~isempty(z), Z));
+        maskw = binIdx(cellfun(@(w) ~isempty(w), W));
         
         superMask = intersect(maskx,masky);
         superMask = intersect(superMask,maskz);
@@ -203,19 +192,19 @@ for patIdx = 1:length(folderNames)
         curr_sma(superMask) = ((window)^-1).*cellfun(@(x,y,z,w) trapz(w,abs(x)+abs(y)+abs(z)), ...
             X(superMask),Y(superMask),Z(superMask),W(superMask));
         SMA = [SMA {curr_sma;times;lens}];
-        %Frequency component median pairs
         
+        %Frequency component median pairs
         curr_Med = NaN(binCount,2);
         fc = 2.5;
         fs = 10;
-        [b,a] = butter(4,fc/(fs/2),'high');
         [d,c] = butter(4,fc/(fs/2),'low');
-        
-        curr_Med(superMask,1) = cellfun(@(x,y,z,w) rssq([median(filter(d,c,x)),...
+        [b,a] = butter(4,fc/(fs/2),'high');
+                
+        curr_Med(superMask,1)=cellfun(@(x,y,z,w) rssq([median(filter(d,c,x)),...
             median(filter(d,c,y)),median(filter(d,c,z))]),....
             X(superMask),Y(superMask),Z(superMask),W(superMask));
         
-        curr_Med(superMask,2) = cellfun(@(x,y,z,w) rssq([median(filter(b,a,x)),...
+        curr_Med(superMask,2)=cellfun(@(x,y,z,w) rssq([median(filter(b,a,x)),...
             median(filter(b,a,y)),median(filter(b,a,z))]),....
             X(superMask),Y(superMask),Z(superMask),W(superMask));
         
@@ -258,20 +247,20 @@ for patIdx = 1:length(folderNames)
     end
     
     if marcc == true
-        save(['~/data/motion_feature_data/band_power/band_power' folder_of_interest(30:31) '.mat'],'bandPower','-v7.3');
-        save(['~/data/motion_feature_data/freq_entropy/freq_entropy' folder_of_interest(30:31) '.mat'],'freqEnt','-v7.3');
-        save(['~/data/motion_feature_data/freq_pairs/freq_pairs' folder_of_interest(30:31) '.mat'],'freqPairs','-v7.3');
-        save(['~/data/motion_feature_data/med_freq/med_freq' folder_of_interest(30:31) '.mat'],'medF','-v7.3');
-        save(['~/data/motion_feature_data/sma/sma' folder_of_interest(30:31) '.mat'],'SMA','-v7.3');
-        save(['~/data/motion_feature_data/wavelets/wavelets' folder_of_interest(30:31) '.mat'],'wavelets','-v7.3');
+        save(['~/data/tfr_motion_feature_data/band_power/band_power' folder_of_interest(30:31) '.mat'],'bandPower','-v7.3');
+        save(['~/data/tfr_motion_feature_data/freq_entropy/freq_entropy' folder_of_interest(30:31) '.mat'],'freqEnt','-v7.3');
+        save(['~/data/tfr_motion_feature_data/freq_pairs/freq_pairs' folder_of_interest(30:31) '.mat'],'freqPairs','-v7.3');
+        save(['~/data/tfr_motion_feature_data/med_freq/med_freq' folder_of_interest(30:31) '.mat'],'medF','-v7.3');
+        save(['~/data/tfr_motion_feature_data/sma/sma' folder_of_interest(30:31) '.mat'],'SMA','-v7.3');
+        save(['~/data/tfr_motion_feature_data/wavelets/wavelets' folder_of_interest(30:31) '.mat'],'wavelets','-v7.3');
         disp(['Patient No. ' folder_of_interest(30:31) ' completed.']);
     else
-        save(['../motion_feature_data/band_power/band_power' folder_of_interest(26:27) '.mat'],'bandPower','-v7.3');
-        save(['../motion_feature_data/freq_entropy/freq_entropy' folder_of_interest(26:27) '.mat'],'freqEnt','-v7.3');
-        save(['../motion_feature_data/freq_pairs/freq_pairs' folder_of_interest(26:27) '.mat'],'freqPairs','-v7.3');
-        save(['../motion_feature_data/med_freq/med_freq' folder_of_interest(26:27) '.mat'],'medF','-v7.3');
-        save(['../motion_feature_data/sma/sma' folder_of_interest(26:27) '.mat'],'SMA','-v7.3');
-        save(['../motion_feature_data/wavelets/wavelets' folder_of_interest(26:27) '.mat'],'wavelets','-v7.3');
+        save(['../tfr_motion_feature_data/band_power/band_power' folder_of_interest(26:27) '.mat'],'bandPower','-v7.3');
+        save(['../tfr_motion_feature_data/freq_entropy/freq_entropy' folder_of_interest(26:27) '.mat'],'freqEnt','-v7.3');
+        save(['../tfr_motion_feature_data/freq_pairs/freq_pairs' folder_of_interest(26:27) '.mat'],'freqPairs','-v7.3');
+        save(['../tfr_motion_feature_data/med_freq/med_freq' folder_of_interest(26:27) '.mat'],'medF','-v7.3');
+        save(['../tfr_motion_feature_data/sma/sma' folder_of_interest(26:27) '.mat'],'SMA','-v7.3');
+        save(['../tfr_motion_feature_data/wavelets/wavelets' folder_of_interest(26:27) '.mat'],'wavelets','-v7.3');
         disp(['Patient No. ' folder_of_interest(26:27) ' completed.']);
     end
     toc
