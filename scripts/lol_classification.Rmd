@@ -40,6 +40,8 @@ freq_pairsFeats<-do.call(cbind,temp_var[13:24])
 med_freqFeats<-do.call(cbind,temp_var[25:30])
 smaFeats<-do.call(cbind,temp_var[31:36])
 waveletsFeats<-do.call(cbind,temp_var[37:42])
+
+write.csv(band_powerFeats, file = './yoopy.csv', row.names = FALSE,col.names = FALSE)
 ```
 
 ## Classification Scheme:
@@ -57,8 +59,32 @@ waveletsFeats<-do.call(cbind,temp_var[37:42])
 
 ```{r}
 set.seed(123) 
-r<-3
-train.control<-trainControl(method = "repeatedcv",number = 5,repeats=3)
+Y<-PYpatient_table$GOSE
+r<-5
 
+yoyoyo<-lol.xval.eval(band_powerFeats, Y, r, alg = lol.project.lol, alg.return="A", classifier=MASS::lda, classifier.return="class", k=5)
+
+
+yooki<- lol.xval.optimal_dimselect(cbind(PYpatient_table$Age,PYpatient_table$GCS_en), Y, rs=c(2), alg = lol.project.lol, alg.return="A",classifier=MASS::lda, classifier.return="class", k=5)
+
+
+```
+
+
+```{r}
+data(ROCR.hiv)
+attach(ROCR.hiv)
+
+out <- cvAUC(hiv.svm$predictions, hiv.svm$labels)
+
+#Plot fold AUCs
+plot(out$perf, col="grey82", lty=3, main="5-fold CV AUC")
+
+#Plot CV AUC
+plot(out$perf, col="red", avg="vertical", add=TRUE)
+
+plot(PYpatient_table$GCS_en, col="red", avg="vertical", add=TRUE)
+
+pred<-prediction(PYpatient_table$GCS_en)
 
 ```
