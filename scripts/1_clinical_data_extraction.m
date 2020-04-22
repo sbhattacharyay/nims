@@ -34,18 +34,20 @@ studyPatients = [2	3	4	5	6	7	8	9	10	11	12	13	14	15 ...
     16	17	18	19	20	21	22	23	24	26	27	28	29	30	31	32	33 ....
     34	35	36	37	38	39	40	41	42	43	44	45	46	47	48	49	50 .....
     51	52	53	54	55	58	59	60	61	62	63	64	66	67];
+
+writetable(patientData(studyPatients,:),'../clinical_data/original_patient_data.csv');
 %% Extract Outcome Information from Patient Dataset
 
 fav_threshold = 4; % GOSE >= fav_threshold is favorable
 
 % Extract outcome scores (GOSE) at discharge
 gose_scores = patientData.gose;
-gose_scores(3) = {'3'}; % Fix single ambiguous GOSE score in dataset
-gose_scores = str2double(gose_scores(studyPatients));
+gose_scores(3) = '3'; % Fix single ambiguous GOSE score in dataset
+gose_scores = (gose_scores(studyPatients));
 
 % Extract outcome scores (GOSE) at 12 months (for patients for which data
 % is available).
-yr_outcome_code = str2num(cell2mat(patientData.outcome_12mo));
+yr_outcome_code = (patientData.outcome_12mo);
 yr_outcome_code = yr_outcome_code(studyPatients);
 
 gose_12months = patientData.gose_12mo;
@@ -59,7 +61,7 @@ yr_outcomes = double(gose_12months>= fav_threshold);
 yr_outcomes(noYearOutcomeAvailable) = NaN;
 
 % Mortality outcomes at discharge and 1 year
-dc_death = str2double(patientData.death(studyPatients));
+dc_death = (patientData.death(studyPatients));
 yr_death = double(gose_12months==1);
 yr_death(noYearOutcomeAvailable) = NaN;
 
@@ -73,15 +75,15 @@ yr_death(noYearOutcomeAvailable) = NaN;
 [age,mu_age,sig_age]=zscore(age);
 
 % GCS at enrollment:
-[gcs_scores_en,lam_gcs_en]=boxcox(str2double(patientData.gcs_en(studyPatients)));
+[gcs_scores_en,lam_gcs_en]=boxcox((patientData.gcs_en(studyPatients)));
 [gcs_scores_en,mu_gcs_en,sig_gcs_en]=zscore(gcs_scores_en);
 
 % APACHE at enrollment:
-[apache_scores,lam_apache]=boxcox(str2double(patientData.apache(studyPatients)));
+[apache_scores,lam_apache]=boxcox((patientData.apache(studyPatients)));
 [apache_scores,mu_apache,sig_apache]=zscore(apache_scores);
 
 % GCS at discharge:
-[gcs_scores_dis,lam_gcs_dis]=boxcox(str2double(patientData.gcs_dis(studyPatients)));
+[gcs_scores_dis,lam_gcs_dis]=boxcox((patientData.gcs_dis(studyPatients)));
 [gcs_scores_dis,mu_gcs_dis,sig_gcs_dis]=zscore(gcs_scores_dis);
 
 % Gender (Males are 1, Females are -1):
@@ -89,12 +91,12 @@ females = categorical(patientData.gender(studyPatients))~= 'M';
 gender = (-1).^females;
 
 % Diagnosis codes
-stroke = -((-1).^str2double(patientData.stroke(studyPatients)));
-ich = -((-1).^str2double(patientData.ich(studyPatients)));
-sah = -((-1).^str2double(patientData.sah(studyPatients)));
-bt = -((-1).^str2double(patientData.bt(studyPatients)));
-sdh = -((-1).^str2double(patientData.sdh(studyPatients)));
-tbi = -((-1).^str2double(patientData.tbi(studyPatients)));
+stroke = -((-1).^(patientData.stroke(studyPatients)));
+ich = -((-1).^(patientData.ich(studyPatients)));
+sah = -((-1).^(patientData.sah(studyPatients)));
+bt = -((-1).^(patientData.bt(studyPatients)));
+sdh = -((-1).^(patientData.sdh(studyPatients)));
+tbi = -((-1).^(patientData.tbi(studyPatients)));
 
 % Impute missing clinical variables with Weighted k-NN (code below)
 dataset = [age gender stroke ich sah bt sdh tbi apache_scores ...
