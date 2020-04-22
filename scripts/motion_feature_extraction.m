@@ -276,3 +276,5 @@ for patIdx = 1:length(folderNames)
     end
     toc
 end
+
+license('inuse')
