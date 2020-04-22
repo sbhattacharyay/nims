@@ -1,0 +1,63 @@
+
+Currently Loaded Modules:
+  1) centos7/current   3) openmpi/3.1         5) matlab/R2019a
+  2) intel/18.0        4) MARCC/summer-2018
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2019 The MathWorks, Inc.
+                  R2019a (9.6.0.1072779) 64-bit (glnxa64)
+                               March 8, 2019
+
+ 
+For online documentation, see https://www.mathworks.com/support
+For product information, visit www.mathworks.com.
+ 
+Elapsed time is 2.057206 seconds.
+Patient No. 02 initiated.
+Elapsed time is 14.787302 seconds.
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In tfr_motion_feature_extraction (line 89)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In tfr_motion_feature_extraction (line 89)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In tfr_motion_feature_extraction (line 89)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In tfr_motion_feature_extraction (line 89)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In tfr_motion_feature_extraction (line 89)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In tfr_motion_feature_extraction (line 89)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In tfr_motion_feature_extraction (line 89)] 
+Elapsed time is 33.105465 seconds.
+{Error using save
+Cannot create 'band_power02.mat' because
+'/home-4/sbhatt15@jhu.edu/data/tfr_motion_feature_data/band_power' does not
+exist.
+
+Error in tfr_motion_feature_extraction (line 250)
+        save(['~/data/tfr_motion_feature_data/band_power/band_power'
+        folder_of_interest(30:31) '.mat'],'bandPower','-v7.3');
+} 
+>> matlab exit code: 0
