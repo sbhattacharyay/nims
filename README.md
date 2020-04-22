@@ -2,7 +2,9 @@
 
 Brain Injury Motion Sensing (BIMS) Project
 
-NOTE: Running MATLAB scripts will require installation of the Financial Toolbox.
+MATLAB Toolboxes Required:
+- Financial Toolbox
+- Statistics and Machine Learning Toolbox
 
 Johns Hopkins University
 
