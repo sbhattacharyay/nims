@@ -5,6 +5,7 @@ Brain Injury Motion Sensing (BIMS) Project
 MATLAB Toolboxes Required:
 - Financial Toolbox
 - Statistics and Machine Learning Toolbox
+- Signal Processing Toolbox
 
 Johns Hopkins University
 
