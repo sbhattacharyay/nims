@@ -183,3 +183,5 @@ for featureType = 1:2
         disp('tfr_motion_feature_data imputation complete');
     end
 end
+
+license('inuse')
