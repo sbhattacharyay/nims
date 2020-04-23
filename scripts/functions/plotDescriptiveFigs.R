@@ -10,7 +10,13 @@ source("functions/graph_plotting/generateRootDir.R")
 plotDescriptiveFigs <- function(inputData, directory, exclusions = NULL, height = 6000, width = 3000, titled = TRUE, legend = TRUE, ptSize = 14) {
   
   ### Load the list of variables to be plotted
-  continuousVariableDF <- filter(allVariablesDF, variableType %in% c("continuous", "integer"))
+  
+  
+  # Mess-Around Zone:
+  
+  inputData<-read.csv('../clinical_data/patient_clinical_data.csv')
+  allVariablesDF <- read.csv('../clinical_data/clinicalVariableList.csv')
+  continuousVariableDF <- filter(allVariablesDF, class %in% c("continuous", "integer"))
   
   if (!is.null(exclusions)) {
     continuousVariableDF <- continuousVariableDF[!continuousVariableDF$variableSubtitle %in% exclusions,]
@@ -18,7 +24,7 @@ plotDescriptiveFigs <- function(inputData, directory, exclusions = NULL, height 
   
   
   ### Create Graph directory
-  rootDir <- generateRootDir(directory)
+  rootDir <- generateRootDir()
   
   ###  histogram of age
   fileName <- paste(rootDir,"/age_Hist_",
@@ -36,11 +42,11 @@ plotDescriptiveFigs <- function(inputData, directory, exclusions = NULL, height 
        col = c("darkblue"),
        xlab = "Age",
        main = "Histogram of Age",
-       xlim = c(0,110),
+       xlim = c(0,100),
        xaxt = 'n')
   
   
-  axis(1, at = seq(0, 120, by = 5), las=2)
+  axis(1, at = seq(0, 100, by = 5), las=2)
   
   dev.off()
   
@@ -56,7 +62,7 @@ plotDescriptiveFigs <- function(inputData, directory, exclusions = NULL, height 
       pointsize = ptSize)
   par(mfrow = c(1,1))
   
-  barplot(table(inputData$icu_duration_days),
+  barplot(table(inputData$los),
           col = c("darkblue"),
           ylim = c(0,6000),
           ylab = "Frequency",
