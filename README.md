@@ -6,6 +6,7 @@ MATLAB Toolboxes Required:
 - Financial Toolbox
 - Statistics and Machine Learning Toolbox
 - Signal Processing Toolbox
+- Wavelet Toolbox
 
 Johns Hopkins University
 
