@@ -86,3 +86,5 @@ for featureType = 1:2
             'bed_corrected_sensors','feature_names');
     end
 end
+
+license('inuse')
