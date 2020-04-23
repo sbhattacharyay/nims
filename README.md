@@ -7,6 +7,8 @@ MATLAB Toolboxes Required:
 - Statistics and Machine Learning Toolbox
 - Signal Processing Toolbox
 - Wavelet Toolbox
+- System Identification Toolbox
+- Symbolic Math Toolbox
 
 Johns Hopkins University
 
