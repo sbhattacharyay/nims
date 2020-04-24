@@ -1,5 +1,7 @@
 function [] = plot_TOD_Diff(t,TOD_Diff)
 % Diff by time of day figures:
+generateRootDir('Diff_Plots')
+
 t = t(1:end-1);
 
 %BandPower:
