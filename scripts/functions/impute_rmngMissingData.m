@@ -41,6 +41,11 @@ for sensIdx = 1:dim_of_sensors(1)
             if ismember(feature_names(featIdx),["freq_entropy","med_freq"])
                 temp_pis = cellfun(@(x)sum(curr_mat(locA(k),x)>...
                     feature_thresholds(featIdx))/(trainWindow*12),trainIdx);
+                dim_temp_pis = size(temp_pis);
+                dim_temp_Idx = size(temp_Idx);
+                if dim_temp_Idx(1) ~= dim_temp_pis(1)
+                    temp_Idx=temp_Idx';
+                end
                 nm_imputes=arrayfun(@(x,y)draws(k,y)<x,...
                     temp_pis,temp_Idx);
                 exp_imputes=~nm_imputes;
@@ -58,6 +63,11 @@ for sensIdx = 1:dim_of_sensors(1)
             else
                 temp_pis = cellfun(@(x)sum(curr_mat(locA(k),x)<...
                     feature_thresholds(featIdx))/(trainWindow*12),trainIdx);
+                dim_temp_pis = size(temp_pis);
+                dim_temp_Idx = size(temp_Idx);
+                if dim_temp_Idx(1) ~= dim_temp_pis(1)
+                    temp_Idx=temp_Idx';
+                end
                 nm_imputes=arrayfun(@(x,y)draws(k,y)<x,...
                     temp_pis,temp_Idx);
                 exp_imputes=~nm_imputes;
@@ -69,12 +79,12 @@ for sensIdx = 1:dim_of_sensors(1)
                         -feature_thresholds(featIdx))','Exponential'),.....
                         trainIdx(exp_imputes));
                     exp_imp_values=arrayfun(@(x)random(x,1,1)+...
-                        feature_thresholds(featIdx),temp_exp_fits)';                    
+                        feature_thresholds(featIdx),temp_exp_fits)';
                     curr_mat(locA(k),temp_Idx(exp_imputes))=exp_imp_values;
                 end
             end
         end
-        sensors{sensIdx,featIdx} = curr_mat;        
+        sensors{sensIdx,featIdx} = curr_mat;
         sensors_output{sensIdx,featIdx} = curr_mat;
     end
 end
