@@ -64,7 +64,6 @@ plotDescriptiveFigs <- function(inputData, directory, exclusions = NULL, height 
   
   barplot(table(inputData$los),
           col = c("darkblue"),
-          ylim = c(0,6000),
           ylab = "Frequency",
           xlab = "ICU duration (days)",
           main = "Histogram of ICU duration")
@@ -84,7 +83,7 @@ plotDescriptiveFigs <- function(inputData, directory, exclusions = NULL, height 
       pointsize = ptSize)
   par(mfrow = c(1,1))
   
-  plot(inputData$alive,
+  plot(inputData$death,
        col = c("#A3C1AD", "darkblue"),
        ylim = c(0,21000),
        ylab = "Frequency",
