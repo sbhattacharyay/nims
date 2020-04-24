@@ -1,0 +1,915 @@
+
+Currently Loaded Modules:
+  1) openmpi/3.1         3) centos7/current   5) R/3.5.1
+  2) MARCC/summer-2018   4) intel/18.0        6) matlab/R2019a
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2019 The MathWorks, Inc.
+                  R2019a (9.6.0.1072779) 64-bit (glnxa64)
+                               March 8, 2019
+
+ 
+For online documentation, see https://www.mathworks.com/support
+For product information, visit www.mathworks.com.
+ 
+Elapsed time is 3.686360 seconds.
+Patient No. 02 initiated.
+Elapsed time is 13.888862 seconds.
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+Elapsed time is 32.774989 seconds.
+Patient No. 02 completed.
+Elapsed time is 387.675024 seconds.
+Patient No. 03 initiated.
+Elapsed time is 15.954154 seconds.
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+Elapsed time is 30.610125 seconds.
+Patient No. 03 completed.
+Elapsed time is 393.914946 seconds.
+Patient No. 04 initiated.
+Elapsed time is 14.979979 seconds.
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+Elapsed time is 29.142054 seconds.
+Patient No. 04 completed.
+Elapsed time is 381.858220 seconds.
+Patient No. 05 initiated.
+Elapsed time is 37.286112 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 73.334399 seconds.
+Patient No. 05 completed.
+Elapsed time is 1752.467040 seconds.
+Patient No. 06 initiated.
+Elapsed time is 31.990716 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 63.752795 seconds.
+Patient No. 06 completed.
+Elapsed time is 1519.268862 seconds.
+Patient No. 07 initiated.
+Elapsed time is 5.478572 seconds.
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+Elapsed time is 9.829153 seconds.
+Patient No. 07 completed.
+Elapsed time is 224.935369 seconds.
+Patient No. 08 initiated.
+Elapsed time is 53.889400 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 105.439053 seconds.
+Patient No. 08 completed.
+Elapsed time is 2001.535362 seconds.
+Patient No. 09 initiated.
+Elapsed time is 34.720560 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 67.591576 seconds.
+Patient No. 09 completed.
+Elapsed time is 1717.074270 seconds.
+Patient No. 10 initiated.
+Elapsed time is 37.209854 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 71.051217 seconds.
+Patient No. 10 completed.
+Elapsed time is 1708.638637 seconds.
+Patient No. 11 initiated.
+Elapsed time is 54.128855 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 103.990636 seconds.
+Patient No. 11 completed.
+Elapsed time is 1854.179691 seconds.
+Patient No. 12 initiated.
+Elapsed time is 16.893712 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 29.282952 seconds.
+Patient No. 12 completed.
+Elapsed time is 726.210018 seconds.
+Patient No. 13 initiated.
+Elapsed time is 32.978381 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 63.203233 seconds.
+Patient No. 13 completed.
+Elapsed time is 1497.938752 seconds.
+Patient No. 14 initiated.
+Elapsed time is 38.324529 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 68.560708 seconds.
+Patient No. 14 completed.
+Elapsed time is 1743.942667 seconds.
+Patient No. 15 initiated.
+Elapsed time is 33.594325 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 64.057646 seconds.
+Patient No. 15 completed.
+Elapsed time is 1689.083231 seconds.
+Patient No. 16 initiated.
+Elapsed time is 71.778426 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 137.392591 seconds.
+Patient No. 16 completed.
+Elapsed time is 2044.906840 seconds.
+Patient No. 17 initiated.
+Elapsed time is 32.438963 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 62.434029 seconds.
+Patient No. 17 completed.
+Elapsed time is 1693.480071 seconds.
+Patient No. 18 initiated.
+Elapsed time is 30.440553 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 60.384524 seconds.
+Patient No. 18 completed.
+Elapsed time is 1670.402320 seconds.
+Patient No. 19 initiated.
+Elapsed time is 34.231914 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 67.833765 seconds.
+Patient No. 19 completed.
+Elapsed time is 1540.242220 seconds.
+Patient No. 20 initiated.
+Elapsed time is 34.133855 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 65.608925 seconds.
+Patient No. 20 completed.
+Elapsed time is 1626.447377 seconds.
+Patient No. 21 initiated.
+Elapsed time is 67.602430 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 119.589355 seconds.
+Patient No. 21 completed.
+Elapsed time is 1965.176970 seconds.
+Patient No. 22 initiated.
+Elapsed time is 35.762712 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 69.395052 seconds.
+Patient No. 22 completed.
+Elapsed time is 1747.659699 seconds.
+Patient No. 23 initiated.
+Elapsed time is 23.787157 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+Additional Day Detected for Current Sensor
+Elapsed time is 45.672872 seconds.
+Patient No. 23 completed.
+Elapsed time is 1368.860407 seconds.
+Patient No. 24 initiated.
+Elapsed time is 33.570797 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 64.214062 seconds.
+Patient No. 24 completed.
+Elapsed time is 1747.252426 seconds.
+Patient No. 26 initiated.
+Elapsed time is 36.696452 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 71.663691 seconds.
+Patient No. 26 completed.
+Elapsed time is 2192.395493 seconds.
+Patient No. 27 initiated.
+Elapsed time is 49.130705 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+Additional Day Detected for Current Sensor
+Elapsed time is 72.619390 seconds.
+Patient No. 27 completed.
+Elapsed time is 1569.257042 seconds.
+Patient No. 28 initiated.
+Elapsed time is 35.660241 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 67.920959 seconds.
+Patient No. 28 completed.
+Elapsed time is 1693.150290 seconds.
+Patient No. 29 initiated.
+Elapsed time is 31.651862 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 60.291890 seconds.
+Patient No. 29 completed.
+Elapsed time is 1540.532544 seconds.
+Patient No. 30 initiated.
+Elapsed time is 38.304494 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 72.866529 seconds.
+Patient No. 30 completed.
+Elapsed time is 1624.138458 seconds.
+Patient No. 31 initiated.
+Elapsed time is 35.701508 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 68.213620 seconds.
+Patient No. 31 completed.
+Elapsed time is 1635.979659 seconds.
+Patient No. 32 initiated.
+Elapsed time is 33.162310 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 63.119473 seconds.
+Patient No. 32 completed.
+Elapsed time is 1670.310798 seconds.
+Patient No. 33 initiated.
+Elapsed time is 35.222682 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 67.288564 seconds.
+Patient No. 33 completed.
+Elapsed time is 1711.062951 seconds.
+Patient No. 34 initiated.
+Elapsed time is 35.442045 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 67.761395 seconds.
+Patient No. 34 completed.
+Elapsed time is 1758.393497 seconds.
+Patient No. 35 initiated.
+Elapsed time is 36.363332 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 69.504337 seconds.
+Patient No. 35 completed.
+Elapsed time is 1740.945388 seconds.
+Patient No. 36 initiated.
+Elapsed time is 33.925541 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 64.874441 seconds.
+Patient No. 36 completed.
+Elapsed time is 1702.127938 seconds.
+Patient No. 37 initiated.
+Elapsed time is 39.471334 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 75.022302 seconds.
+Patient No. 37 completed.
+Elapsed time is 1598.788890 seconds.
+Patient No. 38 initiated.
+Elapsed time is 32.329973 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 61.479314 seconds.
+Patient No. 38 completed.
+Elapsed time is 1831.632991 seconds.
+Patient No. 39 initiated.
+Elapsed time is 36.864747 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 69.303637 seconds.
+Patient No. 39 completed.
+Elapsed time is 1698.471569 seconds.
+Patient No. 40 initiated.
+Elapsed time is 53.569156 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 103.915837 seconds.
+Patient No. 40 completed.
+Elapsed time is 1752.067756 seconds.
+Patient No. 41 initiated.
+Elapsed time is 66.657462 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 127.104386 seconds.
+Patient No. 41 completed.
+Elapsed time is 2091.225748 seconds.
+Patient No. 42 initiated.
+Elapsed time is 28.876474 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 57.250968 seconds.
+Patient No. 42 completed.
+Elapsed time is 1564.903056 seconds.
+Patient No. 43 initiated.
+Elapsed time is 37.868540 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 72.342605 seconds.
+Patient No. 43 completed.
+Elapsed time is 1743.313242 seconds.
+Patient No. 46 initiated.
+Elapsed time is 36.750866 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 69.379379 seconds.
+Patient No. 46 completed.
+Elapsed time is 1761.359119 seconds.
+Patient No. 47 initiated.
+Elapsed time is 31.293044 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 59.698332 seconds.
+Patient No. 47 completed.
+Elapsed time is 1560.653595 seconds.
+Patient No. 48 initiated.
+Elapsed time is 43.834410 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 83.805698 seconds.
+Patient No. 48 completed.
+Elapsed time is 1813.420549 seconds.
+Patient No. 49 initiated.
+Elapsed time is 35.562899 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 67.090217 seconds.
+Patient No. 49 completed.
+Elapsed time is 1725.163621 seconds.
+Patient No. 50 initiated.
+Elapsed time is 28.750305 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 54.677988 seconds.
+Patient No. 50 completed.
+Elapsed time is 1401.761841 seconds.
+Patient No. 51 initiated.
+Elapsed time is 34.993030 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 66.937250 seconds.
+Patient No. 51 completed.
+Elapsed time is 1736.191522 seconds.
+Patient No. 52 initiated.
+Elapsed time is 35.148747 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 66.882911 seconds.
+Patient No. 52 completed.
+Elapsed time is 1703.403591 seconds.
+Patient No. 53 initiated.
+Elapsed time is 37.386586 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 73.379039 seconds.
+Patient No. 53 completed.
+Elapsed time is 1787.563960 seconds.
+Patient No. 54 initiated.
+Elapsed time is 36.649583 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 70.372451 seconds.
+Patient No. 54 completed.
+Elapsed time is 1722.417210 seconds.
+Patient No. 55 initiated.
+Elapsed time is 37.287139 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 71.945360 seconds.
+Patient No. 55 completed.
+Elapsed time is 1737.112125 seconds.
+Patient No. 56 initiated.
+Elapsed time is 34.290177 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 66.542699 seconds.
+Patient No. 56 completed.
+Elapsed time is 1431.679877 seconds.
+Patient No. 57 initiated.
+Elapsed time is 24.589747 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+Elapsed time is 46.325376 seconds.
+Patient No. 57 completed.
+Elapsed time is 1239.851066 seconds.
+Patient No. 59 initiated.
+Elapsed time is 34.771378 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 66.244283 seconds.
+Patient No. 59 completed.
+Elapsed time is 1510.792137 seconds.
+Patient No. 60 initiated.
+Elapsed time is 34.993280 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 67.249376 seconds.
+Patient No. 60 completed.
+Elapsed time is 1729.752077 seconds.
+Patient No. 61 initiated.
+Elapsed time is 34.232045 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 64.938891 seconds.
+Patient No. 61 completed.
+Elapsed time is 1649.431516 seconds.
+Patient No. 62 initiated.
+Elapsed time is 35.561078 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 66.322227 seconds.
+Patient No. 62 completed.
+Elapsed time is 1671.013527 seconds.
+Patient No. 63 initiated.
+Elapsed time is 33.105821 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+Additional Day Detected for Current Sensor
+Elapsed time is 62.013017 seconds.
+Patient No. 63 completed.
+Elapsed time is 1486.938927 seconds.
+Patient No. 64 initiated.
+Elapsed time is 39.192561 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 75.965861 seconds.
+Patient No. 64 completed.
+Elapsed time is 1828.178907 seconds.
+Patient No. 65 initiated.
+Elapsed time is 67.559752 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 129.629723 seconds.
+Patient No. 65 completed.
+Elapsed time is 1942.202458 seconds.
+Patient No. 67 initiated.
+Elapsed time is 31.864308 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+[Warning: Invalid MinPeakHeight. There are no data points greater than
+MinPeakHeight.] 
+[> In findpeaks>removePeaksBelowMinPeakHeight (line 516)
+  In findpeaks (line 147)
+  In motion_feature_extraction (line 93)] 
+Elapsed time is 62.249494 seconds.
+Patient No. 67 completed.
+Elapsed time is 1535.567302 seconds.
+Patient No. 68 initiated.
+Elapsed time is 35.746176 seconds.
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Additional Day Detected for Current Sensor
+Elapsed time is 67.705726 seconds.
+Patient No. 68 completed.
+Elapsed time is 1692.765028 seconds.
+matlab
+signal_toolbox
+wavelet_toolbox
+>> matlab exit code: 0
