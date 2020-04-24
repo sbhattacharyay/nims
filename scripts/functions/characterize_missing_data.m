@@ -1,5 +1,5 @@
 function [missing_percentages,missing_time_series,missingIdxs] = ...
-    characterize_missing_data(sensors,t,studyPatientsPY,display_plots)
+    characterize_missing_data(sensors,t,studyPatientsPY,display_plots,featureType)
 
 dim_of_sensors=size(sensors);
 
@@ -30,12 +30,19 @@ if display_plots == true
     image(x,y,sensors_missing,'CDataMapping','scaled')
     ax = gca;
     ax.FontSize = 14;
-    datetick('x','HH PM');
+    if featureType==1
+        datetick('x','HH PM');
+        xlabel('Time of Day','FontWeight','bold','FontSize',20);
+    else
+        x_tick_pts=datenum(hours(0):hours(1):hours(8));
+        xticks(x_tick_pts)
+        datetick('x','HH:MM','keepticks');
+        xlabel('Time from Start of Recording','FontWeight','bold','FontSize',20);
+    end
     set(gca, 'FontName', 'Myriad Pro');
     h=colorbar;
     ylabel(h, 'No. of Sensors Missing','FontSize',14)
     set(gcf, 'Units', 'Inches', 'Position', [0, 0, 10, 10], 'PaperUnits', 'Inches', 'PaperSize', [10, 10])
-    xlabel('Time of Day','FontWeight','bold','FontSize',20);
     ylabel('Patient No.','FontWeight','bold','FontSize',20);
 end
 end
