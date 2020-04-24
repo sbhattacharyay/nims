@@ -1,5 +1,5 @@
-%% Authors: Shubhayu Bhattacharyay, B.S. Candidate, Matthew Wang, B.S. Candidate 
-% Department of Biomedical Engineering 
+%% Authors: Shubhayu Bhattacharyay, B.S. Candidate, Matthew Wang, B.S. Candidate
+% Department of Biomedical Engineering
 % Department of Applied Mathematics and Statistics
 % Whiting School of Engineering, Johns Hopkins University
 % email address: shubhayu@jhu.edu
@@ -17,20 +17,20 @@ finTime2 = '23:59:59:999';
 sensorLabels = ["LA","LE","LW","RA","RE","RW","Bed"];
 
 for k = 1:length(data_copy)-1
-startTime = datenum('00:00','HH:MM');%recording start time
-subplot(7,1,k)
-hold on;
-t = (0:length(data_copy{1,k+1})-1)./ Fs;%time in seconds
-t = t/3600/24 + startTime; %time in days (serial date)
-plot(t,data_copy{1,k+1},'r')
-plot(t,data_copy{2,k+1},'b')
-plot(t,data_copy{3,k+1},'k')
-ylabel(sensorLabels(k))
-ylim([-2 2]);
-xlim([datenum(initTime,'HH:MM:SS'),datenum(finTime,'HH:MM:SS')]);
-xticks([datenum(initTime,'HH:MM:SS'),datenum(finTime,'HH:MM:SS')]);
-xticklabels(string(datestr([datenum(initTime,'HH:MM:SS'),datenum(finTime,'HH:MM:SS')],'HH:MM:SS'))');
-set(gca, 'FontName', 'Myriad Pro');
+    startTime = datenum('00:00','HH:MM');%recording start time
+    subplot(7,1,k)
+    hold on;
+    t = (0:length(data_copy{1,k+1})-1)./ Fs;%time in seconds
+    t = t/3600/24 + startTime; %time in days (serial date)
+    plot(t,data_copy{1,k+1},'r')
+    plot(t,data_copy{2,k+1},'b')
+    plot(t,data_copy{3,k+1},'k')
+    ylabel(sensorLabels(k))
+    ylim([-2 2]);
+    xlim([datenum(initTime,'HH:MM:SS'),datenum(finTime,'HH:MM:SS')]);
+    xticks([datenum(initTime,'HH:MM:SS'),datenum(finTime,'HH:MM:SS')]);
+    xticklabels(string(datestr([datenum(initTime,'HH:MM:SS'),datenum(finTime,'HH:MM:SS')],'HH:MM:SS'))');
+    set(gca, 'FontName', 'Myriad Pro');
 end
 
 subplot(7,1,7)
@@ -55,17 +55,17 @@ finTime = '17:00:00';
 sensorLabels = ["LA","LE","LW","RA","RE","RW","Bed"];
 
 for k = 1:length(SMA)-1
-startTime = datenum('00:00','HH:MM');%recording start time
-subplot(7,1,k)
-hold on;
-plot(SMA{2,k+1},SMA{1,k+1},'r')
-ylabel(sensorLabels(k))
-xlim([datenum(initTime,'HH:MM:SS'),datenum(finTime,'HH:MM:SS')]);
-datetick('x','HH:MM:SS');
-% xticks([datenum(initTime,'HH:MM:SS'),datenum(finTime,'HH:MM:SS')]);
-% xticklabels(string(datestr([datenum(initTime,'HH:MM:SS'),datenum(finTime,'HH:MM:SS')],'HH:MM:SS'))');
-axis tight
-end               
+    startTime = datenum('00:00','HH:MM');%recording start time
+    subplot(7,1,k)
+    hold on;
+    plot(SMA{2,k+1},SMA{1,k+1},'r')
+    ylabel(sensorLabels(k))
+    xlim([datenum(initTime,'HH:MM:SS'),datenum(finTime,'HH:MM:SS')]);
+    datetick('x','HH:MM:SS');
+    % xticks([datenum(initTime,'HH:MM:SS'),datenum(finTime,'HH:MM:SS')]);
+    % xticklabels(string(datestr([datenum(initTime,'HH:MM:SS'),datenum(finTime,'HH:MM:SS')],'HH:MM:SS'))');
+    axis tight
+end
 
 subplot(7,1,7)
 hold on;

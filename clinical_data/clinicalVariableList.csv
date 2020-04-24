@@ -1,70 +1,73 @@
-"","X","order","variable","type","class","variableSubtitle","variableTitle","figName","figTitle","units"
-"1",1,1,"PY_pNum","static","integer","PY_pNum","pNum","","",""
-"2",2,2,"pNum","static","integer","pNum","pNum","episode ID","episode ID",""
-"3",3,3,"gender","static","factor","gender","gender","vital status at discharge","vital status at discharge",""
-"4",4,4,"age","time","integer","age","age","sex","sex","years"
-"5",5,5,"date_admission","time","factor","date_admission","date","age","age",""
-"6",6,6,"date_discharge","static","factor","date_discharge","date","APACHE score","APACHE score",""
-"7",7,7,"los","static","integer","los","los","ICU discharge (hours)","ICU discharge (hours)","days"
-"8",8,8,"diagnosis_1","static","factor","diagnosis_1","diagnosis","ICU discharge (days)","ICU discharge (days)",""
-"9",9,9,"diagnosis_2","static","factor","diagnosis_2","diagnosis","mimimum HR (day 1)","mimimum HR",""
-"10",10,10,"diagnosis_3","static","factor","diagnosis_3","diagnosis","maximum HR (day 1)","maximum HR",""
-"11",11,11,"stroke","static","integer","stroke","stroke","mimimum MAP (day 1)","mimimum MAP",""
-"12",12,12,"ich","static","integer","ich","ich","maximum MAP (day 1)","maximum MAP",""
-"13",13,13,"sah","static","integer","sah","sah","ventilation status (day 1)","ventilation status",""
-"14",14,14,"bt","static","integer","bt","bt","mimimum PaO2FiO2 (day 1)","mimimum PaO2FiO2",""
-"15",15,15,"sdh","static","integer","sdh","sdh","maximum PaO2FiO2 (day 1)","maximum PaO2FiO2",""
-"16",16,16,"tbi","static","integer","tbi","tbi","mimimum lactate (day 1)","mimimum lactate",""
-"17",17,17,"date_consented","static","factor","date_consented","date","maximum lactate (day 1)","maximum lactate",""
-"18",18,18,"date_eeg","static","factor","date_eeg","date","","",""
-"19",19,19,"hlm_en","time","numeric","hlm_en","hlm","mimimum sodium (day 1)","mimimum sodium",""
-"20",20,20,"hlm_dis","time","numeric","hlm_dis","hlm","maximum sodium (day 1)","maximum sodium",""
-"21",21,21,"ampac_en_r","time","numeric","ampac_en_r","ampac","mimimum potassium (day 1)","mimimum potassium",""
-"22",22,22,"ampac_en_t","time","numeric","ampac_en_t","ampac","maximum potassium (day 1)","maximum potassium",""
-"23",23,23,"ampac_dis_r","time","numeric","ampac_dis_r","ampac","mimimum pH (day 1)","mimimum pH",""
-"24",24,24,"ampac_dis_t","time","numeric","ampac_dis_t","ampac","maximum pH (day 1)","maximum pH",""
-"25",25,25,"apache","static","integer","apache","apache","mimimum creatinine (day 1)","mimimum creatinine",""
-"26",26,26,"apache_interpretation","static","factor","apache_interpretation","apache","maximum creatinine (day 1)","maximum creatinine",""
-"27",27,27,"strength_LUE_en","time","numeric","strength_LUE_en","gcs","mimimum CRP (day 1)","mimimum CRP",""
-"28",28,28,"strength_RUE_en","time","numeric","strength_RUE_en","gcs","maximum CRP (day 1)","maximum CRP",""
-"29",29,29,"strength_RLE_en","time","numeric","strength_RLE_en","gcs","total noradrenaline (day 1)","total noradrenaline",""
-"30",30,30,"strength_LLE_en","time","numeric","strength_LLE_en","gcs","total adrenaline (day 1)","total adrenaline",""
-"31",31,31,"gcs_eyes_en","time","integer","gcs_eyes_en","gcs","total vasopressin (day 1)","total vasopressin",""
-"32",32,32,"gcs_verbal_en","time","integer","gcs_verbal_en","gcs","mimimum HR (day 2)","mimimum HR",""
-"33",33,33,"gcs_motor_en","time","integer","gcs_motor_en","gcs","maximum HR (day 2)","maximum HR",""
-"34",34,34,"gcs_en","time","integer","gcs_en","gcs","mimimum MAP (day 2)","mimimum MAP",""
-"35",35,35,"strength_LUE_dis","time","integer","strength_LUE_dis","gcs","maximum MAP (day 2)","maximum MAP",""
-"36",36,36,"strength_RUE_dis","time","integer","strength_RUE_dis","gcs","ventilation status (day 2)","ventilation status",""
-"37",37,37,"strength_RLE_dis","time","numeric","strength_RLE_dis","gcs","mimimum PaO2FiO2 (day 2)","mimimum PaO2FiO2",""
-"38",38,38,"strength_LLE_dis","time","numeric","strength_LLE_dis","gcs","maximum PaO2FiO2 (day 2)","maximum PaO2FiO2",""
-"39",39,39,"gcs_eyes_dis","time","integer","gcs_eyes_dis","gcs","mimimum lactate (day 2)","mimimum lactate",""
-"40",40,40,"gcs_verbal_dis","time","integer","gcs_verbal_dis","gcs","maximum lactate (day 2)","maximum lactate",""
-"41",41,41,"gcs_motor_dis","time","integer","gcs_motor_dis","gcs","mimimum sodium (day 2)","mimimum sodium",""
-"42",42,42,"gcs_dis","time","integer","gcs_dis","gcs","maximum sodium (day 2)","maximum sodium",""
-"43",43,43,"date_jfk_en","time","factor","date_jfk_en","date","mimimum potassium (day 2)","mimimum potassium",""
-"44",44,44,"jfk_auditory_en","time","numeric","jfk_auditory_en","jfk","maximum potassium (day 2)","maximum potassium",""
-"45",45,45,"jfk_visual_en","time","numeric","jfk_visual_en","jfk","mimimum pH (day 2)","mimimum pH",""
-"46",46,46,"jfk_motor_en","time","numeric","jfk_motor_en","jfk","maximum pH (day 2)","maximum pH",""
-"47",47,47,"jfk_verbal_en","time","numeric","jfk_verbal_en","jfk","mimimum creatinine (day 2)","mimimum creatinine",""
-"48",48,48,"jfk_communication_en","time","numeric","jfk_communication_en","jfk","maximum creatinine (day 2)","maximum creatinine",""
-"49",49,49,"jfk_arousal_en","time","numeric","jfk_arousal_en","jfk","mimimum CRP (day 2)","mimimum CRP",""
-"50",50,50,"jfk_en","time","numeric","jfk_en","jfk","maximum CRP (day 2)","maximum CRP",""
-"51",51,51,"date_jfk_dis","time","factor","date_jfk_dis","date","total noradrenaline (day 2)","total noradrenaline",""
-"52",52,52,"jfk_auditory_dis","time","numeric","jfk_auditory_dis","jfk","total adrenaline (day 2)","total adrenaline",""
-"53",53,53,"jfk_visual_dis","time","numeric","jfk_visual_dis","jfk","total vasopressin (day 2)","total vasopressin",""
-"54",54,54,"jfk_motor_dis","time","numeric","jfk_motor_dis","jfk","mimimum HR (day 3)","mimimum HR",""
-"55",55,55,"jfk_verbal_dis","time","numeric","jfk_verbal_dis","jfk","maximum HR (day 3)","maximum HR",""
-"56",56,56,"jfk_communication_dis","time","numeric","jfk_communication_dis","jfk","mimimum MAP (day 3)","mimimum MAP",""
-"57",57,57,"jfk_arousal_dis","time","numeric","jfk_arousal_dis","jfk","maximum MAP (day 3)","maximum MAP",""
-"58",58,58,"jfk_dis","time","numeric","jfk_dis","jfk","ventilation status (day 3)","ventilation status",""
-"59",59,59,"gose","static","integer","gose","gose","mimimum PaO2FiO2 (day 3)","mimimum PaO2FiO2",""
-"60",60,60,"death","static","integer","death","death","maximum PaO2FiO2 (day 3)","maximum PaO2FiO2",""
-"61",61,61,"code_destination","static","numeric","code_destination","destination","mimimum lactate (day 3)","mimimum lactate",""
-"62",62,62,"destination","static","factor","destination","destination","maximum lactate (day 3)","maximum lactate",""
-"63",63,63,"mRS_12mo","time","numeric","mRS_12mo","mRS","mimimum sodium (day 3)","mimimum sodium",""
-"64",64,64,"eq550_12mo","time","numeric","eq550_12mo","eq550","maximum sodium (day 3)","maximum sodium",""
-"65",65,65,"eq550_perc_12mo","time","numeric","eq550_perc_12mo","eq550","mimimum potassium (day 3)","mimimum potassium",""
-"66",66,66,"gose_12mo","time","numeric","gose_12mo","gose","maximum potassium (day 3)","maximum potassium",""
-"67",67,67,"outcome_12mo","time","integer","outcome_12mo","outcome_12mo","mimimum pH (day 3)","mimimum pH",""
-"68",68,68,"reason_for_loss","static","factor","reason_for_loss","reason_for_loss","maximum pH (day 3)","maximum pH",""
-"69",69,69,"notes","static","factor","notes","notes","mimimum creatinine (day 3)","mimimum creatinine",""
+"","order","variable","type","class","variableSubtitle","variableTitle","figName","figTitle","units"
+"1",1,"PY_pNum","integer","integer","PY_pNum","pNum",NA,NA,NA
+"2",2,"pNum","integer","integer","pNum","pNum","episode ID","episode ID",NA
+"3",3,"gender","factor","integer","gender","gender","vital status at discharge","vital status at discharge",NA
+"4",4,"age","integer","integer","age","age","sex","sex","years"
+"5",5,"date_admission","Date","double","date_admission","date","age","age",NA
+"6",6,"date_discharge","Date","double","date_discharge","date","APACHE score","APACHE score",NA
+"7",7,"los","integer","integer","los","los","ICU discharge (hours)","ICU discharge (hours)","days"
+"8",8,"diagnosis_1","character","character","diagnosis_1","diagnosis","ICU discharge (days)","ICU discharge (days)",NA
+"9",9,"diagnosis_2","character","character","diagnosis_2","diagnosis","mimimum HR (day 1)","mimimum HR",NA
+"10",10,"diagnosis_3","character","character","diagnosis_3","diagnosis","maximum HR (day 1)","maximum HR",NA
+"11",11,"stroke","factor","integer","stroke","stroke","mimimum MAP (day 1)","mimimum MAP",NA
+"12",12,"ich","factor","integer","ich","ich","maximum MAP (day 1)","maximum MAP",NA
+"13",13,"sah","factor","integer","sah","sah","ventilation status (day 1)","ventilation status",NA
+"14",14,"bt","factor","integer","bt","bt","mimimum PaO2FiO2 (day 1)","mimimum PaO2FiO2",NA
+"15",15,"sdh","factor","integer","sdh","sdh","maximum PaO2FiO2 (day 1)","maximum PaO2FiO2",NA
+"16",16,"tbi","factor","integer","tbi","tbi","mimimum lactate (day 1)","mimimum lactate",NA
+"17",17,"date_consented","Date","double","date_consented","date","maximum lactate (day 1)","maximum lactate",NA
+"18",18,"date_eeg","Date","double","date_eeg","date",NA,NA,NA
+"19",19,"hlm_en","integer","integer","hlm_en","hlm","mimimum sodium (day 1)","mimimum sodium",NA
+"20",20,"hlm_dis","integer","integer","hlm_dis","hlm","maximum sodium (day 1)","maximum sodium",NA
+"21",21,"ampac_en_r","integer","integer","ampac_en_r","ampac","mimimum potassium (day 1)","mimimum potassium",NA
+"22",22,"ampac_en_t","numeric","double","ampac_en_t","ampac","maximum potassium (day 1)","maximum potassium",NA
+"23",23,"ampac_dis_r","integer","integer","ampac_dis_r","ampac","mimimum pH (day 1)","mimimum pH",NA
+"24",24,"ampac_dis_t","numeric","double","ampac_dis_t","ampac","maximum pH (day 1)","maximum pH",NA
+"25",25,"apache","integer","integer","apache","apache","mimimum creatinine (day 1)","mimimum creatinine",NA
+"26",26,"apache_interpretation","factor","integer","apache_interpretation","apache","maximum creatinine (day 1)","maximum creatinine",NA
+"27",27,"strength_LUE_en","integer","integer","strength_LUE_en","gcs","mimimum CRP (day 1)","mimimum CRP",NA
+"28",28,"strength_RUE_en","integer","integer","strength_RUE_en","gcs","maximum CRP (day 1)","maximum CRP",NA
+"29",29,"strength_RLE_en","integer","integer","strength_RLE_en","gcs","total noradrenaline (day 1)","total noradrenaline",NA
+"30",30,"strength_LLE_en","integer","integer","strength_LLE_en","gcs","total adrenaline (day 1)","total adrenaline",NA
+"31",31,"gcs_eyes_en","integer","integer","gcs_eyes_en","gcs","total vasopressin (day 1)","total vasopressin",NA
+"32",32,"gcs_verbal_en","integer","integer","gcs_verbal_en","gcs","mimimum HR (day 2)","mimimum HR",NA
+"33",33,"gcs_motor_en","integer","integer","gcs_motor_en","gcs","maximum HR (day 2)","maximum HR",NA
+"34",34,"gcs_en","integer","integer","gcs_en","gcs","mimimum MAP (day 2)","mimimum MAP",NA
+"35",35,"strength_LUE_dis","integer","integer","strength_LUE_dis","gcs","maximum MAP (day 2)","maximum MAP",NA
+"36",36,"strength_RUE_dis","integer","integer","strength_RUE_dis","gcs","ventilation status (day 2)","ventilation status",NA
+"37",37,"strength_RLE_dis","integer","integer","strength_RLE_dis","gcs","mimimum PaO2FiO2 (day 2)","mimimum PaO2FiO2",NA
+"38",38,"strength_LLE_dis","integer","integer","strength_LLE_dis","gcs","maximum PaO2FiO2 (day 2)","maximum PaO2FiO2",NA
+"39",39,"gcs_eyes_dis","integer","integer","gcs_eyes_dis","gcs","mimimum lactate (day 2)","mimimum lactate",NA
+"40",40,"gcs_verbal_dis","integer","integer","gcs_verbal_dis","gcs","maximum lactate (day 2)","maximum lactate",NA
+"41",41,"gcs_motor_dis","integer","integer","gcs_motor_dis","gcs","mimimum sodium (day 2)","mimimum sodium",NA
+"42",42,"gcs_dis","integer","integer","gcs_dis","gcs","maximum sodium (day 2)","maximum sodium",NA
+"43",43,"date_jfk_en","Date","double","date_jfk_en","date","mimimum potassium (day 2)","mimimum potassium",NA
+"44",44,"jfk_auditory_en","integer","integer","jfk_auditory_en","jfk","maximum potassium (day 2)","maximum potassium",NA
+"45",45,"jfk_visual_en","integer","integer","jfk_visual_en","jfk","mimimum pH (day 2)","mimimum pH",NA
+"46",46,"jfk_motor_en","integer","integer","jfk_motor_en","jfk","maximum pH (day 2)","maximum pH",NA
+"47",47,"jfk_verbal_en","integer","integer","jfk_verbal_en","jfk","mimimum creatinine (day 2)","mimimum creatinine",NA
+"48",48,"jfk_communication_en","integer","integer","jfk_communication_en","jfk","maximum creatinine (day 2)","maximum creatinine",NA
+"49",49,"jfk_arousal_en","integer","integer","jfk_arousal_en","jfk","mimimum CRP (day 2)","mimimum CRP",NA
+"50",50,"jfk_en","integer","integer","jfk_en","jfk","maximum CRP (day 2)","maximum CRP",NA
+"51",51,"date_jfk_dis","Date","double","date_jfk_dis","date","total noradrenaline (day 2)","total noradrenaline",NA
+"52",52,"jfk_auditory_dis","integer","integer","jfk_auditory_dis","jfk","total adrenaline (day 2)","total adrenaline",NA
+"53",53,"jfk_visual_dis","integer","integer","jfk_visual_dis","jfk","total vasopressin (day 2)","total vasopressin",NA
+"54",54,"jfk_motor_dis","integer","integer","jfk_motor_dis","jfk","mimimum HR (day 3)","mimimum HR",NA
+"55",55,"jfk_verbal_dis","integer","integer","jfk_verbal_dis","jfk","maximum HR (day 3)","maximum HR",NA
+"56",56,"jfk_communication_dis","integer","integer","jfk_communication_dis","jfk","mimimum MAP (day 3)","mimimum MAP",NA
+"57",57,"jfk_arousal_dis","integer","integer","jfk_arousal_dis","jfk","maximum MAP (day 3)","maximum MAP",NA
+"58",58,"jfk_dis","integer","integer","jfk_dis","jfk","ventilation status (day 3)","ventilation status",NA
+"59",59,"gose","integer","integer","gose","gose","mimimum PaO2FiO2 (day 3)","mimimum PaO2FiO2",NA
+"60",60,"death","factor","integer","death","death","maximum PaO2FiO2 (day 3)","maximum PaO2FiO2",NA
+"61",61,"code_destination","factor","integer","code_destination","destination","mimimum lactate (day 3)","mimimum lactate",NA
+"62",62,"destination","character","character","destination","destination","maximum lactate (day 3)","maximum lactate",NA
+"63",63,"mRS_12mo","integer","integer","mRS_12mo","mRS","mimimum sodium (day 3)","mimimum sodium",NA
+"64",64,"eq550_12mo","integer","integer","eq550_12mo","eq550","maximum sodium (day 3)","maximum sodium",NA
+"65",65,"eq550_perc_12mo","numeric","double","eq550_perc_12mo","eq550","mimimum potassium (day 3)","mimimum potassium",NA
+"66",66,"gose_12mo","integer","integer","gose_12mo","gose","maximum potassium (day 3)","maximum potassium",NA
+"67",67,"outcome_12mo","factor","integer","outcome_12mo","outcome_12mo","mimimum pH (day 3)","mimimum pH",NA
+"68",68,"reason_for_loss","character","character","reason_for_loss","reason_for_loss","maximum pH (day 3)","maximum pH",NA
+"69",69,"notes","character","character","notes","notes","mimimum creatinine (day 3)","mimimum creatinine",NA
+"70",70,"favorable","factor","integer","favorable",NA,NA,NA,NA
+"71",71,"favorable_12mo","factor","integer","favorable_12mo",NA,NA,NA,NA
+"72",72,"death_12mo","factor","integer","death_12mo",NA,NA,NA,NA
