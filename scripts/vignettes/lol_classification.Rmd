@@ -17,6 +17,7 @@ library(plotly)
 library(naniar)
 library(MASS)
 library(caret)
+library(cvAUC)
 source("../functions/generateRootDir.R")
 ```
 
@@ -53,11 +54,11 @@ return (lapply(c(2:7), function(y) {
 }
 
 ## [[1]]:bp_pred [[2]]:fe_pred [[3]]:fp_pred [[4]]:mf_pred [[5]]:sm_pred [[6]]:wv_pred
-val<-names(self_val_predictions12mo[[1]])
-get_auc_plots <- function(plot_info){
+get_auc_plots <- function(plot_info, auc_info){
   filePath = paste0("../",generateRootDir(paste0(deparse(substitute(plot_info)),"/")))
   dir.create(filePath, recursive=TRUE,showWarnings = FALSE)
   color_choice = c('red','blue4','green','purple','pink','cyan2')
+  val<-names(auc_info[[1]])
   lapply(c(1:6), function(y) {
     png(paste0(filePath,val[y],".png"))
       lapply(seq_along(plot_info), function(x) {
@@ -75,12 +76,12 @@ get_auc_plots <- function(plot_info){
 
 ```{r }
 self_dis<-get_auc_info(self_val_predictionsDis)
-get_auc_plots(self_dis)
+get_auc_plots(self_dis,self_val_predictionsDis)
 self_12mo<-get_auc_info(self_val_predictions12mo)
-get_auc_plots(self_12mo)
+get_auc_plots(self_12mo,self_val_predictions12mo)
 test_dis<-get_auc_info(test_val_predictionsDis)
-get_auc_plots(test_dis)
+get_auc_plots(test_dis,test_val_predictionsDis)
 test_12mo<-get_auc_info(test_val_predictions12mo)
-get_auc_plots(test_12mo)
+get_auc_plots(test_12mo,test_val_predictions12mo)
 ```
    
