@@ -33,37 +33,54 @@ source("../functions/generateRootDir.R")
 * 3: Mortality during hospital stay
 * 4: Mortality within 1 year
 
+
 ```{r }
-draw_auc_plots <- function(list_of_preds){
-  for(i in seq_along(list_of_preds)){
-      filePath = paste0("../",generateRootDir(paste0(deparse(substitute(list_of_preds)),"/Fold",i,"/")))
-      dir.create(filePath, recursive=TRUE,showWarnings = FALSE)
-      for(j in seq_along(list_of_preds[[i]])){
-          out<-cvAUC(list(na.omit(list_of_preds[[i]][[j]])$bp_pred, 
-                          na.omit(list_of_preds[[i]][[j]])$fe_pred,
-                          na.omit(list_of_preds[[i]][[j]])$fp_pred,
-                          na.omit(list_of_preds[[i]][[j]])$mf_pred,
-                          na.omit(list_of_preds[[i]][[j]])$sm_pred,
-                          na.omit(list_of_preds[[i]][[j]])$wv_pred),
-                     rep(list(na.omit(list_of_preds[[i]][[j]])$ground_truth),6))
-          plot_title<-switch(j, 
-                         "TOD & GOSE",
-                         "TFR & GOSE",
-                         "TOD & Favorable GOSE",
-                         "TFR & Favorable GOSE",
-                         "TOD & Death",
-                         "TFR & Death")
-          png(paste0(filePath,plot_title,".png"))
-          plot(out$perf, col="grey", lty=3)
-          plot(out$perf, col="red", avg="vertical", add=TRUE)
-          title (paste("5-fold CV AUC:",plot_title))
-          dev.off()
-      }
-    }
+get_auc_info <- function(list_of_preds){
+  
+return (lapply(c(2:7), function(y) {
+          lapply(seq_along(list_of_preds[[1]]), function(x) {
+            cvAUC(list(na.omit(list_of_preds[[1]][[x]])[[y]],
+                       na.omit(list_of_preds[[2]][[x]])[[y]],
+                       na.omit(list_of_preds[[3]][[x]])[[y]],
+                       na.omit(list_of_preds[[4]][[x]])[[y]],
+                       na.omit(list_of_preds[[5]][[x]])[[y]]),
+                  list(na.omit(list_of_preds[[1]][[x]])$ground_truth,
+                       na.omit(list_of_preds[[2]][[x]])$ground_truth,
+                       na.omit(list_of_preds[[3]][[x]])$ground_truth,
+                       na.omit(list_of_preds[[4]][[x]])$ground_truth,
+                       na.omit(list_of_preds[[5]][[x]])$ground_truth))})
+          }))
 }
 
-draw_auc_plots(self_val_predictionsDis)
-draw_auc_plots(self_val_predictions12mo)
-draw_auc_plots(test_val_predictionsDis)
-draw_auc_plots(test_val_predictions12mo)
+## [[1]]:bp_pred [[2]]:fe_pred [[3]]:fp_pred [[4]]:mf_pred [[5]]:sm_pred [[6]]:wv_pred
+val<-names(self_val_predictions12mo[[1]])
+get_auc_plots <- function(plot_info){
+  filePath = paste0("../",generateRootDir(paste0(deparse(substitute(plot_info)),"/")))
+  dir.create(filePath, recursive=TRUE,showWarnings = FALSE)
+  color_choice = c('red','blue4','green','purple','pink','cyan2')
+  lapply(c(1:6), function(y) {
+    png(paste0(filePath,val[y],".png"))
+      lapply(seq_along(plot_info), function(x) {
+      plot(plot_info[[x]][[y]]$perf, col="grey", lty=3)
+      plot(plot_info[[x]][[y]]$perf, avg="vertical",col=color_choice[x], lwd=2, add=TRUE) 
+      par(new=TRUE) 
+      })
+    legend("bottomright", legend=c("bp_pred", "fe_pred","fp_pred", "mf_pred","sm_pred", "wv_pred"),fill=color_choice,cex=0.75)  
+    title(val[y])
+    dev.off()
+  })
+
+}
 ```
+
+```{r }
+self_dis<-get_auc_info(self_val_predictionsDis)
+get_auc_plots(self_dis)
+self_12mo<-get_auc_info(self_val_predictions12mo)
+get_auc_plots(self_12mo)
+test_dis<-get_auc_info(test_val_predictionsDis)
+get_auc_plots(test_dis)
+test_12mo<-get_auc_info(test_val_predictions12mo)
+get_auc_plots(test_12mo)
+```
+   
