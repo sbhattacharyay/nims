@@ -1,13 +1,19 @@
 train_GLM<-function(train_CV,Y,currTrainIdx,a,k){
-
-    bp_glm<-cv.glmnet(train_CV$band_power_train_cv,Y[currTrainIdx],alpha = a,family = "binomial",type.measure = "auc",nfolds=k)
-    fe_glm<-cv.glmnet(train_CV$band_power_train_cv,Y[currTrainIdx],alpha = a,family = "binomial",type.measure = "auc",nfolds=k)
-    fp_glm<-cv.glmnet(train_CV$band_power_train_cv,Y[currTrainIdx],alpha = a,family = "binomial",type.measure = "auc",nfolds=k)
-    mf_glm<-cv.glmnet(train_CV$band_power_train_cv,Y[currTrainIdx],alpha = a,family = "binomial",type.measure = "auc",nfolds=k)
-    sm_glm<-cv.glmnet(train_CV$band_power_train_cv,Y[currTrainIdx],alpha = a,family = "binomial",type.measure = "auc",nfolds=k)
-    wv_glm<-cv.glmnet(train_CV$band_power_train_cv,Y[currTrainIdx],alpha = a,family = "binomial",type.measure = "auc",nfolds=k)
-    
-    tempList<-list(bp_glm,fe_glm,fp_glm,mf_glm,sm_glm,wv_glm)
-    names(tempList)<-c("bp_glm","fe_glm","fp_glm","mf_glm","sm_glm","wv_glm")
+    tempList<-lapply(train_CV, function(x) cv.glmnet(data.matrix(x),Y[currTrainIdx],alpha = a,family = "binomial",type.measure ="auc",nfolds=k))
+    names(tempList)<-c(
+        "bp_clin_glm",
+        "fe_clin_glm",
+        "fp_clin_glm",
+        "mf_clin_glm",
+        "sm_clin_glm",
+        "wv_clin_glm",
+        "clin_only_glm",
+        "bp_only_glm",
+        "fe_only_glm",
+        "fp_only_glm",
+        "mf_only_glm",
+        "sm_only_glm",
+        "wv_only_glm"
+    )
     return(tempList)
 } 

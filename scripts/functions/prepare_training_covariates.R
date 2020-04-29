@@ -1,36 +1,63 @@
-prepare_training_covariates<-function(Y_LOL,train_tf_covariates,gose_logical){
-
-  if (gose_logical == TRUE){
-    band_power_train_cv<-cbind(train_tf_covariates$Age,train_tf_covariates$Sex,train_tf_covariates$GCS_en,Y_LOL$band_powerLOL$Xr[,1:3])
-    freq_entropy_train_cv<-cbind(train_tf_covariates$Age,train_tf_covariates$Sex,train_tf_covariates$GCS_en,Y_LOL$freq_entropyLOL$Xr[,1:3])
-    freq_pairs_train_cv<-cbind(train_tf_covariates$Age,train_tf_covariates$Sex,train_tf_covariates$GCS_en,Y_LOL$freq_pairsLOL$Xr[,1:3])
-    med_freq_train_cv<-cbind(train_tf_covariates$Age,train_tf_covariates$Sex,train_tf_covariates$GCS_en,Y_LOL$med_freqLOL$Xr[,1:3])
-    sma_train_cv<-cbind(train_tf_covariates$Age,train_tf_covariates$Sex,train_tf_covariates$GCS_en,Y_LOL$smaLOL$Xr[,1:3])
-    wavelets_train_cv<-cbind(train_tf_covariates$Age,train_tf_covariates$Sex,train_tf_covariates$GCS_en,Y_LOL$waveletsLOL$Xr[,1:3])
-    
-    colnames(band_power_train_cv)<-c("Age","Sex","GCS_en","MF.1","MF.2","MF.3")
-    colnames(freq_entropy_train_cv)<-c("Age","Sex","GCS_en","MF.1","MF.2","MF.3")
-    colnames(freq_pairs_train_cv)<-c("Age","Sex","GCS_en","MF.1","MF.2","MF.3")
-    colnames(med_freq_train_cv)<-c("Age","Sex","GCS_en","MF.1","MF.2","MF.3")
-    colnames(sma_train_cv)<-c("Age","Sex","GCS_en","MF.1","MF.2","MF.3")
-    colnames(wavelets_train_cv)<-c("Age","Sex","GCS_en","MF.1","MF.2","MF.3")
-  } else {
-    band_power_train_cv<-cbind(train_tf_covariates$Age,train_tf_covariates$Sex,train_tf_covariates$APACHE,Y_LOL$band_powerLOL$Xr[,1:3])
-    freq_entropy_train_cv<-cbind(train_tf_covariates$Age,train_tf_covariates$Sex,train_tf_covariates$APACHE,Y_LOL$freq_entropyLOL$Xr[,1:3])
-    freq_pairs_train_cv<-cbind(train_tf_covariates$Age,train_tf_covariates$Sex,train_tf_covariates$APACHE,Y_LOL$freq_pairsLOL$Xr[,1:3])
-    med_freq_train_cv<-cbind(train_tf_covariates$Age,train_tf_covariates$Sex,train_tf_covariates$APACHE,Y_LOL$med_freqLOL$Xr[,1:3])
-    sma_train_cv<-cbind(train_tf_covariates$Age,train_tf_covariates$Sex,train_tf_covariates$APACHE,Y_LOL$smaLOL$Xr[,1:3])
-    wavelets_train_cv<-cbind(train_tf_covariates$Age,train_tf_covariates$Sex,train_tf_covariates$APACHE,Y_LOL$waveletsLOL$Xr[,1:3])
-    
-    colnames(band_power_train_cv)<-c("Age","Sex","APACHE","MF.1","MF.2","MF.3")
-    colnames(freq_entropy_train_cv)<-c("Age","Sex","APACHE","MF.1","MF.2","MF.3")
-    colnames(freq_pairs_train_cv)<-c("Age","Sex","APACHE","MF.1","MF.2","MF.3")
-    colnames(med_freq_train_cv)<-c("Age","Sex","APACHE","MF.1","MF.2","MF.3")
-    colnames(sma_train_cv)<-c("Age","Sex","APACHE","MF.1","MF.2","MF.3")
-    colnames(wavelets_train_cv)<-c("Age","Sex","APACHE","MF.1","MF.2","MF.3")
-  }
+prepare_training_covariates<-function(clinicalVars,Y_LOL,train_tf_covariates,r){
   
-  tempList<-list(band_power_train_cv,freq_entropy_train_cv,freq_pairs_train_cv,med_freq_train_cv,sma_train_cv,wavelets_train_cv)
-  names(tempList)<-c("band_power_train_cv","freq_entropy_train_cv","freq_pairs_train_cv","med_freq_train_cv","sma_train_cv","wavelets_train_cv")
+  bp_clin_train_cv<-cbind(train_tf_covariates[clinicalVars],Y_LOL$band_powerLOL$Xr[,1:r])
+  fe_clin_train_cv<-cbind(train_tf_covariates[clinicalVars],Y_LOL$freq_entropyLOL$Xr[,1:r])
+  fp_clin_train_cv<-cbind(train_tf_covariates[clinicalVars],Y_LOL$freq_pairsLOL$Xr[,1:r])
+  mf_clin_train_cv<-cbind(train_tf_covariates[clinicalVars],Y_LOL$med_freqLOL$Xr[,1:r])
+  sm_clin_train_cv<-cbind(train_tf_covariates[clinicalVars],Y_LOL$smaLOL$Xr[,1:r])
+  wv_clin_train_cv<-cbind(train_tf_covariates[clinicalVars],Y_LOL$waveletsLOL$Xr[,1:r])
+  clin_only_train_cv <- train_tf_covariates[clinicalVars]
+  bp_only_train_cv<-as.data.frame(Y_LOL$band_powerLOL$Xr[,1:r])
+  fe_only_train_cv<-as.data.frame(Y_LOL$freq_entropyLOL$Xr[,1:r])
+  fp_only_train_cv<-as.data.frame(Y_LOL$freq_pairsLOL$Xr[,1:r])
+  mf_only_train_cv<-as.data.frame(Y_LOL$med_freqLOL$Xr[,1:r])
+  sm_only_train_cv<-as.data.frame(Y_LOL$smaLOL$Xr[,1:r])
+  wv_only_train_cv<-as.data.frame(Y_LOL$waveletsLOL$Xr[,1:r])
+
+  colnames(bp_clin_train_cv)<-c(clinicalVars,paste0(rep("MF.",r),1:r))
+  colnames(fe_clin_train_cv)<-c(clinicalVars,paste0(rep("MF.",r),1:r))
+  colnames(fp_clin_train_cv)<-c(clinicalVars,paste0(rep("MF.",r),1:r))
+  colnames(mf_clin_train_cv)<-c(clinicalVars,paste0(rep("MF.",r),1:r))
+  colnames(sm_clin_train_cv)<-c(clinicalVars,paste0(rep("MF.",r),1:r))
+  colnames(wv_clin_train_cv)<-c(clinicalVars,paste0(rep("MF.",r),1:r))
+  
+  colnames(bp_only_train_cv)<-paste0(rep("MF.",r),1:r)
+  colnames(fe_only_train_cv)<-paste0(rep("MF.",r),1:r)
+  colnames(fp_only_train_cv)<-paste0(rep("MF.",r),1:r)
+  colnames(mf_only_train_cv)<-paste0(rep("MF.",r),1:r)
+  colnames(sm_only_train_cv)<-paste0(rep("MF.",r),1:r)
+  colnames(wv_only_train_cv)<-paste0(rep("MF.",r),1:r)
+  
+  tempList <-
+    list(
+      bp_clin_train_cv,
+      fe_clin_train_cv,
+      fp_clin_train_cv,
+      mf_clin_train_cv,
+      sm_clin_train_cv,
+      wv_clin_train_cv,
+      clin_only_train_cv,
+      bp_only_train_cv,
+      fe_only_train_cv,
+      fp_only_train_cv,
+      mf_only_train_cv,
+      sm_only_train_cv,
+      wv_only_train_cv
+    )
+  names(tempList)<-c(
+    "bp_clin_train_cv",
+    "fe_clin_train_cv",
+    "fp_clin_train_cv",
+    "mf_clin_train_cv",
+    "sm_clin_train_cv",
+    "wv_clin_train_cv",
+    "clin_only_train_cv",
+    "bp_only_train_cv",
+    "fe_only_train_cv",
+    "fp_only_train_cv",
+    "mf_only_train_cv",
+    "sm_only_train_cv",
+    "wv_only_train_cv"
+  )
   return(tempList)
 } 
