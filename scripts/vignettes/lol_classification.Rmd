@@ -171,6 +171,7 @@ get_auc_plots(test_kNN_12mo,test_val_kNN_predictions12mo)
 
 ```{r }
 get_auc_mean_sd <- function(plot_info, auc_info){
+  filePath = paste0("../",generateRootDir(paste0(deparse(substitute(plot_info)))))
   info_list<-list()
   lapply(c(1:6), function(y) {
       means <- c()
@@ -179,15 +180,33 @@ get_auc_mean_sd <- function(plot_info, auc_info){
       means<<-c(means,mean(plot_info[[x]][[y]]$fold.AUC))
       stddevs<<-c(stddevs,sd(plot_info[[x]][[y]]$fold.AUC))
       })
-      info_list[[y]]<<-data.frame(mean=means,stddev=stddevs, row.names=names(auc_info[[1]][[1]])[2:7])
+      info_list[[y]]<<-data.frame(mean=means,stddev=stddevs, row.names=gsub("_X1","",names(auc_info[[1]][[1]])[2:14]))
   })
   names(info_list)<-c(names(auc_info[[1]]))
-  return (info_list)
+  write.csv(info_list, file = paste0(filePath,".csv"),
+            row.names = TRUE)
 }
+```
 
-self_dis_metrics<-get_auc_mean_sd(self_dis,self_val_predictionsDis)
-self_12mo_metrics<-get_auc_mean_sd(self_12mo,self_val_predictions12mo)
-test_dis_metrics<-get_auc_mean_sd(test_dis,test_val_predictionsDis)
-test_12mo_metrics<-get_auc_mean_sd(test_12mo,test_val_predictions12mo)
+```{r }
+get_auc_mean_sd(self_GLM_dis,self_val_GLM_predictionsDis)
+get_auc_mean_sd(self_GLM_12mo,self_val_GLM_predictions12mo)
+get_auc_mean_sd(test_GLM_dis,test_val_GLM_predictionsDis)
+get_auc_mean_sd(test_GLM_12mo,test_val_GLM_predictions12mo)
+# 
+get_auc_mean_sd(self_SVM_dis,self_val_SVM_predictionsDis)
+get_auc_mean_sd(self_SVM_12mo,self_val_SVM_predictions12mo)
+get_auc_mean_sd(test_SVM_dis,test_val_SVM_predictionsDis)
+get_auc_mean_sd(test_SVM_12mo,test_val_SVM_predictions12mo)
+# 
+get_auc_mean_sd(self_LDA_dis,self_val_LDA_predictionsDis)
+get_auc_mean_sd(self_LDA_12mo,self_val_LDA_predictions12mo)
+get_auc_mean_sd(test_LDA_dis,test_val_LDA_predictionsDis)
+get_auc_mean_sd(test_LDA_12mo,test_val_LDA_predictions12mo)
+# 
+get_auc_mean_sd(self_kNN_dis,self_val_kNN_predictionsDis)
+get_auc_mean_sd(self_kNN_12mo,self_val_kNN_predictions12mo)
+get_auc_mean_sd(test_kNN_dis,test_val_kNN_predictionsDis)
+get_auc_mean_sd(test_kNN_12mo,test_val_kNN_predictions12mo)
 ```
    
