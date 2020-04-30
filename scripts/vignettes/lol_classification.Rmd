@@ -38,18 +38,18 @@ source("../functions/generateRootDir.R")
 ```{r }
 get_auc_info <- function(list_of_preds){
   
-return (lapply(c(2:7), function(y) {
+return (lapply(c(2:14), function(y) {
           lapply(seq_along(list_of_preds[[1]]), function(x) {
-            cvAUC(list(na.omit(list_of_preds[[1]][[x]])[[y]],
-                       na.omit(list_of_preds[[2]][[x]])[[y]],
-                       na.omit(list_of_preds[[3]][[x]])[[y]],
-                       na.omit(list_of_preds[[4]][[x]])[[y]],
-                       na.omit(list_of_preds[[5]][[x]])[[y]]),
-                  list(na.omit(list_of_preds[[1]][[x]])$ground_truth,
-                       na.omit(list_of_preds[[2]][[x]])$ground_truth,
-                       na.omit(list_of_preds[[3]][[x]])$ground_truth,
-                       na.omit(list_of_preds[[4]][[x]])$ground_truth,
-                       na.omit(list_of_preds[[5]][[x]])$ground_truth))})
+            cvAUC(list(list_of_preds[[1]][[x]][[y]],
+                       list_of_preds[[2]][[x]][[y]],
+                       list_of_preds[[3]][[x]][[y]],
+                       list_of_preds[[4]][[x]][[y]],
+                       list_of_preds[[5]][[x]][[y]]),
+                  list(list_of_preds[[1]][[x]]$ground_truth,
+                       list_of_preds[[2]][[x]]$ground_truth,
+                       list_of_preds[[3]][[x]]$ground_truth,
+                       list_of_preds[[4]][[x]]$ground_truth,
+                       list_of_preds[[5]][[x]]$ground_truth))})
           }))
 }
 
@@ -57,7 +57,8 @@ return (lapply(c(2:7), function(y) {
 get_auc_plots <- function(plot_info, auc_info){
   filePath = paste0("../",generateRootDir(paste0(deparse(substitute(plot_info)),"/")))
   dir.create(filePath, recursive=TRUE,showWarnings = FALSE)
-  color_choice = c('red','blue4','green','purple','pink','cyan2')
+  color_choice = factor(auc_info[[1]][[1]])[2:14]
+  names(color_choice) = gsub("_X1","",names(color_choice))
   val<-names(auc_info[[1]])
   lapply(c(1:6), function(y) {
     png(paste0(filePath,val[y],".png"))
@@ -66,22 +67,59 @@ get_auc_plots <- function(plot_info, auc_info){
       plot(plot_info[[x]][[y]]$perf, avg="vertical",col=color_choice[x], lwd=2, add=TRUE) 
       par(new=TRUE) 
       })
-    legend("bottomright", legend=c("bp_pred", "fe_pred","fp_pred", "mf_pred","sm_pred", "wv_pred"),fill=color_choice,cex=0.75)  
+    legend("bottomright", legend=names(color_choice),fill=color_choice,cex=0.75)  
     title(val[y])
     dev.off()
   })
-
 }
+
+```
+
+```{r echo=FALSE}
+self_GLM_dis<-get_auc_info(self_val_GLM_predictionsDis)
+get_auc_plots(self_GLM_dis,self_val_GLM_predictionsDis)
+
+test_GLM_dis<-get_auc_info(test_val_GLM_predictionsDis)
+get_auc_plots(test_GLM_dis,test_val_GLM_predictionsDis)
+
+self_SVM_dis<-get_auc_info(self_val_SVM_predictionsDis)
+get_auc_plots(self_SVM_dis,self_val_SVM_predictionsDis)
+
+test_SVM_dis<-get_auc_info(test_val_SVM_predictionsDis)
+get_auc_plots(test_SVM_dis,test_val_SVM_predictionsDis)
+
+self_LDA_dis<-get_auc_info(self_val_LDA_predictionsDis)
+get_auc_plots(self_LDA_dis,self_val_LDA_predictionsDis)
+
+test_LDA_dis<-get_auc_info(test_val_LDA_predictionsDis)
+get_auc_plots(test_LDA_dis,test_val_LDA_predictionsDis)
+
+self_kNN_dis<-get_auc_info(self_val_kNN_predictionsDis)
+get_auc_plots(self_kNN_dis,self_val_kNN_predictionsDis)
+
+test_kNN_dis<-get_auc_info(test_val_kNN_predictionsDis)
+get_auc_plots(test_kNN_dis,test_val_kNN_predictionsDis)
 ```
 
 ```{r }
-self_dis<-get_auc_info(self_val_predictionsDis)
-get_auc_plots(self_dis,self_val_predictionsDis)
-self_12mo<-get_auc_info(self_val_predictions12mo)
-get_auc_plots(self_12mo,self_val_predictions12mo)
-test_dis<-get_auc_info(test_val_predictionsDis)
-get_auc_plots(test_dis,test_val_predictionsDis)
-test_12mo<-get_auc_info(test_val_predictions12mo)
-get_auc_plots(test_12mo,test_val_predictions12mo)
+get_auc_mean_sd <- function(plot_info, auc_info){
+  info_list<-list()
+  lapply(c(1:6), function(y) {
+      means <- c()
+      stddevs <- c()
+      lapply(seq_along(plot_info), function(x) {
+      means<<-c(means,mean(plot_info[[x]][[y]]$fold.AUC))
+      stddevs<<-c(stddevs,sd(plot_info[[x]][[y]]$fold.AUC))
+      })
+      info_list[[y]]<<-data.frame(mean=means,stddev=stddevs, row.names=names(auc_info[[1]][[1]])[2:7])
+  })
+  names(info_list)<-c(names(auc_info[[1]]))
+  return (info_list)
+}
+
+self_dis_metrics<-get_auc_mean_sd(self_dis,self_val_predictionsDis)
+self_12mo_metrics<-get_auc_mean_sd(self_12mo,self_val_predictions12mo)
+test_dis_metrics<-get_auc_mean_sd(test_dis,test_val_predictionsDis)
+test_12mo_metrics<-get_auc_mean_sd(test_12mo,test_val_predictions12mo)
 ```
    
