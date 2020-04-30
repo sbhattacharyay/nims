@@ -18,6 +18,7 @@ library(naniar)
 library(MASS)
 library(caret)
 library(cvAUC)
+library(precrec)
 source("../functions/generateRootDir.R")
 ```
 
@@ -53,6 +54,23 @@ return (lapply(c(2:14), function(y) {
           }))
 }
 
+get_precrec_info <- function(list_of_preds){
+  
+return (lapply(c(2:14), function(y) {
+          lapply(seq_along(list_of_preds[[1]]), function(x) {
+            evalmod(scores=list(list_of_preds[[1]][[x]][[y]],
+                       list_of_preds[[2]][[x]][[y]],
+                       list_of_preds[[3]][[x]][[y]],
+                       list_of_preds[[4]][[x]][[y]],
+                       list_of_preds[[5]][[x]][[y]]),
+                  labels=(list(list_of_preds[[1]][[x]]$ground_truth,
+                       list_of_preds[[2]][[x]]$ground_truth,
+                       list_of_preds[[3]][[x]]$ground_truth,
+                       list_of_preds[[4]][[x]]$ground_truth,
+                       list_of_preds[[5]][[x]]$ground_truth)),dsids=c(1:5))})
+          }))
+}
+
 ## [[1]]:bp_pred [[2]]:fe_pred [[3]]:fp_pred [[4]]:mf_pred [[5]]:sm_pred [[6]]:wv_pred
 get_auc_plots <- function(plot_info, auc_info){
   filePath = paste0("../",generateRootDir(paste0(deparse(substitute(plot_info)),"/")))
@@ -73,32 +91,82 @@ get_auc_plots <- function(plot_info, auc_info){
   })
 }
 
+get_precrec_plots <- function(plot_info, auc_info){
+  filePath = paste0("../",generateRootDir(paste0(deparse(substitute(plot_info)),"/")))
+  dir.create(filePath, recursive=TRUE,showWarnings = FALSE)
+  color_choice = factor(auc_info[[1]][[1]])[2:14]
+  names(color_choice) = gsub("_X1","",names(color_choice))
+  val<-names(auc_info[[1]])
+  lapply(c(1:6), function(y) {
+    png(paste0(filePath,val[y],"_precrec.png"))
+      lapply(seq_along(plot_info), function(x) {
+      plot(plot_info[[x]][[y]], "PRC",col=color_choice[x], lwd=2) 
+      par(new=TRUE) 
+      })
+    legend("bottomright", legend=names(color_choice),fill=color_choice,cex=0.75)  
+    title(val[y])
+    dev.off()
+  })
+}
+
 ```
 
 ```{r echo=FALSE}
 self_GLM_dis<-get_auc_info(self_val_GLM_predictionsDis)
 get_auc_plots(self_GLM_dis,self_val_GLM_predictionsDis)
+# self_GLM_dis_pr<-get_precrec_info(self_val_GLM_predictionsDis)
+# get_precrec_plots(self_GLM_dis_pr,self_val_GLM_predictionsDis)
+self_GLM_12mo<-get_auc_info(self_val_GLM_predictions12mo)
+get_auc_plots(self_GLM_12mo,self_val_GLM_predictions12mo)
 
 test_GLM_dis<-get_auc_info(test_val_GLM_predictionsDis)
 get_auc_plots(test_GLM_dis,test_val_GLM_predictionsDis)
+# test_GLM_dis_pr<-get_precrec_info(test_val_GLM_predictionsDis)
+# get_precrec_plots(test_GLM_dis_pr,test_val_GLM_predictionsDis)
+test_GLM_12mo<-get_auc_info(test_val_GLM_predictions12mo)
+get_auc_plots(test_GLM_12mo,test_val_GLM_predictions12mo)
 
 self_SVM_dis<-get_auc_info(self_val_SVM_predictionsDis)
 get_auc_plots(self_SVM_dis,self_val_SVM_predictionsDis)
+# self_SVM_dis_pr<-get_precrec_info(self_val_SVM_predictionsDis)
+# get_precrec_plots(self_SVM_dis_pr,self_val_SVM_predictionsDis)
+self_SVM_12mo<-get_auc_info(self_val_SVM_predictions12mo)
+get_auc_plots(self_SVM_12mo,self_val_SVM_predictions12mo)
 
 test_SVM_dis<-get_auc_info(test_val_SVM_predictionsDis)
 get_auc_plots(test_SVM_dis,test_val_SVM_predictionsDis)
+# test_SVM_dis_pr<-get_precrec_info(test_val_SVM_predictionsDis)
+# get_precrec_plots(test_SVM_dis_pr,test_val_SVM_predictionsDis)
+test_SVM_12mo<-get_auc_info(test_val_SVM_predictions12mo)
+get_auc_plots(test_SVM_12mo,test_val_SVM_predictions12mo)
 
 self_LDA_dis<-get_auc_info(self_val_LDA_predictionsDis)
 get_auc_plots(self_LDA_dis,self_val_LDA_predictionsDis)
+# self_LDA_dis_pr<-get_precrec_info(self_val_LDA_predictionsDis)
+# get_precrec_plots(self_LDA_dis_pr,self_val_LDA_predictionsDis)
+self_LDA_12mo<-get_auc_info(self_val_LDA_predictions12mo)
+get_auc_plots(self_LDA_12mo,self_val_LDA_predictions12mo)
 
 test_LDA_dis<-get_auc_info(test_val_LDA_predictionsDis)
 get_auc_plots(test_LDA_dis,test_val_LDA_predictionsDis)
+# test_LDA_dis_pr<-get_precrec_info(test_val_LDA_predictionsDis)
+# get_precrec_plots(test_LDA_dis_pr,test_val_LDA_predictionsDis)
+test_LDA_12mo<-get_auc_info(test_val_LDA_predictions12mo)
+get_auc_plots(test_LDA_12mo,test_val_LDA_predictions12mo)
 
 self_kNN_dis<-get_auc_info(self_val_kNN_predictionsDis)
 get_auc_plots(self_kNN_dis,self_val_kNN_predictionsDis)
+# self_kNN_dis_pr<-get_precrec_info(self_val_kNN_predictionsDis)
+# get_precrec_plots(self_kNN_dis_pr,self_val_kNN_predictionsDis)
+self_kNN_12mo<-get_auc_info(self_val_kNN_predictions12mo)
+get_auc_plots(self_kNN_12mo,self_val_kNN_predictions12mo)
 
 test_kNN_dis<-get_auc_info(test_val_kNN_predictionsDis)
 get_auc_plots(test_kNN_dis,test_val_kNN_predictionsDis)
+# test_kNN_dis_pr<-get_precrec_info(test_val_kNN_predictionsDis)
+# get_precrec_plots(test_kNN_dis_pr,test_val_kNN_predictionsDis)
+test_kNN_12mo<-get_auc_info(test_val_kNN_predictions12mo)
+get_auc_plots(test_kNN_12mo,test_val_kNN_predictions12mo)
 ```
 
 ```{r }
