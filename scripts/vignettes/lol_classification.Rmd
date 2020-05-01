@@ -19,6 +19,7 @@ library(MASS)
 library(caret)
 library(cvAUC)
 library(precrec)
+library(plotfunctions)
 source("../functions/generateRootDir.R")
 ```
 
@@ -78,30 +79,60 @@ get_auc_plots <- function(plot_info, auc_info){
   dir.create(filePath, recursive=TRUE,showWarnings = FALSE)
   color_choice = factor(auc_info[[1]][[1]])[2:14]
   names(color_choice) = gsub("_X1","",names(color_choice))
+  col_vector<-palette(c(rgb(0,184,172, maxColorValue=255),
+                        rgb(122,0,140, maxColorValue=255),
+                        rgb(181,255,74, maxColorValue=255),
+                        rgb(248,137,255, maxColorValue=255),
+                        rgb(0,106,57, maxColorValue=255),
+                        rgb(175,0,71, maxColorValue=255),
+                        rgb(247,255,171, maxColorValue=255),
+                        rgb(2,98,202, maxColorValue=255),
+                        rgb(255,196,89, maxColorValue=255),
+                        rgb(27,0,25, maxColorValue=255),
+                        rgb(157,129,0, maxColorValue=255),
+                        rgb(157,216,255, maxColorValue=255),
+                        rgb(255,208,234, maxColorValue=255)))
   val<-names(auc_info[[1]])
   lapply(c(1:6), function(y) {
-    png(paste0(filePath,val[y],".png"))
+    tiff(paste0(filePath,val[y],".tiff"))
       lapply(seq_along(plot_info), function(x) {
       plot(plot_info[[x]][[y]]$perf, col="grey", lty=3)
-      plot(plot_info[[x]][[y]]$perf, avg="vertical",col=color_choice[x], lwd=2, add=TRUE) 
+      plot(plot_info[[x]][[y]]$perf, avg="vertical",col=col_vector[x], lwd=2, add=TRUE) 
+      # plot_error(rowMeans(sapply(plot_info[[x]][[y]]$perf@x.values, `length<-`, max(lengths(plot_info[[x]][[y]]$perf@x.values))), 
+      #                     na.rm=TRUE),rowMeans(sapply(plot_info[[x]][[y]]$perf@y.values, `length<-`, 
+      #                                                 max(lengths(plot_info[[x]][[y]]$perf@y.values))), na.rm=TRUE),type="n", 
+      #            se.fit=sd(plot_info[[x]][[y]]$fold.AUC), shade=TRUE, col="grey",alpha=0.10)
       par(new=TRUE) 
       })
-    legend("bottomright", legend=names(color_choice),fill=color_choice,cex=0.75)  
+    legend("bottomright", legend=names(color_choice),fill=col_vector,cex=0.75)  
     title(val[y])
     dev.off()
   })
-}
+}     
 
 get_precrec_plots <- function(plot_info, auc_info){
   filePath = paste0("../",generateRootDir(paste0(gsub("_pr","",deparse(substitute(plot_info))),"/")))
   color_choice = factor(auc_info[[1]][[1]])[2:14]
   names(color_choice) = gsub("_X1","",names(color_choice))
+  col_vector<-palette(c(rgb(0,184,172, maxColorValue=255),
+                        rgb(122,0,140, maxColorValue=255),
+                        rgb(181,255,74, maxColorValue=255),
+                        rgb(248,137,255, maxColorValue=255),
+                        rgb(0,106,57, maxColorValue=255),
+                        rgb(175,0,71, maxColorValue=255),
+                        rgb(247,255,171, maxColorValue=255),
+                        rgb(2,98,202, maxColorValue=255),
+                        rgb(255,196,89, maxColorValue=255),
+                        rgb(27,0,25, maxColorValue=255),
+                        rgb(157,129,0, maxColorValue=255),
+                        rgb(157,216,255, maxColorValue=255),
+                        rgb(255,208,234, maxColorValue=255)))  
   val<-names(auc_info[[1]])
     for (i in 1:6){
       png(paste0(filePath,val[i],"_prc.png"))
       p_roc <<- ggplot()
       for (j in 1:13){
-        p_roc <<- p_roc + geom_line(data=cbind(motion_feats=names(color_choice)[j],subset(fortify(plot_info[[j]][[i]]), curvetype == "PRC")),
+        p_roc <<- p_roc + geom_line(data=cbind(motion_feats=col_vector[j],subset(fortify(plot_info[[j]][[i]]), curvetype == "PRC")),
                                    mapping=aes(x = x, y = y, color = motion_feats))
       }
       p_roc <<- p_roc + xlab("Recall") + ylab("Precision") + ggtitle(val[i])+  
@@ -113,6 +144,7 @@ get_precrec_plots <- function(plot_info, auc_info){
     }
 }
 
+#lapply(c(1:5), function(x) calibration(ground_truth~bp_clin_glm,data=self_val_GLM_predictionsDis[[x]][[1]]))
 ```
 
 ```{r echo=FALSE}
