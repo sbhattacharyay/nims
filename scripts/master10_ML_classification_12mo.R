@@ -1,4 +1,4 @@
-#### Master Script 9: GLM Classification ####
+#### Master Script 9: Classification of 12 Month Outcomes ####
 # Decoding Quantitative Motor Features for Classification and Prediction
 # in Severe Acquired Brain Injury
 #
