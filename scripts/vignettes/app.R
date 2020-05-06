@@ -1,66 +1,152 @@
+#### Classification Shiny App ####
+# Decoding Quantitative Motor Features for Classification and Prediction
+# in Severe Acquired Brain Injury
+#
+# Shubhayu Bhattacharyay and Eshan Joshi
+# Department of Biomedical Engineering
+# Department of Applied Mathematics and Statistics
+# Whiting School of Engineering, Johns Hopkins University
+# email address: shubhayu@jhu.edu
+
+library(devtools)
+if (!require(lolR))
+  install_github('neurodata/lol',
+                 build_vignettes = TRUE,
+                 force = TRUE)
+library(lolR)
+library(R.matlab)
 library(shiny)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(purrr)
+library(tibble)
+library(stringr)
+library(forcats)
+library(readxl)
+library(plotly)
+library(naniar)
+library(MASS)
+library(glmnet)
+library(caret)
+library(kernlab)
+library(rlist)
+library(nnet)
+library(e1071)
+library(randomForest)
+library(foreach)
+
+setwd("..")
+
+source('./functions/load_patient_clinical_data.R')
+source('./functions/update_clinicalVariableList.R')
+source('./functions/get_motion_features.R')
+source('./functions/lol_project_motion_features.R')
+source("./functions/cross_val_splits.R")
+source("./functions/load_tf_patient_covariates.R")
+source('./functions/cv_lol_project_motion_features.R')
+source('./functions/prepare_training_covariates.R')
+source('./functions/prepare_testing_covariates.R')
+source('./functions/classification_function_shiny_dis.R')
+source('./functions/classification_function_shiny_12mo.R')
+source('./functions/train_caret_models.R')
+source('./functions/predict_caret_models.R')
 
 ui <- fluidPage(
   fluidRow(
     column(12,
-           h1("A JOOBY HOOBY COLLEGE PRESENTATION"),
+           h1("ICU Accelerometry Classification with 5-fold Cross-Validation"),
     )
   ),
-    sidebarLayout(
-      sidebarPanel(
-          cellArgs = list(style='white-space: normal;'),
-          
-          submitButton("Click Here to Train Models"),
-          br(),
-          checkboxGroupInput("classifier_choice", label="Choice of Classifier",
-                             choices=c("SVM Radial Weights"="svm", "k-Nearest Neighbors"="knn", "Logistic (Ridge) Regression"="lrr", 
-                                       "Linear Discriminant Analysis"="lda", "Model Averaged Neural Network"="mann","Parallel Random Forests"="prf"),
-                             selected=c("svm","knn","lda")),
-          radioButtons("time_choice", label="Measure Time Interval by:",
-                       choices=c("Time of Day (TOD)"="tod","Time from Recording (TFR)"="tfr"), 
-                       selected="tfr"),
-          verticalLayout( 
-           sliderInput("tod_slice", label="TOD Time Interval Between 6 PM and 12 PM (+1)", timeFormat = "%T%p",
-                       step = 30,
-                       ticks=FALSE,
-                       min = as.POSIXct("2020-05-05 18:00:00"),
-                       max = as.POSIXct("2020-05-06 12:00:00"), 
-                       value = c(as.POSIXct("2020-05-06 0:00:00"),as.POSIXct("2020-05-06 6:00:00"))),
-           sliderInput("tfr_slide", label="TFR in hours",  
-                        min = 0, max = 8, step=1, value = c(2,6))
-            ),
-         
-         numericInput("dim_red",label="# of Dimensions to Reduce to",
-                      min=1,max=3,step=0.5,value=3),
-
-         checkboxGroupInput("mf_choice",label="Choice of Motion Features",
-                            choices=c("BP"="bp","FE"="fe","FP"="fp","MF"="mf","SM"="sm","WV"="wv"),
-                            selected="bp",
-                            inline = TRUE),
-         checkboxGroupInput("clinvar_choice", label="Choice of Clinical Variables",
-                            choices=c("Age"="age","Sex"="sex","APACHE"="apache","GCS_Enrollment"="gcs_en","Diagnosis"="diag"),
-                            selected=c("apache","sex","diag"),
-                            inline=TRUE),
-         checkboxGroupInput("sensor_loc", label="Choice of Sensor Locations",
-                            choices=c("Left Elbow"="left_el","Left Wrist"="left_wr","Left Ankle"="left_ank",
-                                      "Right Elbow"="right_el","Right Wrist"="right_wr","Right Ankle"="right_ank"),
-                            selected=c("left_el","left_wr","left_ank"),
-                            inline=TRUE)
-      ),
-      mainPanel(
-             tabsetPanel(
-               tabPanel("ROC", "contents"), 
-               tabPanel("Precision-Recall", "contents"), 
-               tabPanel("Calibration", "contents")
-        )
-        )
+  sidebarLayout(
+    sidebarPanel(
+      cellArgs = list(style='white-space: normal;'),
+      
+      checkboxGroupInput("classifier_choice", label="Choice of Classifier",
+                         choices = c(
+                           "SVM Radial Weights" = "svmRadialWeights",
+                           "k-Nearest Neighbors" = "knn",
+                           "Logistic Regression (Elastic Net)" = "glmnet",
+                           "Linear Discriminant Analysis" = "lda",
+                           "Model Averaged Neural Network" = "avNNet",
+                           "Parallel Random Forests" = "parRF"
+                         ), 
+                         selected=c("svmRadialWeights","knn","lda","glmnet")),
+      radioButtons("time_choice", label="Measure Time Interval by:",
+                   choices=c("Time of Day (TOD)"="tod","Time from Recording (TFR)"="tfr"), 
+                   selected="tfr"),
+      uiOutput("slider_type"),
+      numericInput("r",label="# of Dimensions to Reduce to",
+                   min=1,max=10,step=1,value=3),
+      checkboxGroupInput("mf_choice",label="Choice of Motion Features",
+                         choices = c(
+                           "Bandpower (0.3 - 3.5 Hz)" = "band_powerFeats",
+                           "Frequency-Domain Entropy" = "freq_entropyFeats",
+                           "High-Frequency, Low-Frequency Time-Domain Median Pairs" = "freq_pairsFeats",
+                           "Median Frequency" = "med_freqFeats",
+                           "Signal Magnitude Area" = "smaFeats",
+                           "db5 Wavelet (L2-6) Detail Coefficients" = "waveletsFeats"
+                         ),
+                         selected="band_powerFeats",
+                         inline = FALSE),
+      checkboxGroupInput("clinicalVars", label="Choice of Clinical Variables",
+                         choices = c(
+                           "Age" = "Age",
+                           "Sex" = "Sex",
+                           "APACHE" = "APACHE",
+                           "GCS at Enrollment" = "GCS_en",
+                           "Diagnosis" = "diag"
+                         ),
+                         selected = c("APACHE", "Sex", "diag"), 
+                         inline=TRUE),
+      checkboxGroupInput("sensor_loc", label="Choice of Sensor Locations",
+                         choices = c(
+                           "Left Ankle" = "left_ank",
+                           "Left Elbow" = "left_el",
+                           "Left Wrist" = "left_wr",
+                           "Right Ankle" = "right_ank",
+                           "Right Elbow" = "right_el",
+                           "Right Wrist" = "right_wr"
+                         ),
+                         selected=c("left_wr","right_wr"),
+                         inline=TRUE),
+      br(),
+      actionButton("button","Click Here to Train Models")
+    ),
+    mainPanel(
+      tabsetPanel(
+        tabPanel("ROC", "contents"), 
+        tabPanel("Precision-Recall", "contents"), 
+        tabPanel("Calibration", "contents")
       )
     )
+  )
+)
 
 server <- function(input, output) {
   
+  output$slider_type <- renderUI({
+    if (input$time_choice == 'tod') {
+      sliderInput("time_slide", label="TOD Time Interval Between 6 PM and 12 PM (+1)", timeFormat = "%I:%M %p",
+                  step = 1800,
+                  min = as.POSIXct("2020-05-05 18:00:00"),
+                  max = as.POSIXct("2020-05-06 12:00:00"), 
+                  value = c(as.POSIXct("2020-05-05 18:00:00"),as.POSIXct("2020-05-06 12:00:00")))
+    } else {
+      sliderInput("time_slide", label="TFR in hours",  
+                  min = 0, max = 8, step=0.5, value = c(0,8))
+    }
+  })
   
+  preds_dis <- eventReactive(input$button,{
+    classification_function_shiny(input$time_choice,input$time_slide,input$classifier_choice,input$r,input$mf_choice,input$clinicalVars,input$sensor_loc)
+  })
   
+  preds_12mo <- eventReactive(input$button,{
+    classification_function_shiny(input$time_choice,input$time_slide,input$classifier_choice,input$r,input$mf_choice,input$clinicalVars,input$sensor_loc)
+  })
+
 }
 
 

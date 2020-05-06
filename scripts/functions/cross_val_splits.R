@@ -6,9 +6,11 @@ cross_val_splits <- function(dataTable,k){
   if (nrow(dataTable)%%k == 0){
     return(split(permutation, ceiling(seq_along(permutation)/ratio)))
   }else{
-    idxV <- 1:((k-1)*(floor(ratio)))
+    idxV <- 1:(k*(floor(ratio)))
     tempList<-split(permutation[idxV], ceiling(seq_along(permutation[idxV])/floor(ratio)))
-    tempList[[as.character(k)]]<-permutation[(tail(idxV,1)+1):tail(nrow(dataTable),1)]
+    for (i in 1:(nrow(dataTable)%%k)){
+      tempList[[as.character(i)]]<-c(tempList[[as.character(i)]],permutation[length(permutation)+1-i])
+    }
     return(tempList)
   }
 }

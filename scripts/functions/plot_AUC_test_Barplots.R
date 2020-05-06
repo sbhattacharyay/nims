@@ -1,4 +1,4 @@
-library(ggplot)
+library(ggplot2)
 library(tidyverse)
 source("./functions/generateRootDir.R")
 
@@ -89,8 +89,8 @@ plot_AUC_Barplots <- function(DirCSV,newDirName,height = 500, width = 650) {
   dev.off()
 }
 
-for (i in list.files(path="../plots/2020-04-30/",pattern="^test.*csv")){
-  curr_Path <- file.path("../plots/2020-04-30/",i)
+for (i in list.files(path="../plots/2020-05-01/",pattern="^test.*csv")){
+  curr_Path <- file.path("../plots/2020-05-01/",i)
   currName <- substr(i, 1, nchar(i) - 4)
   plot_AUC_Barplots(curr_Path,currName)
 }
