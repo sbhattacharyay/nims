@@ -35,6 +35,10 @@ tod_range<-seq(as.POSIXct("2020-05-05 18:00:05"),as.POSIXct("2020-05-06 12:00:00
 
 sensor_options <- c("left_ank","left_el","left_wr","right_ank","right_el","right_wr")
 
+# Split for k-fold cross validation for discharge predictions:
+k <- 5
+cvIdx <- cross_val_splits(patient_clinical_data, k)
+
 classification_function_shiny_dis <-function(time_choice,time_slide,classifier_choice,r,mf_choice,clinicalVars,sensor_loc){
   
   sensor_choice_Idxs <- match(sensor_loc,sensor_options)
@@ -64,10 +68,6 @@ classification_function_shiny_dis <-function(time_choice,time_slide,classifier_c
     tf_covariates <- tfr_tf_covariates
     
   }  
-  
-  # Split for k-fold cross validation for discharge predictions:
-  k <- 5
-  cvIdx <- cross_val_splits(patient_clinical_data, k)
   
   GOSE_predictions  <- vector(mode = "list", length = k)
   fav_predictions   <- vector(mode = "list", length = k)
