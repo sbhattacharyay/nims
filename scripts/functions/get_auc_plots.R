@@ -1,24 +1,28 @@
 get_auc_plots <- function(auc_info){
   val<-names(auc_info[[1]])
-  col_vector=c('red','darkgreen','blue')
-  plot_sep<-list(c(1:3),c(4:5),c(6:8))
+  col_vector=c('red','green','blue')
+  name_vector=c('CM: ','CF only: ', 'MF only: ')
+  plot_sep<-list(c(1,4,6),c(2,4,7),c(3,5,8))
   plots <- vector(mode = "list", length = length(val))
   i = 1
   for (z in plot_sep){
+    auc_stats<<-sapply(seq_along(z), function(x) {
+                    sapply(seq_along(auc_info[z][[1]]), function(y) {
+                      paste(name_vector[x],round(mean(auc_info[z][[x]][[y]]$fold.AUC),2), "(+/-",round(sd(auc_info[z][[x]][[y]]$fold.AUC),2),")")
+                    })
+    })
     lapply(seq_along(auc_info[z][[1]]), function(y){
-      plots[[y]][[i]]<<-arrangeGrob(as.grob(function()
+      plots[[y]][[i]]<<-arrangeGrob((as.ggplot(function()
         sapply(seq_along(auc_info[z]), function(x) {
           plot(auc_info[z][[x]][[y]]$perf,col='grey',lty=3)
-          if (i==1&y==1|i==3&y==1) legend(0.6,0.4, c("GOSE", "Fav","Death"),fill=col_vector, bty = "n",pt.cex = 2, y.intersp=2.2)
-          if (i==2&y==1) legend(0.6,0.4, c("GOSE","Death"),fill=col_vector[-2], bty = "n",pt.cex = 2, y.intersp=2.2)  
-          if (i==2) plot(auc_info[z][[x]][[y]]$perf,avg="vertical",col=col_vector[-2][x], lwd=2, add=TRUE)
-          else plot(auc_info[z][[x]][[y]]$perf,avg="vertical",col=col_vector[x], lwd=2, add=TRUE)
+          plot(auc_info[z][[x]][[y]]$perf,avg="vertical",col=col_vector[x], lwd=2, add=TRUE)
           par(new=T)
         })
-      ),top=textGrob(val[y],vjust = 1.5, gp = gpar(fontface = "bold", cex = 1.5)))
+      )+coord_fixed()),top=textGrob(val[y],vjust = 1.5, gp = gpar(fontface = "bold", cex = 1.5)),
+        bottom=textGrob(paste('Mean AUC (+/-1 SD)',paste(auc_stats[y,], collapse='\n'), sep='\n')))
       par(new=F) 
     })
     i=i+1
-    }
+  }
   return(plots)
 }

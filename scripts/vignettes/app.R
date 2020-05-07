@@ -41,6 +41,7 @@ library(ggplotify)
 library(precrec)
 library(cvAUC)
 library(grid)
+library(cowplot)
 
 
 setwd("..")
@@ -126,18 +127,90 @@ ui <- fluidPage(
     ),
     mainPanel(
       tabsetPanel(
-        tabPanel("ROC Discharge", 
-                 plotOutput("plot_roc_dis", height = "1000px")
-                 ), 
-        tabPanel("ROC 12mo", 
-                 plotOutput("plot_roc_12mo", height = "1000px")
-        ),         
-        tabPanel("Precision-Recall Discharge", 
-                 plotOutput("plot_precrec_dis", height = "1000px")
-                 ), 
-        tabPanel("Precision-Recall 12mo", 
-                 plotOutput("plot_precrec_12mo", height = "1000px")
-        ),         
+        tabPanel("ROC 12mo",
+                 fluidRow(
+                   column(12,
+                          h4('Legend: '),
+                          h5(span('|Red = Combined Model|',style="color:red"),
+                             span(' |Green = Clinical Feature(s) Only|',style="color:green"),
+                             span(' |Blue = Motion Feature(s) Only|',style="color:blue"))
+                   )),
+                 fluidRow(
+                   column(4,
+                          h3('GOSE',align='center')
+                   ),
+                   column(4,
+                          h3('Fav',align='center')
+                   ),
+                   column(4,
+                          h3('Death',align='center')
+                   )          
+                 ),
+                 plotOutput("plot_roc_12mo", width="100%")
+        ),
+        tabPanel("Precision-Recall 12mo",
+                 fluidRow(
+                   h4('Legend: '),
+                   column(12,
+                          h5(span('|Red = Combined Model|',style="color:red"),
+                             span(' |Green = Clinical Feature(s) Only|',style="color:green"),
+                             span(' |Blue = Motion Feature(s) Only|',style="color:blue"))
+                   )),
+                 fluidRow(
+                   column(4,
+                          h3('GOSE',align='center')
+                   ),
+                   column(4,
+                          h3('Fav',align='center')
+                   ),
+                   column(4,
+                          h3('Death',align='center')
+                   )          
+                 ),                 
+                 plotOutput("plot_precrec_12mo",width="100%")
+        ),
+        tabPanel("ROC Discharge",
+                 fluidRow(
+                   column(12,
+                          h4('Legend: '),
+                          h5(span('|Red = Combined Model|',style="color:red"),
+                             span(' |Green = Clinical Feature(s) Only|',style="color:green"),
+                             span(' |Blue = Motion Feature(s) Only|',style="color:blue"))
+                   )),
+                 fluidRow(
+                   column(4,
+                          h3('GOSE',align='center')
+                   ),
+                   column(4,
+                          h3('Fav',align='center')
+                   ),
+                   column(4,
+                          h3('Death',align='center')
+                   )          
+                 ),
+                 plotOutput("plot_roc_dis", width="100%")
+        ),
+        tabPanel("Precision-Recall Discharge",
+                 fluidRow(
+                   h4('Legend: '),
+                   column(12,
+                          h5(span('|Red = Combined Model|',style="color:red"),
+                             span(' |Green = Clinical Feature(s) Only|',style="color:green"),
+                             span(' |Blue = Motion Feature(s) Only|',style="color:blue"))
+                   )),
+                 fluidRow(
+                   column(4,
+                          h3('GOSE',align='center')
+                   ),
+                   column(4,
+                          h3('Fav',align='center')
+                   ),
+                   column(4,
+                          h3('Death',align='center')
+                   )          
+                 ),                 
+                 plotOutput("plot_precrec_dis",width="100%")
+        ),
         tabPanel("Calibration", "contents")
       )
     )
@@ -166,13 +239,17 @@ server <- function(input, output) {
   output$plot_roc_dis <- renderPlot({
     get_auc <- get_auc_info(preds_dis())
     get_plots <- get_auc_plots(get_auc)    
-    do.call(grid.arrange, c(unlist(get_plots, recursive = F), nrow=length(get_auc[[1]])))
-  })
+    do.call(plot_grid, c(unlist(get_plots, recursive = F), ncol=3))
+  },
+  height = function(x) 300*length(preds_dis()[[1]][[1]][-1])
+  )
   output$plot_precrec_dis <- renderPlot({
     get_precrec <- get_precrec_info(preds_dis())
     get_plots <- get_precrec_plots(get_precrec)    
-    do.call(grid.arrange, c(unlist(get_plots, recursive = F), nrow=length(get_precrec[[1]])))
-  })
+    do.call(plot_grid, c(unlist(get_plots, recursive = F), ncol=3))
+  },
+  height = function(x) 300*length(preds_dis()[[1]][[1]][-1])
+  )
   
   preds_12mo <- eventReactive(input$button,{
      classification_function_shiny_12mo(input$time_choice,input$time_slide,input$classifier_choice,input$r,
@@ -181,13 +258,17 @@ server <- function(input, output) {
   output$plot_roc_12mo <- renderPlot({
     get_auc <- get_auc_info(preds_12mo())
     get_plots <- get_auc_plots(get_auc)    
-    do.call(grid.arrange, c(unlist(get_plots, recursive = F), nrow=length(get_auc[[1]])))
-  })
+    do.call(plot_grid, c(unlist(get_plots, recursive = F), ncol=3))
+  },
+  height = function(x) 300*length(preds_12mo()[[1]][[1]][-1])
+  )
   output$plot_precrec_12mo <- renderPlot({
     get_precrec <- get_precrec_info(preds_12mo())
     get_plots <- get_precrec_plots(get_precrec)    
-    do.call(grid.arrange, c(unlist(get_plots, recursive = F), nrow=length(get_precrec[[1]])))
-  })
+    do.call(plot_grid, c(unlist(get_plots, recursive = F), ncol=3))
+  },
+  height = function(x) 300*length(preds_12mo()[[1]][[1]][-1])
+  )
 }  
 
 
