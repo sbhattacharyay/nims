@@ -101,3 +101,6 @@ viz_lol_2D(tfr_death_LOL,Y,"death_tfr",height = 1500, width = 1800, ptSize = 20)
 Y<-patient_clinical_data$death_12mo
 viz_lol_2D(tod_death12mo_LOL,Y,"death_12mo_tod",height = 1500, width = 1800, ptSize = 20)
 viz_lol_2D(tfr_death12mo_LOL,Y,"death_12mo_tfr",height = 1500, width = 1800, ptSize = 20)
+
+# Coefficient Analysis:
+viz_lol_coeff()
