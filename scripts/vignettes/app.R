@@ -39,6 +39,9 @@ library(foreach)
 library(gridExtra)
 library(ggplotify)
 library(precrec)
+library(cvAUC)
+library(grid)
+
 
 setwd("..")
 
@@ -63,7 +66,7 @@ source('./functions/get_precrec_plots.R')
 ui <- fluidPage(
   fluidRow(
     column(12,
-           h1("ICU Accelerometry Classification with 5-fold Cross-Validation"),
+           h1("ICU Accelerometry Classification with 5-fold Cross-Validation")
     )
   ),
   sidebarLayout(
@@ -124,16 +127,16 @@ ui <- fluidPage(
     mainPanel(
       tabsetPanel(
         tabPanel("ROC Discharge", 
-                 plotOutput("plot_roc_dis")
+                 plotOutput("plot_roc_dis", height = "1000px")
                  ), 
         tabPanel("ROC 12mo", 
-                 plotOutput("plot_roc_12mo")
+                 plotOutput("plot_roc_12mo", height = "1000px")
         ),         
         tabPanel("Precision-Recall Discharge", 
-                 plotOutput("plot_precrec_dis")
+                 plotOutput("plot_precrec_dis", height = "1000px")
                  ), 
         tabPanel("Precision-Recall 12mo", 
-                 plotOutput("plot_precrec_12mo")
+                 plotOutput("plot_precrec_12mo", height = "1000px")
         ),         
         tabPanel("Calibration", "contents")
       )
@@ -163,12 +166,12 @@ server <- function(input, output) {
   output$plot_roc_dis <- renderPlot({
     get_auc <- get_auc_info(preds_dis())
     get_plots <- get_auc_plots(get_auc)    
-    do.call(grid.arrange, c(get_plots, ncol=2))
+    do.call(grid.arrange, c(unlist(get_plots, recursive = F), nrow=length(get_auc[[1]])))
   })
   output$plot_precrec_dis <- renderPlot({
     get_precrec <- get_precrec_info(preds_dis())
     get_plots <- get_precrec_plots(get_precrec)    
-    do.call(grid.arrange, c(get_plots, ncol=2))
+    do.call(grid.arrange, c(unlist(get_plots, recursive = F), nrow=length(get_precrec[[1]])))
   })
   
   preds_12mo <- eventReactive(input$button,{
@@ -178,15 +181,14 @@ server <- function(input, output) {
   output$plot_roc_12mo <- renderPlot({
     get_auc <- get_auc_info(preds_12mo())
     get_plots <- get_auc_plots(get_auc)    
-    do.call(grid.arrange, c(get_plots, ncol=2))
+    do.call(grid.arrange, c(unlist(get_plots, recursive = F), nrow=length(get_auc[[1]])))
   })
   output$plot_precrec_12mo <- renderPlot({
     get_precrec <- get_precrec_info(preds_12mo())
     get_plots <- get_precrec_plots(get_precrec)    
-    do.call(grid.arrange, c(get_plots, ncol=2))
+    do.call(grid.arrange, c(unlist(get_plots, recursive = F), nrow=length(get_precrec[[1]])))
   })
-
-}
+}  
 
 
 shinyApp(ui, server)
