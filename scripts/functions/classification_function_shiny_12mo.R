@@ -8,6 +8,10 @@ tfr_tf_covariates_yr<-tfr_tf_covariates[seq_for_12mo,]
 tod_motion_features_yr<-lapply(tod_motion_features, function(x) x[seq_for_12mo,])
 tfr_motion_features_yr<-lapply(tfr_motion_features, function(x) x[seq_for_12mo,])
 
+# Split for k-fold cross validation for discharge predictions:
+k <- 5
+cvIdx <- cross_val_splits(patient_clinical_data_yr, k)
+
 classification_function_shiny_12mo <-function(time_choice,time_slide,classifier_choice,r,mf_choice,clinicalVars,sensor_loc){
 
   sensor_choice_Idxs <- match(sensor_loc,sensor_options)
@@ -37,11 +41,7 @@ classification_function_shiny_12mo <-function(time_choice,time_slide,classifier_
     tf_covariates <- tfr_tf_covariates_yr
     
   }  
-  
-  # Split for k-fold cross validation for discharge predictions:
-  k <- 5
-  cvIdx <- cross_val_splits(patient_clinical_data_yr, k)
-  
+
   GOSE_predictions  <- vector(mode = "list", length = k)
   fav_predictions   <- vector(mode = "list", length = k)
   death_predictions <- vector(mode = "list", length = k)

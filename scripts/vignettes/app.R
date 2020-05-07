@@ -140,11 +140,11 @@ server <- function(input, output) {
   })
   
   preds_dis <- eventReactive(input$button,{
-    classification_function_shiny(input$time_choice,input$time_slide,input$classifier_choice,input$r,input$mf_choice,input$clinicalVars,input$sensor_loc)
+    classification_function_shiny_dis(input$time_choice,input$time_slide,input$classifier_choice,input$r,input$mf_choice,input$clinicalVars,input$sensor_loc)
   })
   
   preds_12mo <- eventReactive(input$button,{
-    classification_function_shiny(input$time_choice,input$time_slide,input$classifier_choice,input$r,input$mf_choice,input$clinicalVars,input$sensor_loc)
+    classification_function_shiny_12mo(input$time_choice,input$time_slide,input$classifier_choice,input$r,input$mf_choice,input$clinicalVars,input$sensor_loc)
   })
 
 }
