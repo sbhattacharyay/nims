@@ -36,6 +36,9 @@ library(nnet)
 library(e1071)
 library(randomForest)
 library(foreach)
+library(gridExtra)
+library(ggplotify)
+library(precrec)
 
 setwd("..")
 
@@ -52,6 +55,10 @@ source('./functions/classification_function_shiny_dis.R')
 source('./functions/classification_function_shiny_12mo.R')
 source('./functions/train_caret_models.R')
 source('./functions/predict_caret_models.R')
+source('./functions/get_auc_info.R')
+source('./functions/get_auc_plots.R')
+source('./functions/get_precrec_info.R')
+source('./functions/get_precrec_plots.R')
 
 ui <- fluidPage(
   fluidRow(
@@ -116,8 +123,18 @@ ui <- fluidPage(
     ),
     mainPanel(
       tabsetPanel(
-        tabPanel("ROC", "contents"), 
-        tabPanel("Precision-Recall", "contents"), 
+        tabPanel("ROC Discharge", 
+                 plotOutput("plot_roc_dis")
+                 ), 
+        tabPanel("ROC 12mo", 
+                 plotOutput("plot_roc_12mo")
+        ),         
+        tabPanel("Precision-Recall Discharge", 
+                 plotOutput("plot_precrec_dis")
+                 ), 
+        tabPanel("Precision-Recall 12mo", 
+                 plotOutput("plot_precrec_12mo")
+        ),         
         tabPanel("Calibration", "contents")
       )
     )
@@ -140,11 +157,33 @@ server <- function(input, output) {
   })
   
   preds_dis <- eventReactive(input$button,{
-    classification_function_shiny(input$time_choice,input$time_slide,input$classifier_choice,input$r,input$mf_choice,input$clinicalVars,input$sensor_loc)
+    classification_function_shiny_dis(input$time_choice,input$time_slide,input$classifier_choice,input$r,
+                                      input$mf_choice,input$clinicalVars,input$sensor_loc)
+  })
+  output$plot_roc_dis <- renderPlot({
+    get_auc <- get_auc_info(preds_dis())
+    get_plots <- get_auc_plots(get_auc)    
+    do.call(grid.arrange, c(get_plots, ncol=2))
+  })
+  output$plot_precrec_dis <- renderPlot({
+    get_precrec <- get_precrec_info(preds_dis())
+    get_plots <- get_precrec_plots(get_precrec)    
+    do.call(grid.arrange, c(get_plots, ncol=2))
   })
   
   preds_12mo <- eventReactive(input$button,{
-    classification_function_shiny(input$time_choice,input$time_slide,input$classifier_choice,input$r,input$mf_choice,input$clinicalVars,input$sensor_loc)
+     classification_function_shiny_12mo(input$time_choice,input$time_slide,input$classifier_choice,input$r,
+                                       input$mf_choice,input$clinicalVars,input$sensor_loc)
+  })
+  output$plot_roc_12mo <- renderPlot({
+    get_auc <- get_auc_info(preds_12mo())
+    get_plots <- get_auc_plots(get_auc)    
+    do.call(grid.arrange, c(get_plots, ncol=2))
+  })
+  output$plot_precrec_12mo <- renderPlot({
+    get_precrec <- get_precrec_info(preds_12mo())
+    get_plots <- get_precrec_plots(get_precrec)    
+    do.call(grid.arrange, c(get_plots, ncol=2))
   })
 
 }
