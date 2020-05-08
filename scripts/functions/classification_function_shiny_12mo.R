@@ -12,7 +12,9 @@ classification_function_shiny_12mo <-function(time_choice,time_slide,classifier_
 
   # Split for k-fold cross validation for discharge predictions:
   k <- 5
-  cvIdx <- cross_val_splits(patient_clinical_data_yr, k)
+  
+  death_cvIdx <- strat_cross_val_splits(patient_clinical_data_yr$death_12mo, k)
+  fav_cvIdx <- strat_cross_val_splits(patient_clinical_data_yr$favorable_12mo, k)
   
   sensor_choice_Idxs <- match(sensor_loc,sensor_options)
   
@@ -53,33 +55,43 @@ classification_function_shiny_12mo <-function(time_choice,time_slide,classifier_
   mf_only_fav_predictions  <- vector(mode = "list", length = k)
   mf_only_death_predictions  <- vector(mode = "list", length = k)
   
-  for (i in 1:length(cvIdx)) {
-    currTestIdx <- cvIdx[[as.character(i)]]
-    currTrainIdx <- seq(nrow(patient_clinical_data_yr))[-currTestIdx]
+  for (i in 1:k) {
+    death_currTestIdx <- death_cvIdx[[as.character(i)]]
+    death_currTrainIdx <- seq(nrow(patient_clinical_data_yr))[-death_currTestIdx]
+    
+    fav_currTestIdx <- fav_cvIdx[[as.character(i)]]
+    fav_currTrainIdx <- seq(nrow(patient_clinical_data_yr))[-fav_currTestIdx]
     
     # Convert numeric to logical indexing
-    logicalTest <- rep(FALSE, nrow(patient_clinical_data_yr))
-    logicalTest[currTestIdx] <- TRUE
-    logicalTrain <- !logicalTest
+    death_logicalTest <- rep(FALSE, nrow(patient_clinical_data_yr))
+    death_logicalTest[death_currTestIdx] <- TRUE
+    death_logicalTrain <- !death_logicalTest
     
-    train_tf_covariates <- tf_covariates[currTrainIdx,]
-    test_tf_covariates  <- tf_covariates[currTestIdx,]
+    fav_logicalTest <- rep(FALSE, nrow(patient_clinical_data_yr))
+    fav_logicalTest[fav_currTestIdx] <- TRUE
+    fav_logicalTrain <- !fav_logicalTest
+    
+    death_train_tf_covariates <- tf_covariates[death_currTrainIdx,]
+    death_test_tf_covariates  <- tf_covariates[death_currTestIdx,]
+    
+    fav_train_tf_covariates <- tf_covariates[fav_currTrainIdx,]
+    fav_test_tf_covariates  <- tf_covariates[fav_currTestIdx,]
     
     # Perform LOL on training data
     
     # - GOSE LOL:
     Y <- as.factor(patient_clinical_data_yr$gose_12mo)
-    logicalIdx <- logicalTrain & !is.na(Y)
+    logicalIdx <- fav_logicalTrain & !is.na(Y)
     GOSE_LOL<-lol.project.lol(curr_motion_features[logicalIdx,], Y[logicalIdx], r)
     
     # - Favorable Outcome LOL:
     Y <- as.factor(patient_clinical_data_yr$favorable_12mo)
-    logicalIdx <- logicalTrain & !is.na(Y)
+    logicalIdx <- fav_logicalTrain & !is.na(Y)
     fav_LOL<-lol.project.lol(curr_motion_features[logicalIdx,], Y[logicalIdx], r)
     
     # - Mortality Outcome LOL:
     Y <- as.factor(patient_clinical_data_yr$death_12mo)
-    logicalIdx <- logicalTrain & !is.na(Y)
+    logicalIdx <- death_logicalTrain & !is.na(Y)
     death_LOL<-lol.project.lol(curr_motion_features[logicalIdx,], Y[logicalIdx], r)
     
     # Prepare training covariates
@@ -88,30 +100,32 @@ classification_function_shiny_12mo <-function(time_choice,time_slide,classifier_
       clinicalVars <- c(clinicalVars[!clinicalVars %in% "diag"],"CVA","ICH","SAH","BT","SDH.TBI")
     }
     
-    train_GOSE_CV <- cbind(train_tf_covariates[clinicalVars],GOSE_LOL$Xr[,1:r])
-    train_fav_CV  <- cbind(train_tf_covariates[clinicalVars],fav_LOL$Xr[,1:r])
-    train_death_CV<- cbind(train_tf_covariates[clinicalVars],death_LOL$Xr[,1:r])
+    train_GOSE_CV <- cbind(fav_train_tf_covariates[clinicalVars],GOSE_LOL$Xr[,1:r])
+    train_fav_CV  <- cbind(fav_train_tf_covariates[clinicalVars],fav_LOL$Xr[,1:r])
+    train_death_CV<- cbind(death_train_tf_covariates[clinicalVars],death_LOL$Xr[,1:r])
     
     colnames(train_GOSE_CV)<-c(clinicalVars,paste0(rep("MF.",r),1:r))
     colnames(train_fav_CV)<-c(clinicalVars,paste0(rep("MF.",r),1:r))
     colnames(train_death_CV)<-c(clinicalVars,paste0(rep("MF.",r),1:r))
     
-    clin_only_train_CV<-train_GOSE_CV[clinicalVars]
+    clin_only_train_CV_fav<-train_GOSE_CV[clinicalVars]
+    clin_only_train_CV_death<-train_death_CV[clinicalVars]
     
     mf_only_train_GOSE_CV<-train_GOSE_CV[paste0(rep("MF.",r),1:r)]
     mf_only_train_fav_CV<-train_fav_CV[paste0(rep("MF.",r),1:r)]
     mf_only_train_death_CV<-train_death_CV[paste0(rep("MF.",r),1:r)]
     
     # Prepare testing covariates
-    test_GOSE_CV <- cbind(test_tf_covariates[clinicalVars],curr_motion_features[currTestIdx,]%*%GOSE_LOL$A[,1:r])
-    test_fav_CV  <- cbind(test_tf_covariates[clinicalVars],curr_motion_features[currTestIdx,]%*%fav_LOL$A[,1:r])
-    test_death_CV<- cbind(test_tf_covariates[clinicalVars],curr_motion_features[currTestIdx,]%*%death_LOL$A[,1:r])
+    test_GOSE_CV <- cbind(fav_test_tf_covariates[clinicalVars],curr_motion_features[fav_currTestIdx,]%*%GOSE_LOL$A[,1:r])
+    test_fav_CV  <- cbind(fav_test_tf_covariates[clinicalVars],curr_motion_features[fav_currTestIdx,]%*%fav_LOL$A[,1:r])
+    test_death_CV<- cbind(death_test_tf_covariates[clinicalVars],curr_motion_features[death_currTestIdx,]%*%death_LOL$A[,1:r])
     
     colnames(test_GOSE_CV)<-c(clinicalVars,paste0(rep("MF.",r),1:r))
     colnames(test_fav_CV)<-c(clinicalVars,paste0(rep("MF.",r),1:r))
     colnames(test_death_CV)<-c(clinicalVars,paste0(rep("MF.",r),1:r))
     
-    clin_only_test_CV<-test_GOSE_CV[clinicalVars]
+    clin_only_test_CV_fav<-test_GOSE_CV[clinicalVars]
+    clin_only_test_CV_death<-test_death_CV[clinicalVars]
     
     mf_only_test_GOSE_CV<-test_GOSE_CV[paste0(rep("MF.",r),1:r)]
     mf_only_test_fav_CV<-test_fav_CV[paste0(rep("MF.",r),1:r)]
@@ -120,39 +134,39 @@ classification_function_shiny_12mo <-function(time_choice,time_slide,classifier_
     # Train models on training data
     Y <- as.factor(patient_clinical_data_yr$favorable_12mo)
     
-    GOSE_models <- train_caret_models(train_GOSE_CV,Y,currTrainIdx,4,classifier_choice)
-    fav_models  <- train_caret_models(train_fav_CV,Y,currTrainIdx,4,classifier_choice)
+    GOSE_models <- train_caret_models(train_GOSE_CV,Y,fav_currTrainIdx,4,classifier_choice)
+    fav_models  <- train_caret_models(train_fav_CV,Y,fav_currTrainIdx,4,classifier_choice)
     
-    clin_only_fav_models <- train_caret_models(clin_only_train_CV,Y,currTrainIdx,4,classifier_choice)
-    mf_only_GOSE_models <- train_caret_models(mf_only_train_GOSE_CV,Y,currTrainIdx,4,classifier_choice)
-    mf_only_fav_models <- train_caret_models(mf_only_train_fav_CV,Y,currTrainIdx,4,classifier_choice)
+    clin_only_fav_models <- train_caret_models(clin_only_train_CV_fav,Y,fav_currTrainIdx,4,classifier_choice)
+    mf_only_GOSE_models <- train_caret_models(mf_only_train_GOSE_CV,Y,fav_currTrainIdx,4,classifier_choice)
+    mf_only_fav_models <- train_caret_models(mf_only_train_fav_CV,Y,fav_currTrainIdx,4,classifier_choice)
     
     Y <- as.factor(patient_clinical_data_yr$death_12mo)
     
-    death_models  <- train_caret_models(train_death_CV,Y,currTrainIdx,4,classifier_choice)
+    death_models  <- train_caret_models(train_death_CV,Y,death_currTrainIdx,4,classifier_choice)
     
-    clin_only_death_models <- train_caret_models(clin_only_train_CV,Y,currTrainIdx,4,classifier_choice)
-    mf_only_death_models <- train_caret_models(mf_only_train_death_CV,Y,currTrainIdx,4,classifier_choice)
+    clin_only_death_models <- train_caret_models(clin_only_train_CV_death,Y,death_currTrainIdx,4,classifier_choice)
+    mf_only_death_models <- train_caret_models(mf_only_train_death_CV,Y,death_currTrainIdx,4,classifier_choice)
     
     # Predict outcomes on testing data using trained models
     
     Y <- as.factor(patient_clinical_data_yr$favorable_12mo)
     
-    GOSE_test_val <-predict_caret_models(GOSE_models, test_GOSE_CV, Y, currTestIdx)
-    fav_test_val  <-predict_caret_models(fav_models, test_fav_CV, Y, currTestIdx)
+    GOSE_test_val <-predict_caret_models(GOSE_models, test_GOSE_CV, Y, fav_currTestIdx)
+    fav_test_val  <-predict_caret_models(fav_models, test_fav_CV, Y, fav_currTestIdx)
     
-    clin_only_fav_test_val<-predict_caret_models(clin_only_fav_models, clin_only_test_CV, Y, currTestIdx)
+    clin_only_fav_test_val<-predict_caret_models(clin_only_fav_models, clin_only_test_CV_fav, Y, fav_currTestIdx)
     
-    mf_only_GOSE_test_val<-predict_caret_models(mf_only_GOSE_models, mf_only_test_GOSE_CV, Y, currTestIdx)
-    mf_only_fav_test_val<-predict_caret_models(mf_only_fav_models, mf_only_test_fav_CV, Y, currTestIdx)
+    mf_only_GOSE_test_val<-predict_caret_models(mf_only_GOSE_models, mf_only_test_GOSE_CV, Y, fav_currTestIdx)
+    mf_only_fav_test_val<-predict_caret_models(mf_only_fav_models, mf_only_test_fav_CV, Y, fav_currTestIdx)
     
     Y <- as.factor(patient_clinical_data_yr$death_12mo)
     
-    death_test_val<-predict_caret_models(death_models, test_death_CV, Y, currTestIdx)
+    death_test_val<-predict_caret_models(death_models, test_death_CV, Y, death_currTestIdx)
     
-    clin_only_death_test_val<-predict_caret_models(clin_only_death_models, clin_only_test_CV, Y, currTestIdx)
+    clin_only_death_test_val<-predict_caret_models(clin_only_death_models, clin_only_test_CV_death, Y, death_currTestIdx)
     
-    mf_only_death_test_val<-predict_caret_models(mf_only_death_models, mf_only_test_death_CV, Y, currTestIdx)
+    mf_only_death_test_val<-predict_caret_models(mf_only_death_models, mf_only_test_death_CV, Y, death_currTestIdx)
     
     GOSE_predictions[[i]] <- GOSE_test_val
     fav_predictions[[i]] <- fav_test_val
