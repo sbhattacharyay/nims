@@ -1,4 +1,4 @@
-library(ggplot)
+library(ggplot2)
 library(tidyverse)
 source("./functions/generateRootDir.R")
 
