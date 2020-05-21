@@ -1,0 +1,25 @@
+
+Currently Loaded Modules:
+  1) centos7/current   3) openmpi/3.1         5) matlab/R2019a
+  2) intel/18.0        4) MARCC/summer-2018
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2019 The MathWorks, Inc.
+                  R2019a (9.6.0.1072779) 64-bit (glnxa64)
+                               March 8, 2019
+
+ 
+For online documentation, see https://www.mathworks.com/support
+For product information, visit www.mathworks.com.
+ 
+{Error using cd
+Cannot CD to /home-4/sbhatt15@jhu.edu/work/bims/scripts (Name is nonexistent or
+not a directory).
+} 
+>> [Warning: Unable to create preferences folder in
+/home-4/sbhatt15@jhu.edu/.matlab/R2019a. Preferences folder location must be
+writable. Using a temporary preferences folder for this MATLAB session. See the
+<a href="matlab: helpview([docroot
+'/matlab/helptargets.map'],'matlabenvironment_prefdir_location')">preferences
+documentation</a> for more details.] 
+matlab exit code: 0
