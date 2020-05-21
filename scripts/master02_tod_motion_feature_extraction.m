@@ -20,39 +20,34 @@ catch
     cd('../accel_sensor_data')
     marcc = false;
 end
-%cd('D:/')
-path = pwd;
-directory = dir;
 
-studyPatientsPY = [2, 3,	4,	5,	6,	7,	8,	9,	10,	11,	12,	13, ...
-    14,	15,	16,	17,	18,	19,	20,	21,	22,	23,	24,	26,	27,	28,	29,	30, ....
-    31,	32,	33,	34,	35,	36,	37,	38,	39,	40,	41,	42,	43,	49,	51,	46, .....
-    47,	48,	50,	52,	53,	54,	55,	56,	57,	59,	60,	61,	62,	63,	64,	65, ......
-    67,	68];
+d = dir('data*');
 
-py_folders = {};
-for i = 1:length(directory)
-    for j = 1:length(studyPatientsPY)
-        patientNum = num2str(studyPatientsPY(j),'%02.f');
-        if startsWith(directory(i).name,'data') && (string(extractBetween(directory(i).name,5,6))==patientNum)
-            py_folders{end+1} = directory(i).name;
-        end
-    end
+studyPatients = cellfun(@(x) (string(x(5:6))),{d.name}');
+studyDirs = {d.name}';
+
+if marcc == true
+    d2 = dir('~/data/tod_motion_feature_data/band_power/*.mat');
+    currentlyDone = cellfun(@(x) string(x(11:12)),{d2.name}');
+else
+    d2 = dir('../tod_motion_feature_data/band_power/*.mat');
+    currentlyDone = cellfun(@(x) string(x(11:12)),{d2.name}');
 end
-folderNames = string(py_folders)';
-toc
+
+[featSet,diffIdx] = setdiff(studyPatients,currentlyDone);
+
 %% Arrange data by time and cut out extraneous times
 %WARNING: Elapsed Time: ~111.286133 seconds.
 %WARNING: Elapsed Time: ~1104.244113 seconds for mega streams.
 
-for patIdx = 1:length(folderNames)
+for patIdx = diffIdx
     tic
     
     if marcc == true
-        folder_of_interest = ['~/data/accel_sensor_data/' folderNames{patIdx}];
+        folder_of_interest = ['~/data/accel_sensor_data/' studyDirs{patIdx}];
         disp(['Patient No. ' folder_of_interest(30:31) ' initiated.']);
     else
-        folder_of_interest = ['../accel_sensor_data/' folderNames{patIdx}];
+        folder_of_interest = ['../accel_sensor_data/',studyDirs{patIdx}];
         disp(['Patient No. ' folder_of_interest(26:27) ' initiated.']);
     end
 
@@ -262,20 +257,20 @@ for patIdx = 1:length(folderNames)
     end
     
     if marcc == true
-        save(['~/data/motion_feature_data/band_power/band_power' folder_of_interest(30:31) '.mat'],'bandPower','-v7.3');
-        save(['~/data/motion_feature_data/freq_entropy/freq_entropy' folder_of_interest(30:31) '.mat'],'freqEnt','-v7.3');
-        save(['~/data/motion_feature_data/freq_pairs/freq_pairs' folder_of_interest(30:31) '.mat'],'freqPairs','-v7.3');
-        save(['~/data/motion_feature_data/med_freq/med_freq' folder_of_interest(30:31) '.mat'],'medF','-v7.3');
-        save(['~/data/motion_feature_data/sma/sma' folder_of_interest(30:31) '.mat'],'SMA','-v7.3');
-        save(['~/data/motion_feature_data/wavelets/wavelets' folder_of_interest(30:31) '.mat'],'wavelets','-v7.3');
+        save(['~/data/tod_motion_feature_data/band_power/band_power' folder_of_interest(30:31) '.mat'],'bandPower','-v7.3');
+        save(['~/data/tod_motion_feature_data/freq_entropy/freq_entropy' folder_of_interest(30:31) '.mat'],'freqEnt','-v7.3');
+        save(['~/data/tod_motion_feature_data/freq_pairs/freq_pairs' folder_of_interest(30:31) '.mat'],'freqPairs','-v7.3');
+        save(['~/data/tod_motion_feature_data/med_freq/med_freq' folder_of_interest(30:31) '.mat'],'medF','-v7.3');
+        save(['~/data/tod_motion_feature_data/sma/sma' folder_of_interest(30:31) '.mat'],'SMA','-v7.3');
+        save(['~/data/tod_motion_feature_data/wavelets/wavelets' folder_of_interest(30:31) '.mat'],'wavelets','-v7.3');
         disp(['Patient No. ' folder_of_interest(30:31) ' completed.']);
     else
-        save(['../motion_feature_data/band_power/band_power' folder_of_interest(26:27) '.mat'],'bandPower','-v7.3');
-        save(['../motion_feature_data/freq_entropy/freq_entropy' folder_of_interest(26:27) '.mat'],'freqEnt','-v7.3');
-        save(['../motion_feature_data/freq_pairs/freq_pairs' folder_of_interest(26:27) '.mat'],'freqPairs','-v7.3');
-        save(['../motion_feature_data/med_freq/med_freq' folder_of_interest(26:27) '.mat'],'medF','-v7.3');
-        save(['../motion_feature_data/sma/sma' folder_of_interest(26:27) '.mat'],'SMA','-v7.3');
-        save(['../motion_feature_data/wavelets/wavelets' folder_of_interest(26:27) '.mat'],'wavelets','-v7.3');
+        save(['../tod_motion_feature_data/band_power/band_power' folder_of_interest(26:27) '.mat'],'bandPower','-v7.3');
+        save(['../tod_motion_feature_data/freq_entropy/freq_entropy' folder_of_interest(26:27) '.mat'],'freqEnt','-v7.3');
+        save(['../tod_motion_feature_data/freq_pairs/freq_pairs' folder_of_interest(26:27) '.mat'],'freqPairs','-v7.3');
+        save(['../tod_motion_feature_data/med_freq/med_freq' folder_of_interest(26:27) '.mat'],'medF','-v7.3');
+        save(['../tod_motion_feature_data/sma/sma' folder_of_interest(26:27) '.mat'],'SMA','-v7.3');
+        save(['../tod_motion_feature_data/wavelets/wavelets' folder_of_interest(26:27) '.mat'],'wavelets','-v7.3');
         disp(['Patient No. ' folder_of_interest(26:27) ' completed.']);
     end
     toc
