@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=matlab_bims
+#SBATCH --job-name=tod_matlab_bims
 #SBATCH --time=72:00:00
 #SBATCH --partition=lrgmem
 #SBATCH --nodes=1
