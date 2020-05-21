@@ -15,5 +15,5 @@
  
 ml matlab
 ml # confirm modules used
-matlab -nodisplay -nojvm -nosplash -nodesktop -r "cd('~/work/bims/scripts/'); master2_motion_feature_extraction;"
+matlab -nodisplay -nojvm -nosplash -nodesktop -r "cd('~/work/bims/scripts/'); master02_tod_motion_feature_extraction;"
 echo "matlab exit code: $?"

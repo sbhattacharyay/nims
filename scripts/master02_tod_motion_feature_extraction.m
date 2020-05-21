@@ -36,6 +36,7 @@ end
 
 [featSet,diffIdx] = setdiff(studyPatients,currentlyDone);
 
+toc
 %% Arrange data by time and cut out extraneous times
 %WARNING: Elapsed Time: ~111.286133 seconds.
 %WARNING: Elapsed Time: ~1104.244113 seconds for mega streams.
