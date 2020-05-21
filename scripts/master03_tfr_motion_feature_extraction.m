@@ -41,7 +41,7 @@ toc
 %WARNING: Elapsed Time: ~111.286133 seconds.
 %WARNING: Elapsed Time: ~1104.244113 seconds for mega streams.
 
-for patIdx = diffIdx
+for patIdx = diffIdx'
     tic
     
     if marcc == true

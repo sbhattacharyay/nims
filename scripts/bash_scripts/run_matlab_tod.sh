@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=matlab
+#SBATCH --job-name=matlab_bims
 #SBATCH --time=72:00:00
 #SBATCH --partition=lrgmem
 #SBATCH --nodes=1
@@ -13,7 +13,7 @@
 # SLURM job script to run serial MATLAB
 #---------------------------------------------------------------------
  
-ml matlab
+ml matlab/R2019b-v2
 ml # confirm modules used
-matlab -nodisplay -nojvm -nosplash -nodesktop -r "cd('~/work/bims/scripts/'); master02_tod_motion_feature_extraction;"
+matlab -nodisplay -nojvm -nosplash -nodesktop -r "cd('~/work/SB_bims/scripts/'); master02_tod_motion_feature_extraction;"
 echo "matlab exit code: $?"
