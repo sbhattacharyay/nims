@@ -15,11 +15,10 @@ for featureType = 1:2
     
     if featureType == 1
         tic
-        load('../motion_feature_data/complete_sensor_data.mat');
+        load('../tod_motion_feature_data/complete_sensor_data.mat');
         toc
-        load('../motion_feature_data/band_power/band_power02.mat')
+        load('../tod_motion_feature_data/band_power/band_power02.mat')
         t = bandPower{2, 1};
-        t_copy = t;
         clear bandPower
     else
         tic
@@ -28,36 +27,31 @@ for featureType = 1:2
         load('../tfr_motion_feature_data/band_power/band_power02.mat')
         t = seconds(5):seconds(5):hours(8);
         t = datenum(t(1:end-1));
-        t_copy = t;
         clear bandPower
     end
     
     dim_of_sensors=size(sensors);
     sensor_count = dim_of_sensors(1);
     feature_count = dim_of_sensors(2);
+    [n,~] = size(sensors{1,1});
     
-    studyPatientsPY = [2,3,4,5,	6,	7,	8,	9,	10,	11,	12,	13, ...
-        14,	15,	16,	17,	18,	19,	20,	21,	22,	23,	24,	26,	27,	28,	29,	30, ....
-        31,	32,	33,	34,	35,	36,	37,	38,	39,	40,	41,	42,	43,	49,	51,	46, .....
-        47,	48,	50,	52,	53,	54,	55,	56,	57,	59,	60,	61,	62,	63,	64,	65, ......
-        67,	68];
-    
-    [sortedPY,sort_order] = sort(studyPatientsPY);
-    
-    % Get Time Point Labels (in datenum format)
+    tf_patient_covariates = ...
+        readtable('../clinical_data/tf_patient_covariates.csv');
+
     %% Identify rows that are completely missing data (and replace with NaN)
     %contains indices of the totally missing time series as follows:
     %Row_1 is the sensor number (1 through 7)
     %Row_2 is the feature_count (1 through 7) that corresponds to "feature_names"
     %Row_3 is the patient number that corresponds to the patient index (1
-    %through 62)
+    %through n)
+    
     [totallyMissingIdxs, sensors]=get_totallyMissingIdxs(sensor_count,...
         feature_count,sensors);
     
     %% Characterize percentage of missing data per time-series recording
     tic
     [missing_percentages,missing_time_series,missingIdxs] = ...
-        characterize_missing_data(sensors,t,studyPatientsPY,true,featureType);
+        characterize_missing_data(sensors,t,true,featureType);
     toc
     %% Identifying distributions of the features:
     % We first wish to identify whether the feature datapoints have any
@@ -85,26 +79,25 @@ for featureType = 1:2
     %NOTE: section takes about 20 seconds to run
     
     SMA_threshold=0.1;
-    feature_thresholds=find_noMotion_thresholds(SMA_threshold,sensors,...
-        feature_names);
+    [feature_thresholds,noMotion_time_series]=find_noMotion_thresholds...
+        (SMA_threshold,sensors,feature_names);
     
+    plotMissingCurve(missing_time_series,noMotion_time_series,...
+    t,featureType,n);
+    
+    disp([num2str(mean(missing_time_series)) '% missing data']);
+    disp([num2str(mean(noMotion_time_series)) '% no motion data']);
+
     if featureType == 1
-        save('../motion_feature_data/feature_thresholds.mat','feature_thresholds');
+        save('../tod_motion_feature_data/feature_thresholds.mat','feature_thresholds');
     else
         save('../tfr_motion_feature_data/feature_thresholds.mat','feature_thresholds');
     end
     %% Fit Zero-inflated poisson distribution to all feature spaces
     
     % NOTE: takes about 4.5 seconds to run
-    load('../clinical_data/clinical_extraction_output.mat')
-    
-    
-    clearvars dc_dataset yr_dataset dc_dataset_labels ...
-        yr_dataset_labels boxcox_lambdas zscore_mus zscore_sigs ....
-        imputedPatientDataset
-    
     tf_patient_covariates = fit_zip(sensors,tf_patient_covariates,...
-        feature_thresholds,sort_order,feature_names);
+        feature_thresholds,feature_names);
     
     %% Regression Strategy:
     % Takes about 3-4 seconds to run
@@ -139,10 +132,10 @@ for featureType = 1:2
     
     % Save most updated clinical patient table
     if featureType==1
-        save('../motion_feature_data/transformed_patient_covariates.mat',...
+        save('../tod_motion_feature_data/transformed_patient_covariates.mat',...
             'tf_patient_covariates');
         writetable(tf_patient_covariates,...
-            '../motion_feature_data/tf_patient_covariates.csv')
+            '../tod_motion_feature_data/tf_patient_covariates.csv')
     else
         save('../tfr_motion_feature_data/transformed_patient_covariates.mat',...
             'tf_patient_covariates');
@@ -154,8 +147,7 @@ for featureType = 1:2
     %% Totally missing data imputation
     
     sensors=impute_totallyMissingData(sensors,tf_patient_covariates,...
-        totallyMissingIdxs,feature_names,feature_thresholds,....
-        studyPatientsPY,sortedPY,t);
+        totallyMissingIdxs,feature_names,feature_thresholds,t);
     
     %% Quasi-missing data imputation
     % for recordings with more than (50%) missing data, we impute by a similar
@@ -163,8 +155,7 @@ for featureType = 1:2
     quasi_threshold=0.5;
     
     sensors = impute_quasiMissingData(sensors,tf_patient_covariates,quasi_threshold,...
-        missing_percentages,missingIdxs,feature_names,feature_thresholds,....
-        studyPatientsPY,sortedPY);
+        missing_percentages,missingIdxs,feature_names,feature_thresholds);
     %% Remaining missing data imputation
     
     % Warning: takes about ~15 minutes to run
@@ -174,9 +165,9 @@ for featureType = 1:2
     sensors = impute_rmngMissingData(sensors,quasi_threshold,trainWindow,...
         missing_percentages,missingIdxs,feature_names,feature_thresholds,t);
     if featureType == 1
-        save('../motion_feature_data/imputed_complete_sensor_data.mat',...
+        save('../tod_motion_feature_data/imputed_complete_sensor_data.mat',...
             'sensors','feature_names');
-        disp('motion_feature_data imputation complete');
+        disp('tod_motion_feature_data imputation complete');
     else
         save('../tfr_motion_feature_data/imputed_complete_sensor_data.mat',...
             'sensors','feature_names');

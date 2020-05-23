@@ -1,15 +1,16 @@
 function [missing_percentages,missing_time_series,missingIdxs] = ...
-    characterize_missing_data(sensors,t,studyPatientsPY,display_plots,featureType)
+    characterize_missing_data(sensors,t,display_plots,featureType)
 
 dim_of_sensors=size(sensors);
+[n,~] = size(sensors{1,1});
 
 missing_percentages=cellfun(@(x) sum(isnan(x),2)/length(t),sensors,...
     'UniformOutput',false);
 
 stacked_matrix=[];
-sensors_missing=zeros(length(studyPatientsPY),length(t));
+sensors_missing=zeros(n,length(t));
 
-for i = 1:(dim_of_sensors(1))
+for i = 1:dim_of_sensors(1)
     curr_matrix = sensors{i,6};
     stacked_matrix = [stacked_matrix; curr_matrix];
     sensors_missing = sensors_missing+isnan(curr_matrix);
@@ -17,14 +18,15 @@ end
 
 missingID=[0 NaN Inf];
 
-missing_time_series=sum(isnan(stacked_matrix))/(length(studyPatientsPY)*...
-    (dim_of_sensors(1)-1));
+missing_time_series=sum(isnan(stacked_matrix))/(n*(dim_of_sensors(1)));
 missingIdxs=cellfun(@(x) ismissing(x,missingID),sensors,'UniformOutput',false);
 
 if display_plots == true
+    rootDir = generateRootDir('Missing_Data');
+    
     figure
     x = [t(1) t(end)];
-    y = [1 length(studyPatientsPY)];
+    y = [1 n];
     colormap(flipud(pink))
     
     image(x,y,sensors_missing,'CDataMapping','scaled')
@@ -44,6 +46,12 @@ if display_plots == true
     ylabel(h, 'No. of Sensors Missing','FontSize',14)
     set(gcf, 'Units', 'Inches', 'Position', [0, 0, 10, 10], 'PaperUnits', 'Inches', 'PaperSize', [10, 10])
     ylabel('Patient No.','FontWeight','bold','FontSize',20);
+    
+    if featureType == 1
+        saveas(gcf,[rootDir filesep 'tod_missing_data.png'])
+    else
+        saveas(gcf,[rootDir filesep 'tfr_missing_data.png'])
+    end
 end
 end
 

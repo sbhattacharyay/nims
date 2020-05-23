@@ -1,5 +1,5 @@
 function output_patient_table = fit_zip(sensors,patient_table,...
-    feature_thresholds,sort_order,feature_names)
+    feature_thresholds,feature_names)
 
 dim_of_sensors=size(sensors);
 
@@ -28,9 +28,8 @@ end
 for i = 1:dim_of_sensors(2)
     for j = 1:dim_of_sensors(1)
         curr_col_pi = all_pis{i,1}{j,1};
-        sorted_col_pi = curr_col_pi(sort_order);
         new_var = sprintf("pi_%s_%d",feature_names(i),j);
-        output_patient_table=addvars(output_patient_table,sorted_col_pi,...
+        output_patient_table=addvars(output_patient_table,curr_col_pi,...
             'NewVariableNames',new_var);
     end
 end
@@ -39,9 +38,8 @@ end
 for i = 1:dim_of_sensors(2)
     for j = 1:dim_of_sensors(1)
         curr_col_lam = all_lambdas{i,1}{j,1};
-        sorted_col_lam = curr_col_lam(sort_order);
         new_var = sprintf("lambda_%s_%d",feature_names(i),j);
-        output_patient_table=addvars(output_patient_table,sorted_col_lam,...
+        output_patient_table=addvars(output_patient_table,curr_col_lam,...
             'NewVariableNames',new_var);
     end
 end

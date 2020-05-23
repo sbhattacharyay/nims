@@ -1,6 +1,6 @@
 function sensors_output = impute_quasiMissingData(sensors,...
     patient_table,quasi_threshold,missing_percentages,missingIdxs,....
-    feature_names,feature_thresholds,studyPatientsPY,sortedPY)
+    feature_names,feature_thresholds)
 
 tic
 rng(1,'twister')
@@ -31,9 +31,8 @@ for sensIdx = 1:dim_of_sensors(1)
             num2str(sensIdx)];
         currQuasiMissing=quasiMissing{sensIdx,featIdx};
         locA=find(currQuasiMissing);
-        [~,locB]=ismember(sortedPY(currQuasiMissing),studyPatientsPY);
-        pi_vars=patient_table{locB,pi_nam};
-        lambda_vars=patient_table{locB,lambda_nam};
+        pi_vars=patient_table{locA,pi_nam};
+        lambda_vars=patient_table{locA,lambda_nam};
         currIdxArray=missingIdxs{sensIdx,featIdx}(currQuasiMissing,:);
         draws=rand(size(currIdxArray));
         for k = 1:length(pi_vars)

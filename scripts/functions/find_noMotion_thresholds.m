@@ -1,4 +1,5 @@
-function feature_thresholds = find_noMotion_thresholds(SMA_threshold,sensors,feature_names)
+function [feature_thresholds,noMotion_time_series] = ...
+    find_noMotion_thresholds(SMA_threshold,sensors,feature_names)
 
 % In order to impute the missing data, we first need to understand how
 % "no motion" manifests in each of the given feature types.
@@ -7,9 +8,20 @@ function feature_thresholds = find_noMotion_thresholds(SMA_threshold,sensors,fea
 % thresholds.
 
 dim_of_sensors=size(sensors);
+[n,~] = size(sensors{1,1});
 
 SMA_nm_percentages = cellfun(@(x) noMotion_th(x,SMA_threshold),...
     sensors(:,6),'UniformOutput',false);
+
+stacked_matrix=[];
+
+for i = 1:dim_of_sensors(1)
+    curr_matrix = sensors{i,6};
+    stacked_matrix = [stacked_matrix; curr_matrix];
+end
+
+noMotion_time_series=sum(stacked_matrix < SMA_threshold)/...
+    (n*(dim_of_sensors(1)));
 
 % Warning: Elapsed Time is 19.35 seconds
 

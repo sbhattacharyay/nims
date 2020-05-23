@@ -16,8 +16,8 @@ for featureType = 1:2
     
     if featureType == 1
         tic
-        load('../motion_feature_data/imputed_complete_sensor_data.mat');
-        load('../motion_feature_data/feature_thresholds.mat');
+        load('../tod_motion_feature_data/imputed_complete_sensor_data.mat');
+        load('../tod_motion_feature_data/feature_thresholds.mat');
         toc
     else
         tic
@@ -79,7 +79,7 @@ for featureType = 1:2
     end
     
     if featureType == 1
-        save('../motion_feature_data/bed_corrected_imputed_complete_sensor_data.mat',...
+        save('../tod_motion_feature_data/bed_corrected_imputed_complete_sensor_data.mat',...
             'bed_corrected_sensors','feature_names');
     else
         save('../tfr_motion_feature_data/bed_corrected_imputed_complete_sensor_data.mat',...

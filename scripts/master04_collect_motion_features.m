@@ -10,8 +10,7 @@
 %% ------------- BEGIN CODE --------------
 % Feature collection and organization script
 
-cd ..
-cd motion_feature_data/
+cd ../tod_motion_feature_data/
 
 sensors = cell(7,6);
 directory = dir;
@@ -38,26 +37,28 @@ end
 
 % Organizing the frequency pairs dataset
 
-%At this point the frequency pairs are all combined in the same 124 x 12959
+%At this point the frequency pairs are all combined in the same (nx2)x12959
 %matrix. However, we would like to split up the high and low frequency
 %matrices. Thus, the odd rows will be partitioned to one matrix while the
 %even rows to another:
 
-freqPair1 = cellfun(@(x) x(1:2:123,:),sensors(:,3),'UniformOutput',false);
-freqPair2 = cellfun(@(x) x(2:2:124,:),sensors(:,3),'UniformOutput',false);
+[n,~] = size(sensors{1,3});
+
+freqPair1 = cellfun(@(x) x(1:2:(n-1),:),sensors(:,3),'UniformOutput',false);
+freqPair2 = cellfun(@(x) x(2:2:n,:),sensors(:,3),'UniformOutput',false);
 
 sensors(:,5:7)=sensors(:,4:6);
 sensors(:,3)=freqPair1;
 sensors(:,4)=freqPair2;
 
-feature_names = [feature_names(1:2),strcat(feature_names(3),"1"),strcat(feature_names(3),"2"),feature_names(4:6)];
+feature_names = [feature_names(1:2),strcat(feature_names(3),"1"),...
+    strcat(feature_names(3),"2"),feature_names(4:6)];
 
 %%  Saving the data
 save('complete_sensor_data.mat','sensors','feature_names');
 
 %%
-cd ..
-cd tfr_motion_feature_data/
+cd ../tfr_motion_feature_data/
 
 sensors = cell(7,6);
 directory = dir;
@@ -84,13 +85,15 @@ end
 
 % Organizing the frequency pairs dataset
 
-%At this point the frequency pairs are all combined in the same 124 x 12959
+%At this point the frequency pairs are all combined in the same (nx2)x12959
 %matrix. However, we would like to split up the high and low frequency
 %matrices. Thus, the odd rows will be partitioned to one matrix while the
 %even rows to another:
 
-freqPair1 = cellfun(@(x) x(1:2:123,:),sensors(:,3),'UniformOutput',false);
-freqPair2 = cellfun(@(x) x(2:2:124,:),sensors(:,3),'UniformOutput',false);
+[n,~] = size(sensors{1,3});
+
+freqPair1 = cellfun(@(x) x(1:2:(n-1),:),sensors(:,3),'UniformOutput',false);
+freqPair2 = cellfun(@(x) x(2:2:n,:),sensors(:,3),'UniformOutput',false);
 
 sensors(:,5:7)=sensors(:,4:6);
 sensors(:,3)=freqPair1;
@@ -101,7 +104,6 @@ feature_names = [feature_names(1:2),strcat(feature_names(3),"1"),strcat(feature_
 %%  Saving the data
 save('complete_sensor_data.mat','sensors','feature_names');
 
-cd ..
-cd scripts/
+cd ../scripts/
 
 license('inuse')
