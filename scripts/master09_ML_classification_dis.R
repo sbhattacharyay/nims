@@ -29,7 +29,7 @@ source('./functions/load_patient_clinical_data.R')
 source('./functions/update_clinicalVariableList.R')
 source('./functions/get_motion_features.R')
 source('./functions/lol_project_motion_features.R')
-source("./functions/cross_val_splits.R")
+source("./functions/strat_cross_val_splits.R")
 source("./functions/load_tf_patient_covariates.R")
 source('./functions/cv_lol_project_motion_features.R')
 source('./functions/prepare_training_covariates.R')
@@ -52,7 +52,7 @@ clinicalVariableList <- update_clinicalVariableList()
 # Load Motion Features Organized by Time of Day (TOD)
 if (!exists("tod_sensors")) {
   tod_sensors <-
-    readMat('../motion_feature_data/bed_corrected_imputed_complete_sensor_data.mat')$bed.corrected.sensors
+    readMat('../tod_motion_feature_data/bed_corrected_imputed_complete_sensor_data.mat')$bed.corrected.sensors
 }
 
 # Load Motion Features Organized by Time from Recording (TFR)
@@ -70,12 +70,12 @@ tod_motion_features <- get_motion_features(tod_temp_var)
 tfr_motion_features <- get_motion_features(tfr_temp_var)
 
 # Load transformed covariates for both TOD and TFR
-tod_tf_covariates <-load_tf_patient_covariates('../motion_feature_data/tf_patient_covariates.csv')
+tod_tf_covariates <-load_tf_patient_covariates('../tod_motion_feature_data/tf_patient_covariates.csv')
 tfr_tf_covariates <-load_tf_patient_covariates('../tfr_motion_feature_data/tf_patient_covariates.csv')
 
 # Split for k-fold cross validation for discharge predictions:
 k <- 5
-cvIdx <- cross_val_splits(patient_clinical_data, k)
+cvIdx <- createFolds(patient_clinical_data$DiedDuringThisHospitalStay_,k,list = TRUE);
 
 self_val_GLM_predictionsDis <- vector(mode = "list", length = k)
 test_val_GLM_predictionsDis <- vector(mode = "list", length = k)

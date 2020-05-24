@@ -1,73 +1,59 @@
-"","order","variable","type","class","variableSubtitle","variableTitle","figName","figTitle","units"
-"1",1,"PY_pNum","integer","integer","PY_pNum","pNum","PY patient number","PY patient number",NA
-"2",2,"pNum","integer","integer","pNum","pNum","patient number","patient number",NA
-"3",3,"gender","factor","integer","gender","gender","gender","gender",NA
-"4",4,"age","integer","integer","age","age","age","age","years"
-"5",5,"date_admission","Date","double","date_admission","date","date of admission","date of admission",NA
-"6",6,"date_discharge","Date","double","date_discharge","date","date of discharge","date of discharge",NA
-"7",7,"los","integer","integer","los","los","length of stay","length of stay","days"
-"8",8,"diagnosis_1","character","character","diagnosis_1","diagnosis","diagnosis 1","diagnosis 1",NA
-"9",9,"diagnosis_2","character","character","diagnosis_2","diagnosis","diagnosis 2","diagnosis 2",NA
-"10",10,"diagnosis_3","character","character","diagnosis_3","diagnosis","diagnosis 3","diagnosis 3",NA
-"11",11,"stroke","factor","integer","stroke","stroke","stroke","stroke",NA
-"12",12,"ich","factor","integer","ich","ich","ich","ich",NA
-"13",13,"sah","factor","integer","sah","sah","sah","sah",NA
-"14",14,"bt","factor","integer","bt","bt","bt","bt",NA
-"15",15,"sdh","factor","integer","sdh","sdh","sdh","sdh",NA
-"16",16,"tbi","factor","integer","tbi","tbi","tbi","tbi",NA
-"17",17,"date_consented","Date","double","date_consented","date","date consented","date consented",NA
-"18",18,"date_eeg","Date","double","date_eeg","date","date of last eeg","date of last eeg",NA
-"19",19,"hlm_en","integer","integer","hlm_en","hlm","hlm at enrollment","hlm at enrollment",NA
-"20",20,"hlm_dis","integer","integer","hlm_dis","hlm","hlm at discharge","hlm at discharge",NA
-"21",21,"ampac_en_r","integer","integer","ampac_en_r","ampac","ampac at enrollment r","ampac at enrollment r",NA
-"22",22,"ampac_en_t","numeric","double","ampac_en_t","ampac","ampac at enrollment t","ampac at enrollment t",NA
-"23",23,"ampac_dis_r","integer","integer","ampac_dis_r","ampac","ampac at discharge r","ampac at discharge r",NA
-"24",24,"ampac_dis_t","numeric","double","ampac_dis_t","ampac","ampac at discharge t","ampac at discharge t",NA
-"25",25,"apache","integer","integer","apache","apache","apache","apache",NA
-"26",26,"apache_interpretation","factor","integer","apache_interpretation","apache","apache interpretation","apache interpretation",NA
-"27",27,"strength_LUE_en","integer","integer","strength_LUE_en","gcs","strength LUE at enrollment","strength LUE at enrollment",NA
-"28",28,"strength_RUE_en","integer","integer","strength_RUE_en","gcs","strength RUE at enrollment","strength RUE at enrollment",NA
-"29",29,"strength_RLE_en","integer","integer","strength_RLE_en","gcs","strength RLE at enrollment","strength RLE at enrollment",NA
-"30",30,"strength_LLE_en","integer","integer","strength_LLE_en","gcs","strength LLE at enrollment","strength LLE at enrollment",NA
-"31",31,"gcs_eyes_en","integer","integer","gcs_eyes_en","gcs","gcs eyes at enrollment","gcs eyes at enrollment",NA
-"32",32,"gcs_verbal_en","integer","integer","gcs_verbal_en","gcs","gcs verbal at enrollment","gcs verbal at enrollment",NA
-"33",33,"gcs_motor_en","integer","integer","gcs_motor_en","gcs","gcs motor at enrollment","gcs motor at enrollment",NA
-"34",34,"gcs_en","integer","integer","gcs_en","gcs","gcs at enrollment","gcs at enrollment",NA
-"35",35,"strength_LUE_dis","integer","integer","strength_LUE_dis","gcs","strength LUE at discharge","strength LUE at discharge",NA
-"36",36,"strength_RUE_dis","integer","integer","strength_RUE_dis","gcs","strength RUE at discharge","strength RUE at discharge",NA
-"37",37,"strength_RLE_dis","integer","integer","strength_RLE_dis","gcs","strength RLE at discharge","strength RLE at discharge",NA
-"38",38,"strength_LLE_dis","integer","integer","strength_LLE_dis","gcs","strength LLE at discharge","strength LLE at discharge",NA
-"39",39,"gcs_eyes_dis","integer","integer","gcs_eyes_dis","gcs","gcs eyes at discharge","gcs eyes at discharge",NA
-"40",40,"gcs_verbal_dis","integer","integer","gcs_verbal_dis","gcs","gcs verbal at discharge","gcs verbal at discharge",NA
-"41",41,"gcs_motor_dis","integer","integer","gcs_motor_dis","gcs","gcs motor at discharge","gcs motor at discharge",NA
-"42",42,"gcs_dis","integer","integer","gcs_dis","gcs","gcs at discharge","gcs at discharge",NA
-"43",43,"date_jfk_en","Date","double","date_jfk_en","date","date jfk at enrollment","date jfk at enrollment",NA
-"44",44,"jfk_auditory_en","integer","integer","jfk_auditory_en","jfk","jfk auditory at enrollment","jfk auditory at enrollment",NA
-"45",45,"jfk_visual_en","integer","integer","jfk_visual_en","jfk","jfk visual at enrollment","jfk visual at enrollment",NA
-"46",46,"jfk_motor_en","integer","integer","jfk_motor_en","jfk","jfk motor at enrollment","jfk motor at enrollment",NA
-"47",47,"jfk_verbal_en","integer","integer","jfk_verbal_en","jfk","jfk verbal at enrollment","jfk verbal at enrollment",NA
-"48",48,"jfk_communication_en","integer","integer","jfk_communication_en","jfk","jfk communication at enrollment","jfk communication at enrollment",NA
-"49",49,"jfk_arousal_en","integer","integer","jfk_arousal_en","jfk","jfk arousal at enrollment","jfk arousal at enrollment",NA
-"50",50,"jfk_en","integer","integer","jfk_en","jfk","jfk at enrollment","jfk at enrollment",NA
-"51",51,"date_jfk_dis","Date","double","date_jfk_dis","date","date jfk at discharge","date jfk at discharge",NA
-"52",52,"jfk_auditory_dis","integer","integer","jfk_auditory_dis","jfk","jfk auditory at discharge","jfk auditory at discharge",NA
-"53",53,"jfk_visual_dis","integer","integer","jfk_visual_dis","jfk","jfk visual at discharge","jfk visual at discharge",NA
-"54",54,"jfk_motor_dis","integer","integer","jfk_motor_dis","jfk","jfk motor at discharge","jfk motor at discharge",NA
-"55",55,"jfk_verbal_dis","integer","integer","jfk_verbal_dis","jfk","jfk verbal at discharge","jfk verbal at discharge",NA
-"56",56,"jfk_communication_dis","integer","integer","jfk_communication_dis","jfk","jfk communication at discharge","jfk communication at discharge",NA
-"57",57,"jfk_arousal_dis","integer","integer","jfk_arousal_dis","jfk","jfk arousal at discharge","jfk arousal at discharge",NA
-"58",58,"jfk_dis","integer","integer","jfk_dis","jfk","jfk at discharge","jfk at discharge",NA
-"59",59,"gose","integer","integer","gose","gose","gose","gose",NA
-"60",60,"death","factor","integer","death","death","death","death",NA
-"61",61,"code_destination","factor","integer","code_destination","destination","code destination","code destination",NA
-"62",62,"destination","character","character","destination","destination","destination","destination",NA
-"63",63,"mRS_12mo","integer","integer","mRS_12mo","mRS","mRS at 12 months","mRS at 12 months",NA
-"64",64,"eq550_12mo","integer","integer","eq550_12mo","eq550","eq550 at 12 months","eq550 at 12 months",NA
-"65",65,"eq550_perc_12mo","numeric","double","eq550_perc_12mo","eq550","eq550 perc at 12 months","eq550 perc at 12 months",NA
-"66",66,"gose_12mo","integer","integer","gose_12mo","gose","gose at 12 months","gose at 12 months",NA
-"67",67,"outcome_12mo","factor","integer","outcome_12mo","outcome_12mo","outcome at 12 months","outcome at 12 months",NA
-"68",68,"reason_for_loss","character","character","reason_for_loss","reason_for_loss","reason for loss","reason for loss",NA
-"69",69,"notes","character","character","notes","notes","notes","notes",NA
-"70",70,"favorable","factor","integer","favorable","favorable","favorable","favorable",NA
-"71",71,"favorable_12mo","factor","integer","favorable_12mo","favorable","favorable","favorable",NA
-"72",72,"death_12mo","factor","integer","death_12mo","death","death at 12 months","death at 12 months",NA
+"","variable","class","type","variableSubtitle"
+"1","StudyPatientNo_","integer","integer","StudyPatientNo_"
+"2","AccelPatientNo_","integer","integer","AccelPatientNo_"
+"3","DOB","Date","double","DOB"
+"4","NCCUAdmissionAge_y_","integer","integer","NCCUAdmissionAge_y_"
+"5","Sex","factor","integer","Sex"
+"6","ConsentDate","Date","double","ConsentDate"
+"7","AccelRecordingStartDate","Date","double","AccelRecordingStartDate"
+"8","AccelDataMountDate","Date","double","AccelDataMountDate"
+"9","AccelDataMountTime","numeric","double","AccelDataMountTime"
+"10","Hospital_EDAdmissionDate","Date","double","Hospital_EDAdmissionDate"
+"11","NCCUAdmissionDate","Date","double","NCCUAdmissionDate"
+"12","NCCUDischargeDate","Date","double","NCCUDischargeDate"
+"13","HospitalDischargeDate","Date","double","HospitalDischargeDate"
+"14","DaysInNCCU","integer","integer","DaysInNCCU"
+"15","DaysInHospital","integer","integer","DaysInHospital"
+"16","ActiveProblem1","character","character","ActiveProblem1"
+"17","ActiveProblem2","character","character","ActiveProblem2"
+"18","ActiveProblem3","character","character","ActiveProblem3"
+"19","ActiveProblem4","character","character","ActiveProblem4"
+"20","ActiveProblem5","character","character","ActiveProblem5"
+"21","CVA","factor","integer","CVA"
+"22","ICH","factor","integer","ICH"
+"23","SAH","factor","integer","SAH"
+"24","BrainTumorOrLesion","factor","integer","BrainTumorOrLesion"
+"25","SDHOrEDH","factor","integer","SDHOrEDH"
+"26","TBI","factor","integer","TBI"
+"27","GCST","integer","integer","GCST"
+"28","Temp","numeric","double","Temp"
+"29","MAP","integer","integer","MAP"
+"30","HR","integer","integer","HR"
+"31","RespRate","integer","integer","RespRate"
+"32","FiO2","integer","integer","FiO2"
+"33","PaO2","numeric","double","PaO2"
+"34","PaCO2","integer","integer","PaCO2"
+"35","ArterialPH","numeric","double","ArterialPH"
+"36","Na","integer","integer","Na"
+"37","K","numeric","double","K"
+"38","Creatinine","numeric","double","Creatinine"
+"39","AcuteRenalFailure","integer","integer","AcuteRenalFailure"
+"40","HCT","numeric","double","HCT"
+"41","WBC","numeric","double","WBC"
+"42","SevereOrganInsufficiency","integer","integer","SevereOrganInsufficiency"
+"43","BrainSurgDuringStay","integer","integer","BrainSurgDuringStay"
+"44","EmergencySurgeryRequired","integer","integer","EmergencySurgeryRequired"
+"45","APACHEII","integer","integer","APACHEII"
+"46","APACHEIIMortalityRisk","numeric","double","APACHEIIMortalityRisk"
+"47","DiedDuringThisHospitalStay_","factor","integer","DiedDuringThisHospitalStay_"
+"48","Destination","factor","integer","Destination"
+"49","DeathDate","Date","double","DeathDate"
+"50","Death12Months","factor","integer","Death12Months"
+"51","GOS_E12Months","integer","integer","GOS_E12Months"
+"52","mRS12Months","integer","integer","mRS12Months"
+"53","TotalEQAt12Months","factor","integer","TotalEQAt12Months"
+"54","TotalEQVas_At12Months","logical","logical","TotalEQVas_At12Months"
+"55","Column1","logical","logical","Column1"
+"56","Outcome12Months_Code_0_Alive_1_Deceased_2_Unknown_","logical","logical","Outcome12Months_Code_0_Alive_1_Deceased_2_Unknown_"
+"57","GOSE_fav_12mo","factor","integer","GOSE_fav_12mo"
+"58","mRS_fav_12mo","factor","integer","mRS_fav_12mo"
