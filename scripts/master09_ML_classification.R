@@ -27,6 +27,11 @@ library(rlist)
 library(cvAUC)
 library(gridExtra)
 library(ggplotify)
+<<<<<<< HEAD
+=======
+library(grid)
+library(cowplot)
+>>>>>>> 0221b2d73c5892d7e78bf49e707bf4855e28f742
 
 source('./functions/load_patient_clinical_data.R')
 source('./functions/update_clinicalVariableList.R')
@@ -41,6 +46,9 @@ source('./functions/predict_caret_models.R')
 source('./functions/classification_function_shiny_dis.R')
 source('./functions/classification_function_shiny_12mo.R')
 source('./functions/get_auc_info.R')
+source('./functions/get_auc_plots.R')
+source('./functions/get_auc_info_ci.R')
+source('./functions/generateRootDir.R')
 
 time_choice<-'tfr'
 time_slide<-c(0,8)
@@ -65,9 +73,5 @@ save_plot(do.call(plot_grid, c(unlist(auc_dis_plots, recursive = F), ncol=2,alig
           ncol=2,base_asp = 1.1,base_height=12, base_width=5)
 save_plot(do.call(plot_grid, c(unlist(auc_12m_plots, recursive = F), ncol=2,align='hv')), file="auc_12m.pdf", 
           ncol=2,base_asp = 1.1,base_height=12, base_width=5)
+
 setwd('../../scripts')
-
-Y <- patient_clinical_data$DiedDuringThisHospitalStay_
-
-result <- lol.xval.optimal_dimselect(curr_motion_features, Y, rs=seq(1,20), alg = lol.project.lol, alg.return="A",
-                                     classifier=glm, classifier.return="class", k=is.integer(5))
