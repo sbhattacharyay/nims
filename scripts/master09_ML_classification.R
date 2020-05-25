@@ -25,6 +25,10 @@ library(caret)
 library(kernlab)
 library(rlist)
 library(cvAUC)
+library(gridExtra)
+library(ggplotify)
+library(grid)
+library(cowplot)
 
 source('./functions/load_patient_clinical_data.R')
 source('./functions/update_clinicalVariableList.R')
@@ -39,6 +43,9 @@ source('./functions/predict_caret_models.R')
 source('./functions/classification_function_shiny_dis.R')
 source('./functions/classification_function_shiny_12mo.R')
 source('./functions/get_auc_info.R')
+source('./functions/get_auc_plots.R')
+source('./functions/get_auc_info_ci.R')
+source('./functions/generateRootDir.R')
 
 time_choice<-'tfr'
 time_slide<-c(0,8)
@@ -51,4 +58,16 @@ preds_dis<-classification_function_shiny_dis(time_choice,time_slide,classifier_c
 preds_12m<-classification_function_shiny_12mo(time_choice,time_slide,classifier_choice,r,mf_choice,sensor_loc)
 
 auc_dis <- get_auc_info(preds_dis)
+auc_dis_ci <- get_auc_info_ci(preds_dis)
 auc_12m <- get_auc_info(preds_12m)
+auc_12m_ci <- get_auc_info_ci(preds_12m)
+
+auc_dis_plots<-get_auc_plots(auc_dis,auc_dis_ci)
+auc_12m_plots<-get_auc_plots(auc_12m,auc_dis_ci)
+
+setwd(generateRootDir())
+save_plot(do.call(plot_grid, c(unlist(auc_dis_plots, recursive = F), ncol=2,align='hv')), file="auc_dis.pdf", 
+          ncol=2,base_asp = 1.1,base_height=12, base_width=5)
+save_plot(do.call(plot_grid, c(unlist(auc_12m_plots, recursive = F), ncol=2,align='hv')), file="auc_12m.pdf", 
+          ncol=2,base_asp = 1.1,base_height=12, base_width=5)
+setwd('../../scripts')
