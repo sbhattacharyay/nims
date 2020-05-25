@@ -27,11 +27,8 @@ library(rlist)
 library(cvAUC)
 library(gridExtra)
 library(ggplotify)
-<<<<<<< HEAD
-=======
 library(grid)
 library(cowplot)
->>>>>>> 0221b2d73c5892d7e78bf49e707bf4855e28f742
 
 source('./functions/load_patient_clinical_data.R')
 source('./functions/update_clinicalVariableList.R')
@@ -66,7 +63,7 @@ auc_12m <- get_auc_info(preds_12m)
 auc_12m_ci <- get_auc_info_ci(preds_12m)
 
 auc_dis_plots<-get_auc_plots(auc_dis,auc_dis_ci)
-auc_12m_plots<-get_auc_plots(auc_12m,auc_dis_ci)
+auc_12m_plots<-get_auc_plots(auc_12m,auc_12m_ci)
 
 setwd(generateRootDir())
 save_plot(do.call(plot_grid, c(unlist(auc_dis_plots, recursive = F), ncol=2,align='hv')), file="auc_dis.pdf", 
