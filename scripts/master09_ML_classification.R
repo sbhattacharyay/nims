@@ -29,6 +29,14 @@ library(gridExtra)
 library(ggplotify)
 library(grid)
 library(cowplot)
+library(nnet)
+library(parallel)
+library(fastAdaboost)
+if(.Platform$OS.type == "unix") {
+  library(doMC)
+} else {
+  library(doParallel)
+}
 
 source('./functions/load_patient_clinical_data.R')
 source('./functions/update_clinicalVariableList.R')
@@ -47,9 +55,18 @@ source('./functions/get_auc_plots.R')
 source('./functions/get_auc_info_ci.R')
 source('./functions/generateRootDir.R')
 
-time_choice<-'tfr'
+# Set the number of parallel cores for parallel tuning
+no.parallel.cores <- floor(2 * detectCores() / 3)
+if(.Platform$OS.type == "unix") {
+  registerDoMC(cores = no.parallel.cores)
+} else {
+  registerDoParallel(cores = no.parallel.cores)
+}
+
+# Select predictor set for training ML models
+time_choice<-'tfr' 
 time_slide<-c(0,8)
-classifier_choice<-c("svmRadialWeights","knn","lda","glmnet")
+classifier_choice<-c("svmRadialWeights","knn","lda","glmnet","avNNet","parRF","adaboost")
 r<-6
 mf_choice<-c("band_powerFeats","freq_entropyFeats","freq_pairsFeats","med_freqFeats","smaFeats","waveletsFeats")
 sensor_loc<-c("left_ank","left_el","left_wr","right_ank","right_el","right_wr")
