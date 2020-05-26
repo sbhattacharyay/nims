@@ -61,6 +61,7 @@ source('./functions/get_auc_plots.R')
 source('./functions/get_auc_info_ci.R')
 source('./functions/generateRootDir.R')
 source('./functions/get_cutpoint.R')
+source('./functions/plot_metric_stripcharts.R')
 
 # Set the number of parallel cores for parallel tuning
 no.parallel.cores <- floor(2 * detectCores() / 3)
@@ -91,7 +92,7 @@ cps_12m<-get_cutpoint(preds_12m)
 sens_dis <- get_sens_info(cps_dis)
 sens_12m <- get_sens_info(cps_12m)
 
-## Sensitivity
+## Specificity
 spec_dis <- get_spec_info(cps_dis)
 spec_12m <- get_spec_info(cps_12m)
 
@@ -112,6 +113,18 @@ auc_dis <- get_auc_info(preds_dis)
 auc_dis_ci <- get_auc_info_ci(preds_dis)
 auc_12m <- get_auc_info(preds_12m)
 auc_12m_ci <- get_auc_info_ci(preds_12m)
+
+# Metric Plots (ROCs for AUC):
+plot_metric_stripcharts(sens_dis,"Sensitivity (Dis)",'sens_dis.png')
+plot_metric_stripcharts(sens_12m,"Sensitivity (12m)",'sens_12m.png')
+plot_metric_stripcharts(spec_dis,"Specificity (Dis)",'spec_dis.png')
+plot_metric_stripcharts(spec_12m,"Specificity (12m)",'spec_12m.png')
+plot_metric_stripcharts(PPV_dis,"PPV (Dis)",'PPV_dis.png')
+plot_metric_stripcharts(PPV_12m,"PPV (12m)",'PPV_12m.png')
+plot_metric_stripcharts(NPV_dis,"NPV (Dis)",'NPV_dis.png')
+plot_metric_stripcharts(NPV_12m,"NPV (12m)",'NPV_12m.png')
+plot_metric_stripcharts(acc_dis,"Accuracy (Dis)",'acc_dis.png')
+plot_metric_stripcharts(acc_12m,"Accuracy (12m)",'acc_12m.png')
 
 auc_dis_plots<-get_auc_plots(auc_dis,auc_dis_ci)
 auc_12m_plots<-get_auc_plots(auc_12m,auc_12m_ci)
