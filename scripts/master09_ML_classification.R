@@ -32,6 +32,7 @@ library(cowplot)
 library(nnet)
 library(parallel)
 library(fastAdaboost)
+library(cutpointr)
 if(.Platform$OS.type == "unix") {
   library(doMC)
 } else {
@@ -50,10 +51,16 @@ source('./functions/train_caret_models.R')
 source('./functions/predict_caret_models.R')
 source('./functions/classification_function_shiny_dis.R')
 source('./functions/classification_function_shiny_12mo.R')
+source('./functions/get_sens_info.R')
+source('./functions/get_spec_info.R')
+source('./functions/get_PPV_info.R')
+source('./functions/get_NPV_info.R')
+source('./functions/get_acc_info.R')
 source('./functions/get_auc_info.R')
 source('./functions/get_auc_plots.R')
 source('./functions/get_auc_info_ci.R')
 source('./functions/generateRootDir.R')
+source('./functions/get_cutpoint.R')
 
 # Set the number of parallel cores for parallel tuning
 no.parallel.cores <- floor(2 * detectCores() / 3)
@@ -74,6 +81,33 @@ sensor_loc<-c("left_ank","left_el","left_wr","right_ank","right_el","right_wr")
 preds_dis<-classification_function_shiny_dis(time_choice,time_slide,classifier_choice,r,mf_choice,sensor_loc)
 preds_12m<-classification_function_shiny_12mo(time_choice,time_slide,classifier_choice,r,mf_choice,sensor_loc)
 
+# Determine optimal cutoff of each probability output by minimizing distance to optimal classifier (TPR = 1, FPR = 0)
+cps_dis<-get_cutpoint(preds_dis)
+cps_12m<-get_cutpoint(preds_12m)
+
+# Derive model performance metrics:
+
+## Sensitivity
+sens_dis <- get_sens_info(cps_dis)
+sens_12m <- get_sens_info(cps_12m)
+
+## Sensitivity
+spec_dis <- get_spec_info(cps_dis)
+spec_12m <- get_spec_info(cps_12m)
+
+## Positive Predictive Value:
+PPV_dis <- get_PPV_info(cps_dis)
+PPV_12m <- get_PPV_info(cps_12m)
+
+## Negative Predictive Value:
+NPV_dis <- get_NPV_info(cps_dis)
+NPV_12m <- get_NPV_info(cps_12m)
+
+## Accuracy:
+acc_dis <- get_acc_info(cps_dis)
+acc_12m <- get_acc_info(cps_12m)
+
+## AUC:
 auc_dis <- get_auc_info(preds_dis)
 auc_dis_ci <- get_auc_info_ci(preds_dis)
 auc_12m <- get_auc_info(preds_12m)
