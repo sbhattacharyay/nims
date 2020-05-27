@@ -1,6 +1,6 @@
 # Decoding Quantitative Motor Features for Classification and Prediction in Severe Acquired Brain Injury
 
-Brain Injury Motion Sensing (BIMS) Project
+Neurological Injury Motion Sensing (NIMS) Project
 
 MATLAB Toolboxes Required:
 - Financial Toolbox
