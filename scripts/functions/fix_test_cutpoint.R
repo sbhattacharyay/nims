@@ -1,4 +1,4 @@
-get_cutpoint <- function(preds_set){
+fix_test_cutpoint <- function(preds_set,self_cps_set){
   outputList <- list()
   for (i in 1:length(preds_set)){
     curr_pred_space <- preds_set[[i]]
@@ -15,8 +15,8 @@ get_cutpoint <- function(preds_set){
                              direction = ">=",
                              pos_class = tru_levels[2],
                              neg_class = tru_levels[1],
-                             method = minimize_metric,
-                             metric = roc01,
+                             method = oc_manual,
+                             cutpoint = self_cps_set[[i]][[j]][[m-1]]$optimal_cutpoint,
                              break_ties = min)
         fold_cps[[m-1]] = curr_cp
       }
