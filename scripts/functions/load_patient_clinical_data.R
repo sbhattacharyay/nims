@@ -1,8 +1,8 @@
-load_patient_clinical_data <- function() {
+load_patient_clinical_data <- function(directory) {
   na_strings <-
     c("NA","N A","N / A","N/A","N/ A","Not Available","Not available","NaN","","NaT")
   patient_clinical_data <-
-    read.csv('../clinical_data/patient_clinical_data.csv', na.strings = na_strings) %>%
+    read.csv(directory, na.strings = na_strings) %>%
     arrange(AccelPatientNo_) %>%
     mutate(
       Sex = as.factor(Sex),

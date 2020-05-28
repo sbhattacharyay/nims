@@ -1,4 +1,4 @@
-update_clinicalVariableList <- function(){
+update_clinicalVariableList <- function(directory){
   na_strings <-
     c("NA",
       "N A",
@@ -11,7 +11,7 @@ update_clinicalVariableList <- function(){
       "",
       "NaT")
   clinicalVariableList <-
-    read.csv('../clinical_data/clinicalVariableList.csv', na.strings = na_strings)
+    read.csv(directory, na.strings = na_strings)
   clinicalVariableList <-
     data.frame(
       colnames(patient_clinical_data),

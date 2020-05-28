@@ -1,29 +1,14 @@
 source('./functions/load_patient_clinical_data.R')
 source('./functions/update_clinicalVariableList.R')
-source('./functions/get_motion_features.R')
 source("./functions/load_tf_patient_covariates.R")
 source("./functions/train_caret_models.R")
 source("./functions/predict_caret_models.R")
 
 # Load patient clinical data (sorts by PY numbering and corrects variable types)
-patient_clinical_data <- load_patient_clinical_data()
+patient_clinical_data <- load_patient_clinical_data('../clinical_data/patient_clinical_data.csv')
 
 # Load and update clinical variable list
-clinicalVariableList <- update_clinicalVariableList()
-
-# Load Motion Features Organized by Time of Day (TOD)
-if (!exists("tod_motion_features")) {
-  tod_sensors <-
-    readMat('../tod_motion_feature_data/bed_corrected_imputed_complete_sensor_data.mat')$bed.corrected.sensors
-  tod_motion_features <- get_motion_features(do.call(rbind, tod_sensors))
-}
-
-# Load Motion Features Organized by Time from Recording (TFR)
-if (!exists("tfr_motion_features")) {
-  tfr_sensors <-
-    readMat('../tfr_motion_feature_data/bed_corrected_imputed_complete_sensor_data.mat')$bed.corrected.sensors
-  tfr_motion_features <- get_motion_features(do.call(rbind, tfr_sensors))
-}
+clinicalVariableList <- update_clinicalVariableList('../clinical_data/clinicalVariableList.csv')
 
 # Load transformed covariates for both TOD and TFR
 tod_tf_covariates <-load_tf_patient_covariates('../tod_motion_feature_data/tf_patient_covariates.csv')

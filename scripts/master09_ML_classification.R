@@ -71,6 +71,20 @@ if(.Platform$OS.type == "unix") {
   registerDoParallel(cores = no.parallel.cores)
 }
 
+# Load Motion Features Organized by Time of Day (TOD)
+if (!exists("tod_motion_features")) {
+  tod_sensors <-
+    readMat('../tod_motion_feature_data/bed_corrected_imputed_complete_sensor_data.mat')$bed.corrected.sensors
+  tod_motion_features <- get_motion_features(do.call(rbind, tod_sensors))
+}
+
+# Load Motion Features Organized by Time from Recording (TFR)
+if (!exists("tfr_motion_features")) {
+  tfr_sensors <-
+    readMat('../tfr_motion_feature_data/bed_corrected_imputed_complete_sensor_data.mat')$bed.corrected.sensors
+  tfr_motion_features <- get_motion_features(do.call(rbind, tfr_sensors))
+}
+
 # Select predictor set for training ML models
 time_choice<-'tfr' 
 time_slide<-c(0,8)
