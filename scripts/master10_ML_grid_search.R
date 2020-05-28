@@ -152,5 +152,7 @@ for (i in 1:nrow(complete_predictor_set)){
                                                       curr_outcomes, 
                                                       curr_mfChoice, 
                                                       curr_sensorLoc)
+  print(paste('Combination No.',as.character(i),"Complete"))
 }
 
+save(out_complete_pred_set,complete_predictor_set,file="~/data/grid_search_output.RData")

@@ -1,3 +1,14 @@
+#!/bin/bash
+#SBATCH --job-name=R_grid_search
+#SBATCH --time=72:00:00
+#SBATCH --partition=lrgmem
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=48
+#
+#---------------------------------------------------------------------
+# SLURM job script to run serial R
+#---------------------------------------------------------------------
+
 ml stack
 ml r/3.6.1
 ml r-assertthat
@@ -24,7 +35,6 @@ ml r-memoise
 ml r-pkgbuild
 ml r-pkgload
 ml r-rcmdcheck
-ml r-rlang
 ml r-roxygen2
 ml r-rstudioapi
 ml r-sessioninfo
@@ -33,7 +43,6 @@ ml r-withr
 ml r-yaml
 ml r-sys
 ml r-r6
-
 ml r-askpass
 ml r-backports
 ml r-brew
@@ -51,3 +60,8 @@ ml r-processx
 ml r-ps
 ml r-rprojroot
 ml r-stringi 
+ml r-whisker
+ml r-xml2
+ml r-xopen
+ml # confirm modules used
+Rscript ~/work/SB_bims/scripts/master10_ML_grid_search.R
