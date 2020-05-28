@@ -52,6 +52,7 @@ if(.Platform$OS.type == "unix") {
   library(doParallel)
 }
 
+source('./functions/list_do.R')
 source('./functions/list_cbind.R')
 source('./functions/get_motion_features.R')
 source('./functions/lol_project_motion_features.R')
