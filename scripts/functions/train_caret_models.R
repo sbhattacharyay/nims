@@ -18,7 +18,6 @@ train_caret_models<-function(train_CV,Y,currTrainIdx,inner_cvIdx,classifier_choi
     method = x,
     metric = "ROC",
     trControl = tc,
-    verbose = FALSE,
     preProcess = c("YeoJohnson","center","scale")  
   ))
   
