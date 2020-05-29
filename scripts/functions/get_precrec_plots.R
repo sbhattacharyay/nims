@@ -1,7 +1,7 @@
 get_precrec_plots <- function(precrec_info){
   col_vector=c('red', 'darkgreen', 'blue')
   val<-names(precrec_info[[1]])
-  plot_sep<-list(c(1,4,6),c(2,4,7),c(3,5,8))
+  plot_sep<-list(c(1,2,3))
   plots <<- vector(mode = "list", length = length(val))
   n = 1
   for (z in plot_sep){

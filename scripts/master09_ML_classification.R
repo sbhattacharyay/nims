@@ -33,6 +33,8 @@ library(nnet)
 library(parallel)
 library(fastAdaboost)
 library(cutpointr)
+library(precrec)
+
 if(.Platform$OS.type == "unix") {
   library(doMC)
 } else {
@@ -56,8 +58,10 @@ source('./functions/get_PPV_info.R')
 source('./functions/get_NPV_info.R')
 source('./functions/get_acc_info.R')
 source('./functions/get_auc_info.R')
+source('./functions/get_precrec_info.R')
 source('./functions/get_auc_cp.R')
 source('./functions/get_auc_plots.R')
+source('./functions/get_precrec_plots.R')
 source('./functions/get_auc_info_ci.R')
 source('./functions/generateRootDir.R')
 source('./functions/get_cutpoint.R')
@@ -157,10 +161,19 @@ plot_metric_stripcharts(auc_12m_cp,"AUC (12m)",'auc_12m.png')
 auc_dis_plots<-get_auc_plots(auc_dis,auc_dis_ci)
 auc_12m_plots<-get_auc_plots(auc_12m,auc_12m_ci)
 
+pr_dis<-get_precrec_info(preds_dis)
+pr_12m<-get_precrec_info(preds_12m)
+pr_dis_plots<-get_precrec_plots(pr_dis)
+pr_12m_plots<-get_precrec_plots(pr_12m)
+
 setwd(generateRootDir())
 save_plot(do.call(plot_grid, c(unlist(auc_dis_plots, recursive = F), ncol=2,align='hv')), file="auc_dis.pdf", 
-          ncol=2,base_asp = 1.1,base_height=12, base_width=5)
+          ncol=2,base_asp = 1.1,base_height=3*length(auc_dis_plots), base_width=5)
+save_plot(do.call(plot_grid, c(unlist(pr_dis_plots, recursive = F), ncol=2,align='hv')), file="pr_dis.pdf", 
+          ncol=2,base_asp = 1.1,base_height=2*length(pr_dis_plots), base_width=5)
 save_plot(do.call(plot_grid, c(unlist(auc_12m_plots, recursive = F), ncol=2,align='hv')), file="auc_12m.pdf", 
-          ncol=2,base_asp = 1.1,base_height=12, base_width=5)
-
+          ncol=2,base_asp = 1.1,base_height=3*length(auc_12m_plots), base_width=5)
+save_plot(do.call(plot_grid, c(unlist(pr_12m_plots, recursive = F), ncol=2,align='hv')), file="pr_12m.pdf", 
+          ncol=2,base_asp = 1.1,base_height=2*length(pr_12m_plots), base_width=5)
 setwd('../../scripts')
+
