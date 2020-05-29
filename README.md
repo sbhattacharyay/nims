@@ -1,4 +1,4 @@
-# Decoding Quantitative Motor Features for Classification and Prediction in Severe Acquired Brain Injury
+# Decoding Quantitative Motor Features for Classification and Prediction in Severe Neurological Injury
 
 Neurological Injury Motion Sensing (NIMS) Project
 
