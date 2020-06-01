@@ -51,7 +51,7 @@
 "50","Death12Months","factor","integer","Death12Months"
 "51","GOS_E12Months","integer","integer","GOS_E12Months"
 "52","mRS12Months","integer","integer","mRS12Months"
-"53","TotalEQAt12Months","factor","integer","TotalEQAt12Months"
+"53","TotalEQAt12Months","character","character","TotalEQAt12Months"
 "54","TotalEQVas_At12Months","logical","logical","TotalEQVas_At12Months"
 "55","Column1","logical","logical","Column1"
 "56","Outcome12Months_Code_0_Alive_1_Deceased_2_Unknown_","logical","logical","Outcome12Months_Code_0_Alive_1_Deceased_2_Unknown_"

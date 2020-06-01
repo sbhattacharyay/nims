@@ -66,6 +66,7 @@ source('./functions/get_auc_info_ci.R')
 source('./functions/generateRootDir.R')
 source('./functions/get_cutpoint.R')
 source('./functions/plot_metric_stripcharts.R')
+source('./functions/fix_test_cutpoint.R')
 
 # Set the number of parallel cores for parallel tuning
 no.parallel.cores <- floor(2 * detectCores() / 3)
@@ -176,4 +177,3 @@ save_plot(do.call(plot_grid, c(unlist(auc_12m_plots, recursive = F), ncol=2,alig
 save_plot(do.call(plot_grid, c(unlist(pr_12m_plots, recursive = F), ncol=2,align='hv')), file="pr_12m.pdf", 
           ncol=2,base_asp = 1.1,base_height=2*length(pr_12m_plots), base_width=5)
 setwd('../../scripts')
-
