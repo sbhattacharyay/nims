@@ -130,8 +130,7 @@ names(complete_predictor_set) <- c("mf_options","sp_options","time_choice","outc
 classifier_choice<-c("svmRadialWeights","knn","lda","glmnet","avNNet","parRF")
 
 out_complete_pred_set <- list()
-#for (i in 1:nrow(complete_predictor_set)){
-for (i in 882:1700){
+for (i in 2501:3300){
   curr_timeChoice <- as.character(complete_predictor_set$time_choice[i])
   if (curr_timeChoice == 'tod'){
     curr_timeSlide <- c(as.POSIXct("2020-05-05 18:00:00"),as.POSIXct("2020-05-06 12:00:00"))
@@ -153,6 +152,6 @@ for (i in 882:1700){
                                                       curr_outcomes, 
                                                       curr_mfChoice, 
                                                       curr_sensorLoc)
-  save(out_complete_pred_set,complete_predictor_set,file="~/data/grid_search_output_v2.RData")
+  save(out_complete_pred_set,complete_predictor_set,file="~/data/grid_search_output_v4.RData")
   print(paste('Combination No.',as.character(i),"Complete"))
 }
