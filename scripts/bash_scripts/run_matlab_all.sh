@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=tod_matlab_bims
+#SBATCH --job-name=all_matlab_nims
 #SBATCH --time=72:00:00
 #SBATCH --partition=lrgmem
 #SBATCH --nodes=1
@@ -15,5 +15,5 @@
  
 ml matlab/R2019b-v2
 ml # confirm modules used
-matlab -nodisplay -nojvm -nosplash -nodesktop -r "cd('~/work/SB_bims/scripts/'); master03_tod_motion_feature_extraction;"
+matlab -nodisplay -nojvm -nosplash -nodesktop -r "cd('~/work/SB_bims/scripts/'); master02_all_motion_feature_extraction;"
 echo "matlab exit code: $?"
