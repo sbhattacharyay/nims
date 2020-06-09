@@ -1,4 +1,4 @@
-%% Master Script 2: Motion Feature Extraction per Time of Day
+%% Master Script 3: Motion Feature Extraction per Time of Day
 % Decoding Quantitative Motor Features for Classification and Prediction
 % in Severe Acquired Brain Injury
 %
