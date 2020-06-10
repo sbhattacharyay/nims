@@ -11,6 +11,7 @@
 library(tidyverse)
 library(forecast)
 library(Amelia)
+library(imputeTS)
 library(parallel)
 library(R.matlab)
 library(car)
@@ -45,71 +46,19 @@ if (!exists("tfr_motion_features")) {
   featureLabels <- read.csv('../tfr_motion_feature_data/feature_names.csv',header = FALSE)
 }
 
-# Set number of features:
-feature_count <- 7
+n <- length(tfr_motion_features)/length(featureLabels)
 
-temp_dims <- dim(tfr_motion_features[[1]])
-sensor_count <- temp_dims[1]
-n <- length(tfr_motion_features)/feature_count
+source('./functions/mf_to_dataframe.R')
+# Recode all missing values to NA, find "totally missing" data-streams, and store all feature values in single DF:
 
-# Recode all missing values to NA, find "totally missing" data-streams:
-mfIdx <- c()
-srIdx <- c()
-corr_motion_features <- vector(mode = 'list')
+out.MF2DF <- mf_to_dataframe(tfr_motion_features,n,verbose = TRUE) 
+completeFeatureSet <- out.MF2DF[[1]]
+totallyMissingSet <- out.MF2DF[[2]]
 
-for (i in 1:length(tfr_motion_features)) {
-  curr_matrix <- ts(t(tfr_motion_features[[i]]),frequency = 720)
-  colnames(curr_matrix) <- c("Bed","LA","LE","LW","RA","RE","RW")
-  curr_matrix[is.nan(curr_matrix)] <- NA
-  curr_matrix[is.infinite(curr_matrix)] <- NA
-  for (j in 1:ncol(curr_matrix)) {
-    if (all(curr_matrix[,j] == 0,na.rm = TRUE)){
-      curr_matrix[,j] <- rep(NA, length(curr_matrix[,j]))
-    }
-    if (all(is.na(curr_matrix[,j]))) {
-      mfIdx <- c(mfIdx,i)
-      srIdx <- c(srIdx,j)
-    }
-  }
-  corr_motion_features[[i]] <- curr_matrix
-}
+rm(tfr_motion_features, tfr_sensors,out.MF2DF)
 
-rm(tfr_motion_features, tfr_sensors)
-
-# Convert mfIdx to ptIdx and ftIdx
-ptIdx <- c()
-ftIdx <- c()
-
-for (i in 1:length(mfIdx)){
-  if(mfIdx[i] %% n == 0){
-    ptIdx <- c(ptIdx,n)
-  } else {
-    ptIdx <- c(ptIdx,mfIdx[i] %% n)
-  }
-  ftIdx <- c(ftIdx,ceiling(mfIdx[i]/69))
-}
-totallyMissingSet <- as.data.frame(cbind(ptIdx,ftIdx,srIdx,mfIdx))
-
-# From this dataframe, we see that the only incident in which a patient had more than one sensor completely missing was patient 6, who
+# From the totallyMissingSet dataframe, we see that the only incident in which a patient had more than one sensor completely missing was patient 6, who
 # had sensors 2 (LA) and 6 (RE) missing.
-
-# Here we compile a complete set of all the recorded motion features across the set
-completeFeatureSet <- data.frame(matrix(ncol = 9, nrow = 0))
-names(completeFeatureSet) <- c("Bed","LA","LE","LW","RA","RE","RW","featureType","pNum")
-
-for (i in 1:length(corr_motion_features)){
-  tempDF <- as.data.frame(corr_motion_features[[i]]) %>% filter_all(any_vars(!is.na(.)))
-  if(i %% n == 0){
-    current_pNum <- n
-  } else {
-    current_pNum <- i %% n
-  }
-  current_feature <- featureLabels[,ceiling(i/69)]
-  tempDF$featureType <- current_feature
-  tempDF$pNum <- current_pNum
-  completeFeatureSet <- rbind(completeFeatureSet,tempDF)
-  print(paste('set no',i,'complete'))
-}
 
 # First separate out missing UE indices:
 totallyMissingUE <- totallyMissingSet %>% filter(srIdx%in%c(3,4,6,7))
@@ -151,47 +100,41 @@ for (i in 1:nrow(uniqUECombos)){
 
 # Impute all totally missing upper extremity values possible with regression models:
 for (i in 1:nrow(totallyMissingUE)){
-  curr_matrix <- corr_motion_features[[totallyMissingUE$mfIdx[i]]]
+  currRows <- which(completeFeatureSet$ptIdx == totallyMissingUE$ptIdx[i] & completeFeatureSet$featureType == featureLabels[[totallyMissingUE$ftIdx[i]]])
+  currDF <- completeFeatureSet %>% filter(ptIdx == totallyMissingUE$ptIdx[i] & featureType == featureLabels[[totallyMissingUE$ftIdx[i]]])
   uniqIdx <- which(uniqUECombos$srIdx == totallyMissingUE$srIdx[i] & uniqUECombos$ftIdx == totallyMissingUE$ftIdx[i])
   curr_UE_mdl <- UEmdls[[uniqIdx]]
   curr_E_bxcx <- UEbxcx[[uniqIdx]][[1]]
   curr_W_bxcx <- UEbxcx[[uniqIdx]][[2]]
-  imputed_sensor<- curr_matrix[,totallyMissingUE$srIdx[i]] 
   if (totallyMissingUE$srIdx[i] == 3){
-    tfPreds <- predict(curr_W_bxcx,newdata = curr_matrix[,4]) 
-    predictor_DF <- data.frame(LE=imputed_sensor,LW=tfPreds)
-    tfOuts<-predict(curr_UE_mdl,newdata = predictor_DF)
+    currDF$LW <- predict(curr_W_bxcx,newdata = currDF$LW)
+    tfOuts <- predict(curr_UE_mdl,newdata = currDF)
     Outs <- predict(curr_E_bxcx,newdata = tfOuts,inverse = TRUE)
   } else if (totallyMissingUE$srIdx[i] == 4) {
-    tfPreds <- predict(curr_E_bxcx,newdata = curr_matrix[,3]) 
-    predictor_DF <- data.frame(LE=tfPreds,LW=imputed_sensor)
-    tfOuts<-predict(curr_UE_mdl,newdata = predictor_DF)
-    Outs <- predict(curr_W_bxcx,newdata = tfOuts,inverse = TRUE)
+    currDF$LE <- predict(curr_E_bxcx,newdata = currDF$LE)
+    tfOuts <- predict(curr_UE_mdl,newdata = currDF)
+    Outs <- predict(curr_W_bxcx,newdata = tfOuts,inverse = TRUE)    
   } else if (totallyMissingUE$srIdx[i] == 6) {
-    tfPreds <- predict(curr_W_bxcx,newdata = curr_matrix[,7]) 
-    predictor_DF <- data.frame(RE=imputed_sensor,RW=tfPreds)
-    tfOuts<-predict(curr_UE_mdl,newdata = predictor_DF)
+    currDF$RW <- predict(curr_W_bxcx,newdata = currDF$RW)
+    tfOuts <- predict(curr_UE_mdl,newdata = currDF)
     Outs <- predict(curr_E_bxcx,newdata = tfOuts,inverse = TRUE)
   } else if (totallyMissingUE$srIdx[i] == 7) {
-    tfPreds <- predict(curr_E_bxcx,newdata = curr_matrix[,6]) 
-    predictor_DF <- data.frame(RE=tfPreds,LW=imputed_sensor)
-    tfOuts<-predict(curr_UE_mdl,newdata = predictor_DF)
-    Outs <- predict(curr_W_bxcx,new,newdata = tfOuts,inverse = TRUE)
+    currDF$RE <- predict(curr_E_bxcx,newdata = currDF$RE)
+    tfOuts <- predict(curr_UE_mdl,newdata = currDF)
+    Outs <- predict(curr_W_bxcx,newdata = tfOuts,inverse = TRUE)   
   }
-  curr_matrix[,totallyMissingUE$srIdx[i]] <- Outs
-  corr_motion_features[[totallyMissingUE$mfIdx[i]]] <- curr_matrix
+  completeFeatureSet[currRows,totallyMissingUE$srIdx[i]] <- Outs
 }
-rm(UEmdls)
+rm(UEmdls,UEmdl,UEbxcx,curr_E_bxcx,curr_W_bxcx,curr_UE_mdl,LE_bxcx,LW_bxcx,RE_bxcx,RW_bxcx)
 
 # Impute totally missing bed values by randomly sampling (with replacement) from available bed data of the same sensor:
 totallyMissingBed <- totallyMissingSet %>% filter(srIdx == 1)
 for (i in 1:nrow(totallyMissingBed)){
-  curr_matrix <- corr_motion_features[[totallyMissingBed$mfIdx[i]]]
+  currRows <- which(completeFeatureSet$ptIdx == totallyMissingBed$ptIdx[i] & completeFeatureSet$featureType == featureLabels[[totallyMissingBed$ftIdx[i]]])
   filtered_bedSet <- completeFeatureSet %>% drop_na(Bed) %>% filter(featureType == featureLabels[[totallyMissingBed$ftIdx[i]]])
-  curr_matrix[,1]<-sample(x = filtered_bedSet$Bed,size = nrow(curr_matrix),replace = TRUE)
-  corr_motion_features[[totallyMissingBed$mfIdx[i]]] <- curr_matrix
+  completeFeatureSet[currRows,1] <- sample(x =filtered_bedSet$Bed,size = length(currRows),replace = TRUE)
 }
-
+rm(filtered_bedSet)
 # Focus on exploratory analysis of prediction of ankle regression:
 # smaFilter <- completeFeatureSet %>% filter(featureType == "sma")
 # LA_bxcx <- boxcox(smaFilter$LA,standardize = TRUE)
@@ -212,6 +155,7 @@ for (i in 1:nrow(totallyMissingBed)){
 # tempMdl2 <- lm(LA ~ LE + LW + LE:LW,smaFilter)
 
 # Based on this analysis, I will use the other available Ankle to impute missing ankle values
+
 # First separate out missing Lower Extremity indices:
 totallyMissingLE <- totallyMissingSet %>% filter(srIdx%in%c(2,5))
 uniqLECombos <- unique(totallyMissingLE[,c('srIdx','ftIdx')])
@@ -235,93 +179,72 @@ for (i in 1:nrow(uniqLECombos)){
 }
 
 for (i in 1:nrow(totallyMissingLE)){
-  curr_matrix <- corr_motion_features[[totallyMissingLE$mfIdx[i]]]
+  currRows <- which(completeFeatureSet$ptIdx == totallyMissingLE$ptIdx[i] & completeFeatureSet$featureType == featureLabels[[totallyMissingLE$ftIdx[i]]])
+  currDF <- completeFeatureSet %>% filter(ptIdx == totallyMissingLE$ptIdx[i] & featureType == featureLabels[[totallyMissingLE$ftIdx[i]]])
   uniqIdx <- which(uniqLECombos$srIdx == totallyMissingLE$srIdx[i] & uniqLECombos$ftIdx == totallyMissingLE$ftIdx[i])
   curr_mdl <- LEmdls[[uniqIdx]]
   curr_LA_bxcx <- LEbxcx[[uniqIdx]][[1]]
   curr_RA_bxcx <- LEbxcx[[uniqIdx]][[2]]
-  imputed_sensor<- curr_matrix[,totallyMissingLE$srIdx[i]] 
   if (totallyMissingLE$srIdx[i] == 2){
-    tfPreds <- predict(curr_RA_bxcx,newdata = curr_matrix[,5]) 
-    predictor_DF <- data.frame(LA=imputed_sensor,RA=tfPreds)
-    tfOuts<-predict(curr_mdl,newdata = predictor_DF)
-    Outs <- predict(curr_LA_bxcx,newdata = tfOuts,inverse = TRUE)
+    currDF$RA <- predict(curr_RA_bxcx,newdata = currDF$RA)
+    tfOuts <- predict(curr_mdl,newdata = currDF)
+    Outs <- predict(curr_LA_bxcx,newdata = tfOuts,inverse = TRUE) 
   } else if (totallyMissingLE$srIdx[i] == 5){
-    tfPreds <- predict(curr_LA_bxcx,newdata = curr_matrix[,2]) 
-    predictor_DF <- data.frame(LA=tfPreds,RA=imputed_sensor)
-    tfOuts<-predict(curr_mdl,newdata = predictor_DF)
-    Outs <- predict(curr_RA_bxcx,newdata = tfOuts,inverse = TRUE)
+    currDF$LA <- predict(curr_LA_bxcx,newdata = currDF$LA)
+    tfOuts <- predict(curr_mdl,newdata = currDF)
+    Outs <- predict(curr_RA_bxcx,newdata = tfOuts,inverse = TRUE) 
   }
-  curr_matrix[,totallyMissingLE$srIdx[i]] <- Outs
-  corr_motion_features[[totallyMissingLE$mfIdx[i]]] <- curr_matrix
+  completeFeatureSet[currRows,totallyMissingLE$srIdx[i]] <- Outs
 }
-rm(LEmdls)
+rm(LEmdls,LEmdl,LEbxcx,curr_LA_bxcx,curr_RA_bxcx,curr_mdl,LA_bxcx,RA_bxcx,filteredSet)
 
-newCompleteFeatureSet <- data.frame(matrix(ncol = 10, nrow = 0))
-names(newCompleteFeatureSet) <- c("Bed","LA","LE","LW","RA","RE","RW","featureType","pNum","timeCount")
-new_bxcx <- vector(mode = "list")
+stored_amelias <- vector(mode = "list")
+stored_bxcx <- vector(mode = "list")
 
-for (i in 1:length(corr_motion_features)){
-  tempDF <- as.data.frame(corr_motion_features[[i]])
-  temp_bxcx <- vector(mode = "list")
-  # transform each stream with univariate boxcox
-  for (j in 1:ncol(tempDF)) {
-    curr_bxcx <- boxcox(tempDF[,j],standardize = TRUE)
-    tempDF[,j] <- curr_bxcx$x.t
-    temp_bxcx[[j]] <- curr_bxcx
+for (i in 1:length(featureLabels)){
+  curr_amelia_DF <- data.frame(matrix(ncol = ncol(completeFeatureSet), nrow = 0))
+  names(curr_amelia_DF) <- names(completeFeatureSet)
+  amelia_bxcx <- vector(mode = "list")
+  for (j in 1:n){
+    currDF <- completeFeatureSet %>% filter(ptIdx == j & featureType == featureLabels[[i]])
+    temp_bxcx <- vector(mode = "list")
+    # transform each stream with univariate boxcox
+    for (k in 1:7) {
+      curr_bxcx <- boxcox(currDF[,k],standardize = TRUE)
+      currDF[,k] <- curr_bxcx$x.t
+      temp_bxcx[[k]] <- curr_bxcx
+    }
+    amelia_bxcx[[j]] <- temp_bxcx
+    curr_amelia_DF <- rbind(curr_amelia_DF,currDF)
   }
-  new_bxcx[[i]] <- temp_bxcx
-  
-  if(i %% n == 0){
-    current_pNum <- n
-  } else {
-    current_pNum <- i %% n
-  }
-  current_feature <- featureLabels[,ceiling(i/69)]
-  tempDF$featureType <- current_feature
-  tempDF$pNum <- current_pNum
-  tempDF$timeCount <- 1:nrow(corr_motion_features[[i]])
-  newCompleteFeatureSet <- rbind(newCompleteFeatureSet,tempDF)
-  print(paste('set no',i,'complete'))
+  curr_amelia_DF <- curr_amelia_DF %>% select(-featureType)
+  curr_amelia <- amelia(curr_amelia_DF, m = 9, ts = "timeCount", cs ="ptIdx",polytime=2)
+  stored_amelias[[i]] <- curr_amelia
+  stored_bxcx[[i]] <- amelia_bxcx
+  print(paste('Feature no.',i,'complete'))
 }
 
-newCompleteBPset <- newCompleteFeatureSet %>% filter(featureType=="band_power")%>%select(-featureType)
-newCompleteFEset <- newCompleteFeatureSet %>% filter(featureType=="freq_entropy")%>%select(-featureType)
-newCompleteFP1set <-newCompleteFeatureSet %>% filter(featureType=="freq_pairs1")%>%select(-featureType)
-newCompleteFP2set <-newCompleteFeatureSet %>% filter(featureType=="freq_pairs2")%>%select(-featureType)
-newCompleteMFset <- newCompleteFeatureSet %>% filter(featureType=="med_freq")%>%select(-featureType)
-newCompleteSMset <- newCompleteFeatureSet %>% filter(featureType=="sma")%>%select(-featureType)
-newCompleteWVset <- newCompleteFeatureSet %>% filter(featureType=="wavelets")%>%select(-featureType)
+for (i in 1:length(stored_amelias)){
+  curr_amelia <- stored_amelias[[i]]
+  curr_bxcx <- stored_bxcx[[i]]
+  for(l in 1:curr_amelia$m){
+    curr_imp <- curr_amelia$imputations[[l]]
+    for (j in 1:n){
+      curr_imp_pt <- curr_imp %>% filter(ptIdx == j)
+      rows_for_change <- which(curr_imp$ptIdx == j)
+      temp_bxcx <- curr_bxcx[[j]]
+      for (k in 1:length(curr_bxcx[[j]])){
+        curr_vec <- predict(temp_bxcx[[k]],newdata = curr_imp_pt[,k],inverse = TRUE)
+        if (sum(is.na(curr_vec)) > 0){
+          curr_vec <- na_interpolation(curr_vec, option = "linear")
+        }
+        curr_imp_pt[,k] <- curr_vec
+      }
+      curr_imp[rows_for_change,] <- curr_imp_pt
+    }
+      fileName <- paste0(featureLabels[[i]],"_",l,".csv")
+      write.csv(curr_imp,file.path("../tfr_motion_feature_data/imputed_features",fileName))
+  }
+  print(paste('Feature no.',i,'complete'))
+}
 
-bp_amelia <- amelia(newCompleteBPset, m = 9, ts = "timeCount", cs ="pNum",polytime=2)
-fe_amelia <- amelia(newCompleteFEset, m = 9, ts = "timeCount", cs ="pNum",polytime=2)
-fp1_amelia<- amelia(newCompleteFP1set,m = 9, ts = "timeCount", cs ="pNum",polytime=2)
-fp1_amelia<- amelia(newCompleteFP2set,m = 9, ts = "timeCount", cs ="pNum",polytime=2)
-mf_amelia <- amelia(newCompleteMFset, m = 9, ts = "timeCount", cs ="pNum",polytime=2)
-sm_amelia <- amelia(newCompleteSMset, m = 9, ts = "timeCount", cs ="pNum",polytime=2)
-wv_amelia <- amelia(newCompleteWVset, m = 9, ts = "timeCount", cs ="pNum",polytime=2)
-
-# Inverse-transform and save imputations in the same format as before:
-# for (i in 1:length(corr_motion_features)){
-#   tempDF <- as.data.frame(corr_motion_features[[i]])
-#   temp_bxcx <- vector(mode = "list")
-#   # transform each stream with univariate boxcox
-#   for (j in 1:ncol(tempDF)) {
-#     curr_bxcx <- boxcox(tempDF[,j],standardize = TRUE)
-#     tempDF[,j] <- curr_bxcx$x.t
-#     temp_bxcx[[j]] <- curr_bxcx
-#   }
-#   new_bxcx[[i]] <- temp_bxcx
-#   
-#   if(i %% n == 0){
-#     current_pNum <- n
-#   } else {
-#     current_pNum <- i %% n
-#   }
-#   current_feature <- featureLabels[,ceiling(i/69)]
-#   tempDF$featureType <- current_feature
-#   tempDF$pNum <- current_pNum
-#   tempDF$timeCount <- 1:nrow(corr_motion_features[[i]])
-#   newCompleteFeatureSet <- rbind(newCompleteFeatureSet,tempDF)
-#   print(paste('set no',i,'complete'))
-# }
