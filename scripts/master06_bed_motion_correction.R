@@ -14,17 +14,17 @@ m <- 9
 library(tidyverse)
 source('./functions/find_thresholds.R')
 
-featureLabels <- read.csv('../tfr_motion_feature_data/feature_names.csv',header = FALSE)
+featureLabels <- read.csv('../all_motion_feature_data/feature_names.csv',header = FALSE)
 compiledImputations <- vector(mode = "list")
 
 for (i in 1:m){
   print(paste('Imputation no.',i,'started'))
   currPattern <- paste0('*',i,'.csv')
-  currFileList <- list.files('../tfr_motion_feature_data/imputed_features/',pattern = currPattern)
+  currFileList <- list.files('../all_motion_feature_data/imputed_features/',pattern = currPattern)
   imputationDF <- data.frame(matrix(ncol = 10, nrow = 0))
   for (j in 1:length(featureLabels)){
-    currFilePath <- file.path('../tfr_motion_feature_data/imputed_features',currFileList[j]) 
-    currDF <- read.csv(currFilePath) %>% select(-X)
+    currFilePath <- file.path('../all_motion_feature_data/imputed_features',currFileList[j]) 
+    currDF <- read.csv(currFilePath) %>% dplyr::select(-X)
     currDF$featureType <- featureLabels[[j]]
     imputationDF <- rbind(imputationDF,currDF)
     print(paste('Feature no.',j,'complete'))
@@ -85,4 +85,4 @@ for (i in 1:length(compiledImputations)){
   compiledImputations[[i]] <- currDF
 }
 
-saveRDS(compiledImputations,file = "../tfr_motion_feature_data/bc_i_c_dataset.rds")
+saveRDS(compiledImputations,file = "../all_motion_feature_data/bc_i_c_dataset.rds")

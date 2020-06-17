@@ -38,25 +38,35 @@ patient_clinical_data = load_patient_clinical_data('../clinical_data/patient_cli
 
 source('./functions/get_motion_features.R')
 
-# Load Motion Features Organized by Time from Recording (TFR)
-if (!exists("tfr_motion_features")) {
-  tfr_sensors <-
-    readMat('../tfr_motion_feature_data/complete_sensor_data.mat')$sensors
-  tfr_motion_features <- do.call(rbind, tfr_sensors)
-  featureLabels <- read.csv('../tfr_motion_feature_data/feature_names.csv',header = FALSE)
+# Load Motion Features (all)
+if (!exists("all_motion_features")) {
+  all_sensors <-
+    readMat('../all_motion_feature_data/complete_sensor_data.mat')$sensors
+  all_motion_features <- do.call(rbind, all_sensors)
+  featureLabels <- read.csv('../all_motion_feature_data/feature_names.csv',header = FALSE)
+  all_mf_times <- read.csv('../all_motion_feature_data/indexed_times.csv') %>% mutate(times = as.POSIXct(times,tz="America/New_York",format ="%d-%b-%Y %H:%M:%S"))
 }
 
-n <- length(tfr_motion_features)/length(featureLabels)
+n <- length(all_motion_features)/length(featureLabels)
 
 source('./functions/mf_to_dataframe.R')
 # Recode all missing values to NA, find "totally missing" data-streams, and store all feature values in single DF:
 
-out.MF2DF <- mf_to_dataframe(tfr_motion_features,n,verbose = TRUE) 
+out.MF2DF <- mf_to_dataframe(all_motion_features,n,verbose = TRUE) 
 completeFeatureSet <- out.MF2DF[[1]]
 totallyMissingSet <- out.MF2DF[[2]]
 
-rm(tfr_motion_features, tfr_sensors,out.MF2DF)
+complete_timestamps <- as.data.frame(matrix(ncol = 3, nrow = 0))
+for (i in 1:n){
+  curr_timestamps <- all_mf_times %>% filter(ptIdx == i)
+  curr_timestamps$timeCount <- seq(nrow(curr_timestamps))
+  complete_timestamps <- rbind(complete_timestamps,curr_timestamps)
+}
+complete_timestamps <- rename(complete_timestamps,timeStamps = times)
+completeFeatureSet <- inner_join(completeFeatureSet,complete_timestamps,by=c("ptIdx","timeCount"))
 
+rm(all_motion_features,all_sensors,out.MF2DF,complete_timestamps,all_mf_times)
+gc()
 # From the totallyMissingSet dataframe, we see that the only incident in which a patient had more than one sensor completely missing was patient 6, who
 # had sensors 2 (LA) and 6 (RE) missing.
 
@@ -217,8 +227,8 @@ for (i in 1:length(featureLabels)){
     amelia_bxcx[[j]] <- temp_bxcx
     curr_amelia_DF <- rbind(curr_amelia_DF,currDF)
   }
-  curr_amelia_DF <- curr_amelia_DF %>% select(-featureType)
-  curr_amelia <- amelia(curr_amelia_DF, m = 9, ts = "timeCount", cs ="ptIdx",polytime=2)
+  curr_amelia_DF <- curr_amelia_DF %>% dplyr::select(-featureType)
+  curr_amelia <- amelia(curr_amelia_DF, m = 1, ts = "timeStamps", cs ="ptIdx",polytime=2,intercs = TRUE, p2s = 2)
   stored_amelias[[i]] <- curr_amelia
   stored_bxcx[[i]] <- amelia_bxcx
   print(paste('Feature no.',i,'complete'))
@@ -243,7 +253,7 @@ for (i in 1:length(stored_amelias)){
       curr_imp[rows_for_change,] <- curr_imp_pt
     }
       fileName <- paste0(featureLabels[[i]],"_",l,".csv")
-      write.csv(curr_imp,file.path("../tfr_motion_feature_data/imputed_features",fileName))
+      write.csv(curr_imp,file.path("../all_motion_feature_data/",fileName))
   }
   print(paste('Feature no.',i,'complete'))
 }

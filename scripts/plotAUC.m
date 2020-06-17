@@ -4,31 +4,31 @@ function plotAUC(preds_mat, out_filename)
     %% get classes
     classes = who(matfile(preds_mat));
     %% load mat file
-    clin_only_predictions = load(preds_mat, classes{1}).(classes{1});
-    combined_predictions = load(preds_mat, classes{2}).(classes{2});
-    mf_only_predictions = load(preds_mat, classes{3}).(classes{3});
+    clin_only_test_predictions = load(preds_mat, classes{1}).(classes{1});
+    combined_test_predictions = load(preds_mat, classes{2}).(classes{2});
+    mf_only_test_predictions = load(preds_mat, classes{3}).(classes{3});
     %% store names of model classifiers
-    mf_classifiers = fieldnames(mf_only_predictions{1});
+    mf_classifiers = fieldnames(mf_only_test_predictions{1});
     mf_classifiers = mf_classifiers(2:end);
 
-    cm_classifiers = fieldnames(combined_predictions{1});
+    cm_classifiers = fieldnames(combined_test_predictions{1});
     cm_classifiers = cm_classifiers(2:end);
 
-    cl_classifiers = fieldnames(clin_only_predictions{1});
+    cl_classifiers = fieldnames(clin_only_test_predictions{1});
     cl_classifiers = cl_classifiers(2:end);
     
     %% build subplots
     aucfig = figure('units','normalized','outerposition',[0 0 1 1]);
     for i=1:length(mf_classifiers)
-        [X,Y,T,AUC] = perfcurve(cellfun(@(x) horzcat(x.ground_truth-1),combined_predictions,'UniformOutput',false),...
-                        cellfun(@(x) horzcat(x.(cm_classifiers{i})),combined_predictions,'UniformOutput',false),...
+        [X,Y,T,AUC] = perfcurve(cellfun(@(x) horzcat(x.ground_truth-1),combined_test_predictions,'UniformOutput',false),...
+                        cellfun(@(x) horzcat(x.(cm_classifiers{i})),combined_test_predictions,'UniformOutput',false),...
                         1,'XCrit','fpr','YCrit','tpr'); 
-        [X1,Y1,T1,AUC1] = perfcurve(cellfun(@(x) horzcat(x.ground_truth-1),mf_only_predictions,'UniformOutput',false),...
-                                cellfun(@(x) horzcat(x.(mf_classifiers{i})),mf_only_predictions,'UniformOutput',false),...
+        [X1,Y1,T1,AUC1] = perfcurve(cellfun(@(x) horzcat(x.ground_truth-1),mf_only_test_predictions,'UniformOutput',false),...
+                                cellfun(@(x) horzcat(x.(mf_classifiers{i})),mf_only_test_predictions,'UniformOutput',false),...
                                 1,'XCrit','fpr','YCrit','tpr');                                         
 
-        [X2,Y2,T2,AUC2] = perfcurve(cellfun(@(x) horzcat(x.ground_truth-1),clin_only_predictions,'UniformOutput',false),...
-                                cellfun(@(x) horzcat(x.(cl_classifiers{i})),clin_only_predictions,'UniformOutput',false),...
+        [X2,Y2,T2,AUC2] = perfcurve(cellfun(@(x) horzcat(x.ground_truth-1),clin_only_test_predictions,'UniformOutput',false),...
+                                cellfun(@(x) horzcat(x.(cl_classifiers{i})),clin_only_test_predictions,'UniformOutput',false),...
                                 1,'XCrit','fpr','YCrit','tpr');    
 
         legend_description = {sprintf('Combined\nAUC = %0.2f\n(%0.2f-%0.2f)',AUC(1),AUC(2),AUC(3));...

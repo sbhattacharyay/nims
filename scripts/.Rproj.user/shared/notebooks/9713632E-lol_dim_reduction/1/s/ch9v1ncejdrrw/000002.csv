@@ -1,4 +1,0 @@
-"0","sortOrder<-sort(studyPatientsPY,index.return=TRUE)$ix"
-"0","PYpatient_table<-patient_table[sortOrder,]"
-"0",""
-"0","PY_1yr_patient_table<-PYpatient_table %>% drop_na(Death_1yr)"
