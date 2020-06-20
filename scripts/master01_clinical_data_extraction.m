@@ -31,16 +31,16 @@ patientData.AccelDataMountTime.Format = 'HH:mm';
 % Indices of patients to use in study. To see exclusion criteria, please
 % refer to Materials and Methods section
 
-GOSE_fav_12mo=NaN(height(patientData),1);
-GOSE_fav_12mo(patientData.GOS_E12Months>=5)=1;
-GOSE_fav_12mo(patientData.GOS_E12Months<5)=0;
-
-mRS_fav_12mo=NaN(height(patientData),1);
-mRS_fav_12mo(patientData.mRS12Months<=2)=1;
-mRS_fav_12mo(patientData.mRS12Months>2)=0;
-
-patientData=addvars(patientData,GOSE_fav_12mo);
-patientData=addvars(patientData,mRS_fav_12mo);
+% GOSE_fav_12mo=NaN(height(patientData),1);
+% GOSE_fav_12mo(patientData.GOS_E12Months>=5)=1;
+% GOSE_fav_12mo(patientData.GOS_E12Months<5)=0;
+% 
+% mRS_fav_12mo=NaN(height(patientData),1);
+% mRS_fav_12mo(patientData.mRS12Months<=2)=1;
+% mRS_fav_12mo(patientData.mRS12Months>2)=0;
+% 
+% patientData=addvars(patientData,GOSE_fav_12mo);
+% patientData=addvars(patientData,mRS_fav_12mo);
 
 writetable(patientData,'../clinical_data/patient_clinical_data.csv');
 

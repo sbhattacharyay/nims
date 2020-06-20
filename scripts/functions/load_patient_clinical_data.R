@@ -28,9 +28,7 @@ load_patient_clinical_data <- function(directory) {
       TBI = as.factor(TBI),
       DiedDuringThisHospitalStay_ = as.factor(DiedDuringThisHospitalStay_),
       Destination = as.factor(Destination),
-      Death12Months = as.factor(Death12Months),
-      GOSE_fav_12mo = as.factor(GOSE_fav_12mo),
-      mRS_fav_12mo = as.factor(mRS_fav_12mo)
+      Death12Months = as.factor(Death12Months)
     )
   return(patient_clinical_data)
 }
