@@ -8,10 +8,9 @@
 # Whiting School of Engineering, Johns Hopkins University
 # email address: shubhayu@jhu.edu
 
-if(.Platform$OS.type == "unix") {
-  setwd('~/work/SB_bims/scripts/')
-  .libPaths( c( "~/Rpackages" , .libPaths(),"/tmp/Rtmpcc66n8/downloaded_packages" ) )
-}
+.libPaths( c( "~/Rpackages" , .libPaths(),"/tmp/Rtmpcc66n8/downloaded_packages" ) )
+
+setwd('~/work/nims/scripts/')
 
 library(devtools)
 if (!require(lolR))
@@ -28,7 +27,7 @@ library(MASS)
 library(glmnet)
 library(caret)
 library(kernlab)
-library(rlist)
+#library(rlist)
 library(cvAUC)
 library(gridExtra)
 library(ggplotify)
@@ -42,7 +41,7 @@ library(precrec)
 library(reshape2)
 library(MLmetrics)
 library(DMwR)
-library(h2o)
+#library(h2o)
 if(.Platform$OS.type == "unix") {
   library(doMC)
 } else {
@@ -50,11 +49,11 @@ if(.Platform$OS.type == "unix") {
 }
 
 # Initiate H20 Cluster:
-h2o.init()
+#h2o.init()
 
 # Set the number of parallel cores for parallel tuning
 #no.parallel.cores <- floor(2 * detectCores() / 3)
-no.parallel.cores <- 4
+no.parallel.cores <- floor(2 * detectCores() / 3)
 if(.Platform$OS.type == "unix") {
   registerDoMC(cores = no.parallel.cores)
 } else {

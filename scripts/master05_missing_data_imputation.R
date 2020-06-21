@@ -8,6 +8,8 @@
 # Whiting School of Engineering, Johns Hopkins University
 # email address: shubhayu@jhu.edu
 
+.libPaths( c( "~/Rpackages" , .libPaths(),"/tmp/Rtmpcc66n8/downloaded_packages" ) )
+
 library(tidyverse)
 library(forecast)
 library(Amelia)
@@ -55,6 +57,8 @@ source('./functions/mf_to_dataframe.R')
 out.MF2DF <- mf_to_dataframe(all_motion_features,n,verbose = TRUE) 
 completeFeatureSet <- out.MF2DF[[1]]
 totallyMissingSet <- out.MF2DF[[2]]
+
+featureLabels <- unlist(featureLabels[1,])
 
 complete_timestamps <- as.data.frame(matrix(ncol = 3, nrow = 0))
 for (i in 1:n){
@@ -167,6 +171,7 @@ rm(filtered_bedSet)
 # Based on this analysis, I will use the other available Ankle to impute missing ankle values
 
 # First separate out missing Lower Extremity indices:
+
 totallyMissingLE <- totallyMissingSet %>% filter(srIdx%in%c(2,5))
 uniqLECombos <- unique(totallyMissingLE[,c('srIdx','ftIdx')])
 LEmdls <- vector(mode = "list")
@@ -228,11 +233,13 @@ for (i in 1:length(featureLabels)){
     curr_amelia_DF <- rbind(curr_amelia_DF,currDF)
   }
   curr_amelia_DF <- curr_amelia_DF %>% dplyr::select(-featureType)
-  curr_amelia <- amelia(curr_amelia_DF, m = 1, ts = "timeStamps", cs ="ptIdx",polytime=2,intercs = TRUE, p2s = 2)
+  curr_amelia <- amelia(curr_amelia_DF, m = 9, ts = "timeStamps", cs ="ptIdx",polytime=2,intercs = FALSE, p2s = 2)
   stored_amelias[[i]] <- curr_amelia
   stored_bxcx[[i]] <- amelia_bxcx
   print(paste('Feature no.',i,'complete'))
 }
+
+dir.create('../all_motion_feature_data/imputed_features',showWarnings = FALSE)
 
 for (i in 1:length(stored_amelias)){
   curr_amelia <- stored_amelias[[i]]
@@ -253,8 +260,7 @@ for (i in 1:length(stored_amelias)){
       curr_imp[rows_for_change,] <- curr_imp_pt
     }
       fileName <- paste0(featureLabels[[i]],"_",l,".csv")
-      write.csv(curr_imp,file.path("../all_motion_feature_data/",fileName))
+      write.csv(curr_imp,file.path("../all_motion_feature_data/imputed_features",fileName))
   }
   print(paste('Feature no.',i,'complete'))
 }
-

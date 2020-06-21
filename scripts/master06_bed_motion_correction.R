@@ -15,6 +15,7 @@ library(tidyverse)
 source('./functions/find_thresholds.R')
 
 featureLabels <- read.csv('../all_motion_feature_data/feature_names.csv',header = FALSE)
+featureLabels <- unlist(featureLabels[1,])
 compiledImputations <- vector(mode = "list")
 
 for (i in 1:m){

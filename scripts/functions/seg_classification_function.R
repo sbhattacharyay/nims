@@ -1,3 +1,6 @@
+source('./functions/list_do.R')
+source('./functions/list_cbind.R')
+
 seg_classification_function <-function(curr_data_table,outcome,classifier_choice,patient_clinical_data,mf_col_idx,outer_fold_count,inner_fold_count){
   
   labelIdx <- which(colnames(curr_data_table)==outcome)
