@@ -98,4 +98,4 @@ ml r-vctrs
 ml r-viridislite
 ml r-zeallot
 ml # confirm modules used
-Rscript ~/work/SB_bims/scripts/master10_3_ML_grid_search.R
+Rscript ~/work/nims/scripts/master10_3_ML_grid_search.R
