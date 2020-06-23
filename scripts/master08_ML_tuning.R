@@ -17,9 +17,9 @@ if (!require(lolR))
   install_github('neurodata/lol',
                  build_vignettes = TRUE,
                  force = TRUE)
+library(tidyverse)
 library(lolR)
 library(R.matlab)
-library(tidyverse)
 library(ggplot2)
 library(plotly)
 library(naniar)
@@ -45,6 +45,14 @@ if(.Platform$OS.type == "unix") {
 } else {
   library(doParallel)
 }
+# Set the number of parallel cores
+no.parallel.cores <- floor(2 * detectCores() / 3)
+if(.Platform$OS.type == "unix") {
+  registerDoMC(cores = no.parallel.cores)
+} else {
+  registerDoParallel(cores = no.parallel.cores)
+}
+
 path.save <- "../all_motion_feature_data/ML_results"
 dir.create(path.save,showWarnings = F)
 
@@ -61,14 +69,17 @@ patient_clinical_data <- mutate(patient_clinical_data,
                                 fav_mRS_dis = factor(mRSDischarge <= mrs_thresh,labels = c("Unfav","Fav")),
                                 fav_mRS_12m = factor(mRS12Months <= mrs_thresh,labels = c("Unfav","Fav")))
 
-### Create outer folds for ML based on available outcome labels ###
+### Create and save outer folds for ML based on available outcome labels ###
 labels.temp <- expand.grid(label=c("fav_mort","fav_GOSE","fav_mRS"),
                            temp = c("dis","12m"))
 outer_fold_count <- 5
 inner_fold_count <- 5
 
-source('./functions/createOuterCVFolds.R')
-outerFolds <- createOuterCVFolds(patient_clinical_data,outer_fold_count)
+# source('./functions/createOuterCVFolds.R')
+# outerFolds <- createOuterCVFolds(patient_clinical_data,outer_fold_count)
+# saveRDS(outerFolds,'../all_motion_feature_data/outerFolds.rds')
+# rm(outerFolds)
+outerFolds <- readRDS('../all_motion_feature_data/outerFolds.rds')
 
 ### Write LOL-embedded motion features for training and testing ###
 # Choose sensors and motion features to test under a given temporal segment window:
@@ -133,14 +144,6 @@ nTunes <- max(as.numeric(lapply(
 
 source('./functions/setSeeds.R')
 seed.list <- setSeeds(method = "cv",numbers=inner_fold_count,repeats=1,tunes = nTunes,seed=2020)
-
-# set the number of parallel cores
-no.parallel.cores <- floor(2 * detectCores() / 3)
-if(.Platform$OS.type == "unix") {
-  registerDoMC(cores = no.parallel.cores)
-} else {
-  registerDoParallel(cores = no.parallel.cores)
-}
 
 # define the train control for all models
 train.control <- trainControl(method="repeatedcv",
