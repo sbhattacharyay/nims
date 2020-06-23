@@ -26,8 +26,10 @@ library(naniar)
 library(MASS)
 library(glmnet)
 library(caret)
+library(keras)
+library(caTools)
 library(kernlab)
-library(cvAUC)
+library(pROC)
 library(gridExtra)
 library(ggplotify)
 library(grid)
@@ -71,7 +73,9 @@ patient_clinical_data <- mutate(patient_clinical_data,
 
 ### Create and save outer folds for ML based on available outcome labels ###
 labels.temp <- expand.grid(label=c("fav_mort","fav_GOSE","fav_mRS"),
-                           temp = c("dis","12m"))
+                           temp = c("dis","12m")) %>% 
+  mutate(label.name = paste(label,temp,sep = "_"))
+
 outer_fold_count <- 5
 inner_fold_count <- 5
 
@@ -84,12 +88,12 @@ outerFolds <- readRDS('../all_motion_feature_data/outerFolds.rds')
 ### Write LOL-embedded motion features for training and testing ###
 # Choose sensors and motion features to test under a given temporal segment window:
 
+source('./functions/motion_feature_preparation.R')
+
 # 5, 10, 30, 60, or 180 minutes
 for (seg_window in c(5,10,30,60,180)){
-  
   mf_choice<-c("band_power","freq_entropy","freq_pairs1","freq_pairs2","med_freq","sma","wavelets")
   sr_choice<-c("LA","LE","LW","RA","RE","RW")
-  
   motion_feature_preparation(
     patient_clinical_data = patient_clinical_data,
     seg_window = seg_window,
@@ -102,7 +106,7 @@ for (seg_window in c(5,10,30,60,180)){
 }
 
 # Define models to tune and train
-classifier_choice <- c("adaboost", "avNNet", "DeepNN", "glmnet", "parRF", "svmRadialWeights","lda")
+classifier_choice <- c("adaboost", "avNNet", "glmnet", "parRF", "svmRadialWeights","lda")
 
 # Set tuning grids for FIRST TUNING RUN:
 
@@ -145,7 +149,7 @@ nTunes <- max(as.numeric(lapply(
 source('./functions/setSeeds.R')
 seed.list <- setSeeds(method = "cv",numbers=inner_fold_count,repeats=1,tunes = nTunes,seed=2020)
 
-# define the train control for all models
+# Define the train control for all models
 train.control <- trainControl(method="repeatedcv",
                               number=inner_fold_count,
                               repeats=1,
@@ -155,76 +159,41 @@ train.control <- trainControl(method="repeatedcv",
                               savePredictions = "all",
                               returnResamp = "all")
 
-# Prepare motion features for model building
-
 # Run the model building function
 source('./functions/tuneMachineLearningModels.R')
+source('./functions/tuneDeepLearningModel.R')
+source('./functions/saveRDSFiles.R')
 
 iter <- 1 # iteration 1 for caret models
 deep.iter <- 1 # iteration 1 for deep learning models
+seg_window <- 5
 
-tuneMachineLearningModels(Iter = iter, 
+tuneMachineLearningModels(seg_window = seg_window,
+                          Iter = iter, 
                           DeepIter = deep.iter, 
                           classifier_choice = classifier_choice, 
                           seed.list = seed.list,
                           path.D = path.save, 
-                          labelsList = labels.temp, 
-                          fullData.imput.in = fullData.imput1)
+                          labelsList = labels.temp)
 
+### 3. Determine tuning outcomes ###
 
+# determine which models have been run 
+source('./functions/generateModelDF.R')
 
-curr_data_table,outcome,classifier_choice,patient_clinical_data,mf_col_idx,outer_fold_count,inner_fold_count
+model.df.all <- generateModelDF()
 
-
-classifier_choice<-c("lda","glmnet","avNNet","parRF")
-
-outcome <- "fav_GOSE_dis"
-
-
-
-tune.grid.avNNet <- expand.grid(size = c(2,3,5,10,20), 
-                                decay = c(0.5,1,3,4,5,10), 
-                                bag = c(TRUE,FALSE))
-tune.grid.svmRdialWeights <- expand.grid(C = c(1,3,5,10,20), 
-                                         Weight = c(0.1,0.5,1,2,3,5,10),
-                                         sigma = c(0.0005,0.001,0.005,0.01,0.05))
-
-tune.grid.adaboost <- expand.grid(method = "Adaboost.M1", nIter = c(10,30,100,300,1000))
-tune.grid.DeepNN <- expand.grid(complexity.multiplier = c(0.3,0.5,0.8,1,1.2),
-                                activation.layer_1 = c('tanh', 'relu'),
-                                activation.layer_2 = c('tanh', 'relu'),
-                                activation.layer_3 = c('sigmoid', 'tanh', 'relu'),
-                                activation.layer_4 = 'tanh',
-                                activation.layer_5 = 'relu',
-                                activation.layer_6 = 'relu',
-                                rate.dropout_1 = c(0.3,0.4),
-                                rate.dropout_2 = c(0.2,0.3),
-                                rate.dropout_3 = 0.2,
-                                rate.dropout_4 = 0.2,
-                                rate.dropout_5 = 0.2,
-                                rate.dropout_6 = 0.2,
-                                Epochs = c(30,50))
-
-for (seg_windows in c(5,10,30,60,180)){
-  
-  print(paste('Segment size:',seg_windows,"min started"))
-  
-  
-#  if (!exists("compiled_imps")) {
-#  compiled_imps <- lapply(seg_files,read_csv) %>% lapply(.,function(x){x %>% dplyr::select(-1,-2)})
-#  }
-
-
-  dir.create(file.path('..','all_motion_feature_data','ML_predictions',outcome),showWarnings = FALSE)
-  dir.create(file.path('..','all_motion_feature_data','ML_predictions',outcome,paste0(seg_windows,'_min')),showWarnings = FALSE)
-  
-  # Preparing covariates for ML training
-  #for (l in 1:length(compiled_imps)){
-  l=1
-  #curr_imp <- compiled_imps[[l]] %>% 
-
-  outList<-seg_classification_function(curr_data_table,outcome,classifier_choice,patient_clinical_data,mf_col_idx,outer_fold_count,inner_fold_count)
-  save(outList,file=file.path('..','all_motion_feature_data','ML_predictions',outcome,paste0(seg_windows,'_min'),paste0('imp',l,'.RData')))
-  gc()
-  print(paste('Segment size:',seg_windows,"min complete"))
+# combine the results into one dataframe for each machine learning method
+# build dataframes of the results for each machine learning method
+for (MLmethod in c("adaboost", "APACHE", "avNNet", "DeepNN", "glm", "parRF", "svmRadialWeights")) {
+  assign(paste("ML.results.df.", MLmethod, sep = ""), 
+         buildPredResDF(MLmethod = MLmethod,  
+                        pred.res = "results", 
+                        model.df = model.df.all, 
+                        path = path.save))
 }
+
+# d. Plot graphs to inspect tuning results and determine any further tuning required
+
+
+plotTuningGraphs()

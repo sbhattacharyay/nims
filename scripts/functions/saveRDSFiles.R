@@ -1,10 +1,13 @@
-# Function to save the model, results, and predictions for the resamples for caret and deep learning models
+# Function to save the model, results, and predictions for the re-samples for caret and deep learning models
 
-saveRDSFiles <- function(classifier.x, MLmethod, day, iter, cumulative, path, saveClassifier = TRUE) {
-  if (cumulative == TRUE) {
-    cumul <- "cumulative"
+saveRDSFiles <- function(classifier.x, newData, MLmethod, seg_window, labelName, fold, combined, iter, path, saveClassifier = TRUE) {
+  
+  curr_test_preds <- classifier.x %>% predict(newData,type = "prob")
+  
+  if (combined == TRUE) {
+    formType <- "combined"
   } else {
-    cumul <- ""
+    formType <- "MFonly"
   }
   
   for (folder in c("pred", "tuning", "results")) {
@@ -13,7 +16,7 @@ saveRDSFiles <- function(classifier.x, MLmethod, day, iter, cumulative, path, sa
     }
   }
   
-  if(saveClassifier == TRUE) saveRDS(classifier.x, paste(path,"/tuning/",MLmethod,"/ROC.tuningML.",MLmethod,".day",day,cumul,".iter",iter,".RDS", sep = ""))
-  saveRDS(classifier.x$pred, paste(path,"/pred/",MLmethod,"/ROC.tuningML.",MLmethod,".day",day,cumul,".iter",iter,".pred.RDS", sep = ""))
-  saveRDS(classifier.x$results, paste(path,"/results/",MLmethod,"/ROC.tuningML.",MLmethod,".day",day,cumul,".iter",iter,".results.RDS", sep = ""))
+  if(saveClassifier == TRUE) saveRDS(classifier.x, paste(path,"/tuning/",MLmethod,"/ROC.fold",fold,".",MLmethod,".",labelName,".",formType,".iter",iter,".rds", sep = ""))
+  saveRDS(classifier.x$pred,   paste(path,"/pred/",MLmethod,"/ROC.fold",fold,".",MLmethod,".",labelName,".",formType,".iter",iter,".rds", sep = ""))
+  saveRDS(classifier.x$results,paste(path,"/results/",MLmethod,"/ROC.fold",fold,".",MLmethod,".",labelName,".",formType,".iter",iter,".rds", sep = ""))
 }
