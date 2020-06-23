@@ -70,21 +70,25 @@ inner_fold_count <- 5
 source('./functions/createOuterCVFolds.R')
 outerFolds <- createOuterCVFolds(patient_clinical_data,outer_fold_count)
 
-### Load motion feature data of the first imputation ###
+### Write LOL-embedded motion features for training and testing ###
 # Choose sensors and motion features to test under a given temporal segment window:
-seg_window <- 5 # 5, 10, 30, 60, or 180 minutes
-mf_choice<-c("band_power","freq_entropy","freq_pairs1","freq_pairs2","med_freq","sma","wavelets")
-sr_choice<-c("LA","LE","LW","RA","RE","RW")
 
-motion_feature_preparation(seg_window,mf_choice,sr_choice,outerFolds)
+# 5, 10, 30, 60, or 180 minutes
+for (seg_window in c(5,10,30,60,180)){
   
-
-if (exists("curr_imp")) {
-  rm(curr_imp)
-  gc()
+  mf_choice<-c("band_power","freq_entropy","freq_pairs1","freq_pairs2","med_freq","sma","wavelets")
+  sr_choice<-c("LA","LE","LW","RA","RE","RW")
+  
+  motion_feature_preparation(
+    patient_clinical_data = patient_clinical_data,
+    seg_window = seg_window,
+    mf_choice = mf_choice,
+    sr_choice = sr_choice,
+    outerFolds = outerFolds,
+    impNo = 1,
+    saveDir = file.path('../all_motion_feature_data/complete_LOL_set',paste0(seg_window,"_min"))
+  )
 }
-
-mf_col_idx <- seq(3,length(sr_choice)*length(mf_choice)*seg_windows*12+2)
 
 # Define models to tune and train
 classifier_choice <- c("adaboost", "avNNet", "DeepNN", "glmnet", "parRF", "svmRadialWeights","lda")
