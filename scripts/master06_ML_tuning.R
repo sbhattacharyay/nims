@@ -72,7 +72,7 @@ classifier_choice <- c("adaboost", "avNNet", "glmnet", "parRF", "svmRadialWeight
 #classifier_choice <- c("glmnet")
 #classifier_choice <- "DeepNN"
 
-# Set tuning grids for FIRST TUNING RUN:
+# Define tuning grids for FIRST TUNING RUN:
 
 tune.grid.adaboost <- expand.grid(method = "Adaboost.M1", nIter = c(10,30,100,300,1000))
 tune.grid.avNNet <- expand.grid(size = c(2,3,5,10,20), 
@@ -123,7 +123,7 @@ train.control <- trainControl(method="repeatedcv",
                               savePredictions = "all",
                               returnResamp = "all")
 
-# Run the model building function
+### Run the model building function ###
 source('./functions/tuneMachineLearningModels.R')
 source('./functions/tuneDeepLearningModel.R')
 source('./functions/saveRDSFiles.R')
@@ -142,7 +142,7 @@ for (seg_window in c(180,60,30,10,5)){
                             labelsList = labels.temp)
 }
 
-### 3. Determine tuning outcomes ###
+### Examine first-pass tuning outcomes ###
 
 # determine which models have been run 
 source('./functions/generateModelDF.R')
