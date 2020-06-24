@@ -107,6 +107,7 @@ for (seg_window in c(5,10,30,60,180)){
 
 # Define models to tune and train
 classifier_choice <- c("adaboost", "avNNet", "glmnet", "parRF", "svmRadialWeights","lda")
+#classifier_choice <- c("glmnet")
 
 # Set tuning grids for FIRST TUNING RUN:
 
@@ -166,7 +167,7 @@ source('./functions/saveRDSFiles.R')
 
 iter <- 1 # iteration 1 for caret models
 deep.iter <- 1 # iteration 1 for deep learning models
-seg_window <- 5
+seg_window <- 180
 
 tuneMachineLearningModels(seg_window = seg_window,
                           Iter = iter, 

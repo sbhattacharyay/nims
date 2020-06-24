@@ -107,7 +107,8 @@ tuneMachineLearningModels <- function(seg_window,Iter, DeepIter, classifier_choi
             iter = Iter,
             path = path.D
           )
-          rm(classifier)
+          rm(combined.classifier)
+          rm(mf.only.classifier)
         }
         gc()
         print(paste("Training of",MLmethod,"complete."))
