@@ -1,4 +1,4 @@
-#### Master Script 5: Multiple Imputation of Missing Accelerometery Values ####
+#### Master Script 3: Multiple Imputation of Missing Accelerometery Values ####
 # Decoding Quantitative Motor Features for Classification and Prediction
 # in Severe Acquired Brain Injury
 #

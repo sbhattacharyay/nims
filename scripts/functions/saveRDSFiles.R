@@ -16,7 +16,7 @@ saveRDSFiles <- function(classifier.x, newData, MLmethod, seg_window, labelName,
     }
   }
   
-  if(saveClassifier == TRUE) saveRDS(classifier.x, paste(path,"/tuning/",MLmethod,"/ROC.fold",fold,".",MLmethod,".",labelName,".",formType,".iter",iter,".rds", sep = ""))
-  saveRDS(classifier.x$pred,   paste(path,"/pred/",MLmethod,"/ROC.fold",fold,".",MLmethod,".",labelName,".",formType,".iter",iter,".rds", sep = ""))
-  saveRDS(classifier.x$results,paste(path,"/results/",MLmethod,"/ROC.fold",fold,".",MLmethod,".",labelName,".",formType,".iter",iter,".rds", sep = ""))
+  if(saveClassifier == TRUE) saveRDS(classifier.x, paste(path,"/tuning/",MLmethod,"/ROC.",seg_window,"_min.fold",fold,".",MLmethod,".",labelName,".",formType,".iter",iter,".rds", sep = ""))
+  saveRDS(curr_test_preds, paste(path,"/pred/",MLmethod,"/ROC.",seg_window,"_min.fold",fold,".",MLmethod,".",labelName,".",formType,".iter",iter,".rds", sep = ""))
+  saveRDS(classifier.x$results,paste(path,"/results/",MLmethod,"/ROC.",seg_window,"_min.fold",fold,".",MLmethod,".",labelName,".",formType,".iter",iter,".rds", sep = ""))
 }
