@@ -55,9 +55,6 @@ if(.Platform$OS.type == "unix") {
   registerDoParallel(cores = no.parallel.cores)
 }
 
-path.save <- "../all_motion_feature_data/ML_results"
-dir.create(path.save,showWarnings = F)
-
 ### Load clinical metadata ###
 source('./functions/load_patient_clinical_data.R')
 patient_clinical_data <- load_patient_clinical_data('../clinical_data/patient_clinical_data.csv') %>% add_column(ptIdx = 1:nrow(.),.after = 2)
@@ -108,6 +105,7 @@ for (seg_window in c(5,10,30,60,180)){
 # Define models to tune and train
 classifier_choice <- c("adaboost", "avNNet", "glmnet", "parRF", "svmRadialWeights","lda")
 #classifier_choice <- c("glmnet")
+#classifier_choice <- "DeepNN"
 
 # Set tuning grids for FIRST TUNING RUN:
 
@@ -167,15 +165,17 @@ source('./functions/saveRDSFiles.R')
 
 iter <- 1 # iteration 1 for caret models
 deep.iter <- 1 # iteration 1 for deep learning models
-seg_window <- 180
-
-tuneMachineLearningModels(seg_window = seg_window,
-                          Iter = iter, 
-                          DeepIter = deep.iter, 
-                          classifier_choice = classifier_choice, 
-                          seed.list = seed.list,
-                          path.D = path.save, 
-                          labelsList = labels.temp)
+for (seg_window in c(180,60,30,10,5)){
+  path.save <- file.path("../all_motion_feature_data/ML_results",paste0(seg_window,'_min'))
+  dir.create(path.save,showWarnings = F,recursive = T)
+  tuneMachineLearningModels(seg_window = seg_window,
+                            Iter = iter, 
+                            DeepIter = deep.iter, 
+                            classifier_choice = classifier_choice, 
+                            seed.list = seed.list,
+                            path.D = path.save, 
+                            labelsList = labels.temp)
+}
 
 ### 3. Determine tuning outcomes ###
 

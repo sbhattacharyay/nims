@@ -1,6 +1,6 @@
 # Function to run k-fold cross-validation of a keras deep learning model when fed a tuning grid
 
-tuneDeepLearningModel <- function(tune.grid,dataset_input,seg_window, labelName, fold, combined, seed.list, file.path, iter, imputVarTest = FALSE, verbose = FALSE, no.parallel.cores, tranches.per.core = 2) {
+tuneDeepLearningModel <- function(tune.grid,dataset_input,seg_window,labelName,fold, combined, seed.list, file.path, iter, imputVarTest = FALSE, verbose = FALSE, no.parallel.cores, tranches.per.core = 2) {
   
   set.seed(1876)
   # Define function to save predictions and results to RDS files
@@ -23,27 +23,28 @@ tuneDeepLearningModel <- function(tune.grid,dataset_input,seg_window, labelName,
   if(combined == TRUE) {
     dataset <- dplyr::select(dataset_input, 
                       all_of(c(curr_label,paste0(rep("MF.",r),1:r),"APACHEIIMortalityRisk")))
+    form <- as.formula(paste(curr_label,"~",paste(paste0(rep("MF.",r),1:r),collapse = " + "),"+ APACHEIIMortalityRisk"))
   } else {
     dataset <- dplyr::select(dataset_input, 
                              all_of(c(curr_label,paste0(rep("MF.",r),1:r))))
+    form <- as.formula(paste(curr_label,"~",paste(paste0(rep("MF.",r),1:r),collapse = " + ")))
   }
 
   # save a copy of the outcome-labelled dataset and then convert outcome to binary 1/0
   dataset.1 <- dataset
-  dataset$alive <- as.factor(ifelse(dataset$alive == "alive", 1, 0))
+  dataset[,labelName] <- as.factor(ifelse(dataset[,labelName] == "Fav", 1, 0))
   
   ### run a logistic classifier to generate the indices for each fold according to the defined seed list (i.e. to match the folds for the models built through caret)
-  train.control <- trainControl(method = "LGOCV", 
-                                number = 20, 
-                                classProbs = TRUE, 
-                                verboseIter = FALSE, 
-                                seeds = seed.list,
+  train.control <- trainControl(method="repeatedcv",
+                                number=inner_fold_count,
+                                repeats=1,
+                                summaryFunction = twoClassSummary, 
+                                classProbs = TRUE,
+                                seeds = seed.list,  
                                 savePredictions = "all",
-                                summaryFunction = twoClassSummary,
-                                returnResamp = "all",
-                                p = 0.8)
+                                returnResamp = "all")
   
-  logistic.classifier <- train(alive ~ age, 
+  logistic.classifier <- train(form, 
                                dataset.1, 
                                method = "glm",
                                metric = "ROC",
@@ -83,7 +84,7 @@ tuneDeepLearningModel <- function(tune.grid,dataset_input,seg_window, labelName,
     results.raw <- data.frame()
     
     # build and test the deep learning model for each fold of 20 folds
-    for (fold in 1:20) {
+    for (fold in 1:outer_fold_count) {
       # name the resample by caret nomenclature
       resample.name <- paste(ifelse(fold <= 9, "Resample0", "Resample"), fold, sep = "")
       
