@@ -16,15 +16,13 @@ update_clinicalVariableList <- function(directory){
     data.frame(
       colnames(patient_clinical_data),
       sapply(patient_clinical_data, class),
-      sapply(patient_clinical_data, typeof),
-      colnames(patient_clinical_data)
-    ) %>%
+      sapply(patient_clinical_data, typeof)    
+      ) %>%
     rename(
       variable = 1,
-      type = 3,
       class = 2,
-      variableSubtitle = 4
-    )
+      type = 3
+      )
   rownames(clinicalVariableList) <- c()
   write.csv(clinicalVariableList,
             '../clinical_data/clinicalVariableList.csv')

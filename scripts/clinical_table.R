@@ -1,3 +1,13 @@
+#### Master Script 1: Clinical Data Extraction and Examination ####
+# Decoding Quantitative Motor Features for Classification and Prediction
+# in Severe Acquired Brain Injury
+#
+# Shubhayu Bhattacharyay, Matthew Wang, Eshan Joshi
+# Department of Biomedical Engineering
+# Department of Applied Mathematics and Statistics
+# Whiting School of Engineering, Johns Hopkins University
+# email address: shubhayu@jhu.edu
+
 # https://cran.r-project.org/web/packages/table1/vignettes/table1-examples.html
 require(table1)
 
