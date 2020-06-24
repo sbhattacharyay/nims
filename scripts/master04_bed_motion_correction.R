@@ -1,4 +1,4 @@
-#### Master Script 5: Bed Motion Correction and Collection of Multiple Imputations ####
+#### Master Script 4: Bed Motion Correction and Collection of Multiple Imputations ####
 # Decoding Quantitative Motor Features for Classification and Prediction
 # in Severe Acquired Brain Injury
 #
