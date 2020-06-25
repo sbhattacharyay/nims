@@ -8,13 +8,11 @@
 # Whiting School of Engineering, Johns Hopkins University
 # email address: shubhayu@jhu.edu
 
-# https://cran.r-project.org/web/packages/table1/vignettes/table1-examples.html
+# Source: https://cran.r-project.org/web/packages/table1/vignettes/table1-examples.html
 require(table1)
 
 patient_clinical_data <- load_patient_clinical_data('../clinical_data/patient_clinical_data.csv',gose_thresh,mrs_thresh)
 
-
-data <- read.csv(file = "patient_clinical_data.csv")
 data$death <- factor(data$death, levels=c(0,1,2), labels=c("Alive at Discharge", "Died During Hospital Stay", "P-Value"))
 
 
@@ -74,8 +72,7 @@ table1(~ gender + stroke + ich + sah + sdh + tbi + + gose + gcs_en + gcs_dis + g
        render=rndr, render.strat=rndr.strat,
        topclass = "Rtable1-grid")
 
--------------------------------------------------------------------------------
-    setwd("C:/Users/Matt/OneDrive/OneDrive - Johns Hopkins University/Desktop/BIMS/Survival Curve/");
+setwd("C:/Users/Matt/OneDrive/OneDrive - Johns Hopkins University/Desktop/BIMS/Survival Curve/");
 data <- read.csv(file = "patient_clinical_data.csv")
 
 death12months <- data[, "Death12Months"]
@@ -130,7 +127,6 @@ fit1 <- survfit(surv_object ~ 1, data = data)
 
 ggsurvplot(fit1, data = data)
 
--------------------------------------------------------------------------------
 library(devtools)
 if (!require(lolR)) install_github('neurodata/lol', build_vignettes=TRUE, force=TRUE)
 library(lolR)

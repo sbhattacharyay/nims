@@ -131,7 +131,7 @@ source('./functions/saveRDSFiles.R')
 iter <- 1 # iteration 1 for caret models
 deep.iter <- 1 # iteration 1 for deep learning models
 #for (seg_window in c(180,60,30,10,5)){
-for (seg_window in c(30,10,5)){
+for (seg_window in c(5,10,30)){
   path.save <- file.path("../all_motion_feature_data/ML_results",paste0(seg_window,'_min'))
   dir.create(path.save,showWarnings = F,recursive = T)
   tuneMachineLearningModels(seg_window = seg_window,
