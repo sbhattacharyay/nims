@@ -11,39 +11,54 @@
 # Source: https://cran.r-project.org/web/packages/table1/vignettes/table1-examples.html
 require(table1)
 
-patient_clinical_data <- load_patient_clinical_data('../clinical_data/patient_clinical_data.csv',gose_thresh,mrs_thresh)
+library(devtools)
+if (!require(lolR)) install_github('neurodata/lol', build_vignettes=TRUE, force=TRUE)
+library(lolR)
+library(R.matlab)
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+library(naniar)
+library(MASS)
 
-data$death <- factor(data$death, levels=c(0,1,2), labels=c("Alive at Discharge", "Died During Hospital Stay", "P-Value"))
+source('./functions/load_patient_clinical_data.R')
+source('./functions/get_motion_features.R')
+source('./functions/lol_project_motion_features.R')
+source('./functions/viz_lol_2D.R')
+source("./functions/generateRootDir.R")
+# source("./functions/plot_descriptive_figs.R")
+
+# Load patient clinical data (sorts by PY numbering and corrects variable types)
+data <- load_patient_clinical_data('../clinical_data/patient_clinical_data.csv')
+
+data$fav_mort_dis <- factor(data$fav_mort_dis, levels=c("Fav","Unfav",2), labels=c("Alive at Discharge", "Died During Hospital Stay", "P-Value"))
 
 
 ###
-data$gender <- factor(data$gender, levels=c("M", "F"), labels=c("Male", "Female"))
-data$stroke <- factor(data$stroke, levels=c(0, 1), labels=c("0", "1"))
-data$ich <- factor(data$ich, levels=c(0, 1), labels=c("0", "1"))
-data$sah <- factor(data$sah, levels=c(0, 1), labels=c("0", "1"))
-data$bt <- factor(data$bt, levels=c(0, 1), labels=c("0", "1"))
-data$sdh <- factor(data$sdh, levels=c(0, 1), labels=c("0", "1"))
-data$tbi <- factor(data$tbi, levels=c(0, 1), labels=c("0", "1"))
+data$gender <- factor(data$Sex, levels=c("M", "F"), labels=c("Male", "Female"))
+data$stroke <- factor(data$CVA, levels=c(0, 1), labels=c("0", "1"))
+data$ICH <- factor(data$ICH, levels=c(0, 1), labels=c("0", "1"))
+data$SAH <- factor(data$SAH, levels=c(0, 1), labels=c("0", "1"))
+data$BrainTumorOrLesion <- factor(data$BrainTumorOrLesion, levels=c(0, 1), labels=c("0", "1"))
+data$SDHOrEDH <- factor(data$SDHOrEDH, levels=c(0, 1), labels=c("0", "1"))
+data$TBI <- factor(data$TBI, levels=c(0, 1), labels=c("0", "1"))
+data$fav_mRS_dis <- factor(data$fav_mRS_dis, levels=c("Unfav", "Fav"), labels=c("0", "1"))
+data$fav_GOSE_dis <- factor(data$fav_GOSE_dis, levels=c("Unfav", "Fav"), labels=c("0", "1"))
 
 
 ###
-label(data$gender) <- "Sex"
-label(data$stroke) <- "CVA"
-label(data$ich) <- "ICH"
-label(data$sah) <- "SAH"
-label(data$bt) <- "BrainTumorOrLesion"
-label(data$sdh) <- "SDH"
-label(data$tbi) <- "TBI"
-label(data$gose) <- "GOSE Discharge"
-label(data$hlm_en) <- "HLM Enrollment"
-label(data$hlm_dis) <- "HLM Discharge"
-label(data$gcs_en) <- "GCS Enrollment"
-label(data$gcs_dis) <- "GCS Discharge"
-label(data$gcs_motor_en) <- "GCS Motor Enrollment"
-label(data$gcs_motor_dis) <- "GCS Motor Discharge"
+label(data$Sex) <- "Sex"
+label(data$CVA) <- "CVA"
+label(data$ICH) <- "ICH"
+label(data$SAH) <- "SAH"
+label(data$BrainTumorOrLesion) <- "BrainTumorOrLesion"
+label(data$SDHOrEDH) <- "SDH"
+label(data$TBI) <- "TBI"
+label(data$fav_GOSE_dis) <- "Favorable GOSE @Discharge"
+label(data$fav_mRS_dis) <- "Favorable mRS @Discharge"
 
-label(data$los) <- "Length of Stay in NCCU"
-units(data$los) <- "d"
+label(data$DaysInNCCU) <- "Length of Stay in NCCU"
+units(data$DaysInNCCU) <- "d"
 
 
 rndr <- function(x, name, ...) {
@@ -51,9 +66,9 @@ rndr <- function(x, name, ...) {
         y <- data[[name]]
         s <- rep("", length(render.default(x=y, name=name, ...)))
         if (is.numeric(y)) {
-            p <- t.test(y ~ data$death)$p.value
+            p <- t.test(y ~ data$fav_mort_dis)$p.value
         } else {
-            p <- chisq.test(table(y, droplevels(data$death)))$p.value
+            p <- chisq.test(table(y, droplevels(data$fav_mort_dis)))$p.value
         }
         s[2] <- sub("<", "&lt;", format.pval(p, digits=3, eps=0.001))
         s
@@ -67,45 +82,45 @@ rndr.strat <- function(label, n, ...) {
 }
 
 
-table1(~ gender + stroke + ich + sah + sdh + tbi + + gose + gcs_en + gcs_dis + gcs_motor_en + gcs_motor_dis + hlm_en + hlm_dis + los| death, 
+table1(~ Sex + CVA + ICH + SAH + BrainTumorOrLesion + SDHOrEDH + TBI + fav_GOSE_dis + fav_mRS_dis + DaysInNCCU | fav_mort_dis, 
        data = data, overall = F, droplevels = F,
        render=rndr, render.strat=rndr.strat,
        topclass = "Rtable1-grid")
 
-setwd("C:/Users/Matt/OneDrive/OneDrive - Johns Hopkins University/Desktop/BIMS/Survival Curve/");
-data <- read.csv(file = "patient_clinical_data.csv")
+###
 
-death12months <- data[, "Death12Months"]
+death12months <- data[, "fav_mort_12m"]
+death12months <- factor(death12months, levels = c("Fav","Unfav"), labels = c(0, 1))
+death12months2 <- as.numeric(levels(death12months))[death12months]
+data$fav_mort_12m <- death12months2
 deathdate <- data[, "DeathDate"]
 
-missing_death12months <- is.nan(death12months)
-missing_deathdate <- deathdate == "NaT"
+missing_death12months <- is.na(death12months)
+missing_deathdate <- is.na(deathdate)
 havedeath12months_missingdate <- ((death12months == 1) + missing_deathdate) == 2
 havedeath12months_missingdate[is.na(havedeath12months_missingdate)] <- FALSE
 
 index = (missing_death12months + havedeath12months_missingdate) == 0
-data <- data[index,c("HospitalDischargeDate", "DiedDuringThisHospitalStay_", "DeathDate", "Death12Months")]
+data2 <- data[index,c("HospitalDischargeDate", "DiedDuringThisHospitalStay_", "DeathDate", "fav_mort_12m")]
+
+
 
 
 event_time <- c()
-for(i in seq(from = 1, to = nrow(data), by = 1)) {
-    a <- as.character(data$HospitalDischargeDate[i])
+for(i in seq(from = 1, to = nrow(data2), by = 1)) {
+    a <- as.character(data2$HospitalDischargeDate[i])
     a <- strsplit(a,"-")
-    a[[1]][2] <- match(a[[1]][2],month.abb)
-    a[[1]][3] <- paste("20",a[[1]][3], sep = "")
-    a <- paste(a[[1]][1], a[[1]][2], a[[1]][3], sep = "/")
+    a <- paste(a[[1]][3], a[[1]][2], a[[1]][1], sep = "/")
     a <- as.numeric(as.Date(a, "%d/%m/%Y"))
     
     
-    b <- as.character(data$DeathDate[i])
-    if (b == "NaT") {
+    b <- as.character(data2$DeathDate[i])
+    if (is.na(b)) {
         b <- NA
         diff <- 365
     } else {
         b = strsplit(b,"-")
-        b[[1]][2] <- match(b[[1]][2],month.abb)
-        b[[1]][3] <- paste("20",b[[1]][3], sep = "")
-        b <- paste(b[[1]][1], b[[1]][2], b[[1]][3], sep = "/")
+        b <- paste(b[[1]][3], b[[1]][2], b[[1]][1], sep = "/")
         b <- as.numeric(as.Date(b, "%d/%m/%Y"))
         diff <- b-a
         if (diff > 365) {
@@ -115,40 +130,15 @@ for(i in seq(from = 1, to = nrow(data), by = 1)) {
     event_time <- c(event_time,diff)
 }
 
-data$event_time <- event_time
-
+data2$event_time <- event_time
 
 library(survival)
 library(survminer)
 library(dplyr)
 
-surv_object <- Surv(time = data$event_time, event = data$Death12Months)
-fit1 <- survfit(surv_object ~ 1, data = data)
 
-ggsurvplot(fit1, data = data)
+surv_object <- Surv(time = data2$event_time, event = data2$fav_mort_12m)
+fit1 <- survfit(surv_object ~ 1, data = data2)
 
-library(devtools)
-if (!require(lolR)) install_github('neurodata/lol', build_vignettes=TRUE, force=TRUE)
-library(lolR)
-library(R.matlab)
-library(tidyverse)
-library(ggplot2)
-library(plotly)
-library(naniar)
-library(MASS)
 
-source('./functions/load_patient_clinical_data.R')
-source('./functions/update_clinicalVariableList.R')
-source('./functions/get_motion_features.R')
-source('./functions/lol_project_motion_features.R')
-source('./functions/viz_lol_2D.R')
-source("./functions/generateRootDir.R")
-source("./functions/plot_descriptive_figs.R")
-    
-# Load patient clinical data (sorts by PY numbering and corrects variable types)
-patient_clinical_data<-load_patient_clinical_data()
-
-# Load and update clinical variable list
-clinicalVariableList<-update_clinicalVariableList()
-
-plotDescriptiveFigs(patient_clinical_data,clinicalVariableList)
+ggsurvplot(fit1, data = data2)
