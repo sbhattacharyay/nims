@@ -155,17 +155,5 @@ model.df.all <- generateModelDF(path.D = "../all_motion_feature_data/ML_results"
 source('./functions/buildPredResDF.R')
 buildPredResDF(modelsDF = model.df.all,patient_clinical_data = patient_clinical_data,outerFolds,impNo = 1)
 
-# combine the results into one dataframe for each machine learning method
-# build dataframes of the results for each machine learning method
-for (MLmethod in c("adaboost", "APACHE", "avNNet", "DeepNN", "glm", "parRF", "svmRadialWeights")) {
-  assign(paste("ML.results.df.", MLmethod, sep = ""), 
-         buildPredResDF(MLmethod = MLmethod,  
-                        pred.res = "results", 
-                        model.df = model.df.all, 
-                        path = path.save))
-}
-
 # d. Plot graphs to inspect tuning results and determine any further tuning required
-
-
 plotTuningGraphs()
