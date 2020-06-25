@@ -1,6 +1,5 @@
 # Function to retrieve the predictions and results from machine learning model output files
-
-generateModelDF <- function(path.D = "../all_motion_feature_data/ML_results") {
+generateModelDF <- function(path.D = "../all_motion_feature_data/ML_results",outer_fold_count,iter=1) {
   # generate list of possible classifiers
   combinations <- expand.grid(MLmethod = c("adaboost", "avNNet","DeepNN","glmnet", "parRF", "svmRadialWeights","lda"),
                               seg_window = c(5,10,30,60,180),
@@ -21,17 +20,17 @@ generateModelDF <- function(path.D = "../all_motion_feature_data/ML_results") {
     path <- path.D
     
     # try to load the results (smallest of the three options --> fastest)
-    fileExists <- file.exists(paste(path, "/results/", combTry$MLmethod, "/ROC.tuningML.", combTry$MLmethod,".day", combTry$day, combTry$cumulative, ".iter", combTry$iter, ".results.RDS", sep = ""))
+    fileExists <- file.exists(file.path(path,paste0(combTry$seg_window,"_min"),"results",combTry$MLmethod,paste("ROC",paste0(combTry$seg_window,"_min"),paste0("fold",combTry$fold),combTry$MLmethod,combTry$label.name,combTry$combined,paste0("iter",iter),"rds",sep = ".")))
     
-    out.model.df.row <- data.frame(method = combTry$MLmethod, 
-                                   day = combTry$day, 
-                                   iter = combTry$iter, 
-                                   classifierPath = paste(path, "/tuning/", combTry$MLmethod, "/ROC.tuningML.", combTry$MLmethod,".day", combTry$day, combTry$cumulative, ".iter", combTry$iter, ".RDS", sep = ""), 
-                                   predPath = paste(path, "/pred/", combTry$MLmethod, "/ROC.tuningML.", combTry$MLmethod,".day", combTry$day, combTry$cumulative, ".iter", combTry$iter, ".pred.RDS", sep = ""), 
-                                   resultsPath = paste(path, "/results/", combTry$MLmethod, "/ROC.tuningML.", combTry$MLmethod,".day", combTry$day, combTry$cumulative, ".iter", combTry$iter, ".results.RDS", sep = ""), 
-                                   stringsAsFactors = FALSE,
-                                   cumulative = ifelse(combTry$cumulative == "", FALSE, TRUE))
-    
+    out.model.df.row <- data.frame(method = combTry$MLmethod,
+                                   seg_window = combTry$seg_window,
+                                   label = combTry$label.name,
+                                   fold = combTry$fold,
+                                   classifierPath = file.path(path,paste0(combTry$seg_window,"_min"),"tuning",combTry$MLmethod,paste("ROC",paste0(combTry$seg_window,"_min"),paste0("fold",combTry$fold),combTry$MLmethod,combTry$label.name,combTry$combined,paste0("iter",iter),"rds",sep = ".")), 
+                                   predPath = file.path(path,paste0(combTry$seg_window,"_min"),"pred",combTry$MLmethod,paste("ROC",paste0(combTry$seg_window,"_min"),paste0("fold",combTry$fold),combTry$MLmethod,combTry$label.name,combTry$combined,paste0("iter",iter),"rds",sep = ".")), 
+                                   resultsPath = file.path(path,paste0(combTry$seg_window,"_min"),"results",combTry$MLmethod,paste("ROC",paste0(combTry$seg_window,"_min"),paste0("fold",combTry$fold),combTry$MLmethod,combTry$label.name,combTry$combined,paste0("iter",iter),"rds",sep = ".")), 
+                                   formType = combTry$combined)
+
     if (fileExists) {
       if (out.model.df.length == 0) {
         out.model.df <- out.model.df.row
@@ -43,6 +42,7 @@ generateModelDF <- function(path.D = "../all_motion_feature_data/ML_results") {
     }
   }
   
+  out.model.df$iter <- iter
+  
   return(out.model.df)
 }
-
