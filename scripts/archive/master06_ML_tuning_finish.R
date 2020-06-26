@@ -70,8 +70,6 @@ outerFolds <- readRDS('../all_motion_feature_data/outerFolds.rds')
 
 # Define models to tune and train
 classifier_choice <- c("adaboost", "avNNet", "glmnet", "parRF", "svmRadialWeights","lda")
-#classifier_choice <- c("glmnet")
-#classifier_choice <- "DeepNN"
 
 # Define tuning grids for FIRST TUNING RUN:
 
