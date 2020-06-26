@@ -340,9 +340,13 @@ cd ../scripts/
 
 license('inuse')
 
-%% 
+%% Characterization of Missing Data
+
 load('../all_motion_feature_data/complete_sensor_data.mat')
 load('../all_motion_feature_data/formatted_times.mat')
+addpath('functions/')
+
+[~,sensors] = get_totallyMissingIdxs(sensors);
 
 missing_data = zeros(size(sensors,1), size(sensors,2));
 recording_time = cell(size(formatted_times,1),3);
@@ -393,6 +397,20 @@ for row = 1:size(sensors,1)
         
         tot_sum = nan_sum + count;
         missing_data(row,i) = tot_sum / length(curr_sensor_data);
-    end
-    
+    end 
 end
+
+d = dir('../accel_sensor_data/data*');
+
+studyPatients = str2double(cellfun(@(x) (string(x(5:6))),{d.name}'));
+studyPatients = array2table(studyPatients);
+studyPatients.Properties.VariableNames = {'Study Patient No.'};
+
+table1 = array2table(missing_data);
+table1.Properties.VariableNames = {'Bed','LA','LE','LW','RA','RE','RW'};
+
+table2 = cell2table(recording_time);
+table2.Properties.VariableNames = {'Start Timestamp','End Timestamp','Recording Duration'};
+
+finalTable = [studyPatients,table1,table2];
+%writetable(finalTable,'../all_motion_feature_data/MissingPercentTables.xlsx');
