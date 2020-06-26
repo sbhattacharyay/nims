@@ -1,9 +1,9 @@
 tuneMachineLearningModels <- function(seg_window,Iter, DeepIter, classifier_choice, path.D, seed.list, labelsList) {
   
   if (seg_window == 5){
-    r <- 1000
+    r <- 200
   } else if (seg_window == 10) {
-    r <- 500
+    r <- 200
   } else if (seg_window == 30) {
     r <- 175
   } else if (seg_window == 60) {
