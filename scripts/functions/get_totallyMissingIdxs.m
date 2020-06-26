@@ -1,11 +1,14 @@
 function [totallyMissingIdxs,output_sensors]=get_totallyMissingIdxs ...
-    (sensor_count,feature_count,sensors)
+    (sensors)
 
 %contains indices of the totally missing time series as follows:
 %Row_1 is the sensor number (1 through 7)
 %Row_2 is the feature_count (1 through 7) that corresponds to "feature_names"
 %Row_3 is the patient number that corresponds to the patient index (1
 %through n)
+
+feature_count = size(sensors,2);
+sensor_count = size(sensors{1,1},1);
 
 totallyMissingIdxs = [];
 missingID=[0 NaN Inf];

@@ -7,6 +7,7 @@
 % Department of Applied Mathematics and Statistics
 % Whiting School of Engineering, Johns Hopkins University
 % email address: shubhayu@jhu.edu
+
 %% Set Directory and Procure File Names
 tic
 addpath('functions/')
@@ -338,3 +339,78 @@ writetable(indexed_times,'indexed_times.csv');
 cd ../scripts/
 
 license('inuse')
+
+%% Characterization of Missing Data
+
+load('../all_motion_feature_data/complete_sensor_data.mat')
+load('../all_motion_feature_data/formatted_times.mat')
+addpath('functions/')
+
+[~,sensors] = get_totallyMissingIdxs(sensors);
+
+missing_data = zeros(size(sensors,1), size(sensors,2));
+recording_time = cell(size(formatted_times,1),3);
+
+% Calculate the start & end times of each patient recording and the
+% duration of recording
+for i = 1:size(formatted_times,1)
+    recording_time{i,1} = formatted_times{i}(1);
+    recording_time{i,2} = formatted_times{i}(end);
+    recording_time{i,3} = char(datetime(recording_time{i,2}, 'InputFormat', 'dd-MMM-yyyy HH:mm:ss')... 
+    - datetime(recording_time{i,1}, 'InputFormat', 'dd-MMM-yyyy HH:mm:ss'));
+end
+
+% Find the fraction of missing data
+for row = 1:size(sensors,1)
+    curr_data = sensors{row,1};
+    for i = 1:size(curr_data,1)
+        curr_sensor_data = curr_data(i,:);
+        nan_sum = sum(isnan(curr_sensor_data));
+
+        iszero = find(curr_sensor_data == 0);
+        count = 0;
+        next = 0;
+        if length(iszero) > 2
+            for j = 1:length(iszero)-2
+                if j < next
+                    continue
+                end
+                if (iszero(j+1) - iszero(j) == 1) && (iszero(j+2) - iszero(j+1) == 1)
+                    seq = 3;
+                    if j == length(iszero)-2
+                        count = count + seq;
+                        continue
+                    end
+                    while iszero(j+seq) - iszero(j+seq-1) == 1
+                        seq = seq + 1;
+                        if iszero(j+seq-1) == iszero(end)
+                            break
+                        end
+                    end
+                    count = count + seq;
+                    next = j + seq;
+                else
+                    continue
+                end   
+            end
+        end
+        
+        tot_sum = nan_sum + count;
+        missing_data(row,i) = tot_sum / length(curr_sensor_data);
+    end 
+end
+
+d = dir('../accel_sensor_data/data*');
+
+studyPatients = str2double(cellfun(@(x) (string(x(5:6))),{d.name}'));
+studyPatients = array2table(studyPatients);
+studyPatients.Properties.VariableNames = {'Study Patient No.'};
+
+table1 = array2table(missing_data);
+table1.Properties.VariableNames = {'Bed','LA','LE','LW','RA','RE','RW'};
+
+table2 = cell2table(recording_time);
+table2.Properties.VariableNames = {'Start Timestamp','End Timestamp','Recording Duration'};
+
+finalTable = [studyPatients,table1,table2];
+%writetable(finalTable,'../all_motion_feature_data/MissingPercentTables.xlsx');

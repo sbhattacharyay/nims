@@ -125,24 +125,23 @@ train.control <- trainControl(method="repeatedcv",
                               returnResamp = "all")
 
 ### Run the model building function ###
-source('./functions/tuneMachineLearningModels.R')
+source('./functions/finishTuneMachineLearningModels.R')
 source('./functions/tuneDeepLearningModel.R')
 source('./functions/saveRDSFiles.R')
 
 iter <- 1 # iteration 1 for caret models
 deep.iter <- 1 # iteration 1 for deep learning models
-#for (seg_window in c(180,60,30,10,5)){
-for (seg_window in c(30,10,5)){
-  path.save <- file.path("../all_motion_feature_data/ML_results",paste0(seg_window,'_min'))
-  dir.create(path.save,showWarnings = F,recursive = T)
-  tuneMachineLearningModels(seg_window = seg_window,
-                            Iter = iter, 
-                            DeepIter = deep.iter, 
-                            classifier_choice = classifier_choice, 
-                            seed.list = seed.list,
-                            path.D = path.save, 
-                            labelsList = labels.temp)
-}
+seg_window <- 30
+
+path.save <- file.path("../all_motion_feature_data/ML_results",paste0(seg_window,'_min'))
+dir.create(path.save,showWarnings = F,recursive = T)
+finishTuneMachineLearningModels(seg_window = seg_window,
+                                Iter = iter, 
+                                DeepIter = deep.iter, 
+                                classifier_choice = classifier_choice, 
+                                seed.list = seed.list,
+                                path.D = path.save, 
+                                labelsList = labels.temp)
 
 ### Examine first-pass tuning outcomes ###
 
