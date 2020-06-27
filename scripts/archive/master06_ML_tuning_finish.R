@@ -69,7 +69,7 @@ inner_fold_count <- 5
 outerFolds <- readRDS('../all_motion_feature_data/outerFolds.rds')
 
 # Define models to tune and train
-classifier_choice <- c("adaboost", "avNNet", "glmnet", "parRF", "svmRadialWeights","lda")
+classifier_choice <- c("lda","svmRadialWeights","parRF")
 
 # Define tuning grids for FIRST TUNING RUN:
 

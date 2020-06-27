@@ -19,7 +19,7 @@ finishTuneMachineLearningModels <- function(seg_window,Iter, DeepIter, classifie
   currFeatSet <- readRDS(file.path('../all_motion_feature_data/complete_LOL_set',paste0(seg_window,'_min'),paste0(curr_label,'.rds')))
   mf.only.formula <- as.formula(paste(curr_label,"~",paste(paste0(rep("MF.",r),1:r),collapse = " + ")))
   combined.formula <- as.formula(paste(curr_label,"~",paste(paste0(rep("MF.",r),1:r),collapse = " + "),"+ APACHEIIMortalityRisk"))
-  foldIdx <- 5
+  foldIdx <- 4
   print(paste("Fold no.",foldIdx,"initiated ..."))
   curr_train <- currFeatSet[[foldIdx]]$train %>% drop_na(all_of(curr_label))
   curr_test <- currFeatSet[[foldIdx]]$test %>% drop_na(all_of(curr_label))
