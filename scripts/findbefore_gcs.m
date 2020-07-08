@@ -1,3 +1,4 @@
+%% Run this section once
 % fid = fopen('../all_motion_feature_data/featureset_ptidx_timestamp.txt');
 % featureset = textscan(fid, '%f%s%s', 'HeaderLines', 1);
 % ptIdx = featureset{1,1};
@@ -10,44 +11,28 @@
 % 
 % save('../all_motion_feature_data/featureset_ptidx_timestamp.mat', 'ptIdx', 'timeStamp')
 
-clear; clc
+% clear; clc
+
+%%
 load('../all_motion_feature_data/featureset_ptidx_timestamp.mat')
 
 % Change here
 time_before = 5/60/24;
 [~,~,gcs_data] = xlsread('../clinical_data/GCS_table.xlsx');
 header = gcs_data(1,:);
-gcs_pt = cell2mat(gcs_data(2:end,1));
-gcs_date = datenum(gcs_data(2:end,2), 'dd/mm/yyyy') + cell2mat(gcs_data(2:end,9));
-accel_overlap = logical(cell2mat(gcs_data(2:end,8)));
+gcs_data = gcs_data(2:end,:);
+accel_overlap = logical(cell2mat(gcs_data(:,8)));
 gcs_data = gcs_data(accel_overlap,:);
-gcs_pt = gcs_pt(accel_overlap);
-gcs_date = gcs_date(accel_overlap);
+gcs_pt = cell2mat(gcs_data(:,1));
+gcs_date = datenum(gcs_data(:,2), 'mm/dd/yyyy') + cell2mat(gcs_data(:,9));
 
 [~,~,clinical_data] = xlsread('../clinical_data/patient_clinical_data.csv');
 accel_conv = cell2mat(clinical_data(2:70,2));
 study_conv = cell2mat(clinical_data(2:70,1));
 
-% for j = 1:length(ptIdx)
-%     index = find(accel_conv == ptIdx(j));
-%     if isempty(index)
-%         continue
-%     else
-%         ptIdx(j) = study_conv(index);
-%     end
-% end
-
 for j = 1:length(ptIdx)
    ptIdx(j) = study_conv(ptIdx(j));
 end
-
-% for k = 1:length(gcs_pt)
-%     if isempty(find(study_conv == gcs_pt(k)))
-%         continue
-%     else
-%         gcs_pt(k) = find(study_conv == gcs_pt(k));
-%     end
-% end
 
 uniqueid = 1:length(gcs_pt);
 ptIdx_uniqueid = zeros(length(ptIdx),1);
