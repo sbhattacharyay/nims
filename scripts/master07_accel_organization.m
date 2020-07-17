@@ -63,6 +63,7 @@ for patIdx = 1:length(studyDirs)
         load('C6.mat')
         load('C7.mat')
         data = [C1;C2;C3;C4;C5;C6;C7]';
+        cd ..
     end
     toc
     %% Filter Data (bworth 4-th order)
