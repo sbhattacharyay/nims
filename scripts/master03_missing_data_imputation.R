@@ -8,7 +8,7 @@
 # Whiting School of Engineering, Johns Hopkins University
 # email address: shubhayu@jhu.edu
 
-.libPaths( c( "~/Rpackages" , .libPaths(),"/tmp/Rtmpcc66n8/downloaded_packages" ) )
+.libPaths(c("~/Rpackages" , .libPaths()))
 
 library(tidyverse)
 library(forecast)
