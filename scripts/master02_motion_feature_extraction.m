@@ -1,6 +1,4 @@
-%% Master Script 2: Complete Motion Feature Extraction
-% Decoding Quantitative Motor Features for Classification and Prediction
-% in Severe Acquired Brain Injury
+%%%% Master Script 2: Complete Motion Feature Extraction %%%%
 %
 % Shubhayu Bhattacharyay
 % Department of Biomedical Engineering
@@ -12,17 +10,11 @@
 tic
 addpath('functions/')
 
-patientData = readtable('../clinical_data/SB_patient_table.xlsx',...
+patientData = readtable('../clinical_data/patient_clinical_data.xlsx',...
     'TreatAsEmpty',{'.','NA'});
 patientData = sortrows(patientData,'AccelPatientNo_');
 
-try
-    cd('~/data/accel_sensor_data')
-    marcc = true;
-catch
-    cd('../accel_sensor_data')
-    marcc = false;
-end
+cd('~/accel_sensor_data');
 
 d = dir('data*');
 
@@ -31,22 +23,16 @@ studyDirs = {d.name}';
 
 toc
 %% Arrange data by time and cut out extraneous times
-%WARNING: Elapsed Time: ~111.286133 seconds.
+%WARNING: Elapsed Time: ~111.286133 seconds per patient.
 %WARNING: Elapsed Time: ~1104.244113 seconds for mega streams.
 
 for patIdx = 1:length(studyDirs)
     tic
     
-    if marcc == true
-        folder_of_interest = ['~/data/accel_sensor_data/' studyDirs{patIdx}];
-        disp(['Patient No. ' folder_of_interest(30:31) ' initiated.']);
-        curr_AccelPatientNo = str2double(folder_of_interest(30:31));
-    else
-        folder_of_interest = ['../accel_sensor_data/',studyDirs{patIdx}];
-        disp(['Patient No. ' folder_of_interest(26:27) ' initiated.']);
-        curr_AccelPatientNo = str2double(folder_of_interest(26:27));
-    end
-    
+    folder_of_interest = ['~/data/accel_sensor_data/' studyDirs{patIdx}];
+    disp(['Patient No. ' folder_of_interest(30:31) ' initiated.']);
+    curr_AccelPatientNo = str2double(folder_of_interest(30:31));
+
     table_row_idx = find(patientData.AccelPatientNo_ == ... 
         curr_AccelPatientNo);
 
@@ -214,12 +200,8 @@ for patIdx = 1:length(studyDirs)
         
         freqEnt = [freqEnt {curr_freqEnt;times;lens}];
         %wavelets
-        if marcc == true
-            cd('~/data/accel_sensor_data')
-        else
-            cd('../accel_sensor_data')
-        end
-        
+        cd('~/data/accel_sensor_data')
+
         curr_wvlt = NaN(binCount,1);
         curr_wvlt(superMask)=cellfun(@(x,y,z) get_wavelets(x,y,z), ...
             X(superMask),Y(superMask),Z(superMask));
@@ -227,29 +209,20 @@ for patIdx = 1:length(studyDirs)
         wavelets = [wavelets {curr_wvlt;times;lens}];
     end
     
-    if marcc == true
-        save(['~/data/all_motion_feature_data/band_power/band_power' folder_of_interest(30:31) '.mat'],'bandPower','-v7.3');
-        save(['~/data/all_motion_feature_data/freq_entropy/freq_entropy' folder_of_interest(30:31) '.mat'],'freqEnt','-v7.3');
-        save(['~/data/all_motion_feature_data/freq_pairs/freq_pairs' folder_of_interest(30:31) '.mat'],'freqPairs','-v7.3');
-        save(['~/data/all_motion_feature_data/med_freq/med_freq' folder_of_interest(30:31) '.mat'],'medF','-v7.3');
-        save(['~/data/all_motion_feature_data/sma/sma' folder_of_interest(30:31) '.mat'],'SMA','-v7.3');
-        save(['~/data/all_motion_feature_data/wavelets/wavelets' folder_of_interest(30:31) '.mat'],'wavelets','-v7.3');
-        disp(['Patient No. ' folder_of_interest(30:31) ' completed.']);
-    else
-        save(['../all_motion_feature_data/band_power/band_power' folder_of_interest(26:27) '.mat'],'bandPower','-v7.3');
-        save(['../all_motion_feature_data/freq_entropy/freq_entropy' folder_of_interest(26:27) '.mat'],'freqEnt','-v7.3');
-        save(['../all_motion_feature_data/freq_pairs/freq_pairs' folder_of_interest(26:27) '.mat'],'freqPairs','-v7.3');
-        save(['../all_motion_feature_data/med_freq/med_freq' folder_of_interest(26:27) '.mat'],'medF','-v7.3');
-        save(['../all_motion_feature_data/sma/sma' folder_of_interest(26:27) '.mat'],'SMA','-v7.3');
-        save(['../all_motion_feature_data/wavelets/wavelets' folder_of_interest(26:27) '.mat'],'wavelets','-v7.3');
-        disp(['Patient No. ' folder_of_interest(26:27) ' completed.']);
-    end
+    save(['~/data/all_motion_feature_data/band_power/band_power' folder_of_interest(30:31) '.mat'],'bandPower','-v7.3');
+    save(['~/data/all_motion_feature_data/freq_entropy/freq_entropy' folder_of_interest(30:31) '.mat'],'freqEnt','-v7.3');
+    save(['~/data/all_motion_feature_data/freq_pairs/freq_pairs' folder_of_interest(30:31) '.mat'],'freqPairs','-v7.3');
+    save(['~/data/all_motion_feature_data/med_freq/med_freq' folder_of_interest(30:31) '.mat'],'medF','-v7.3');
+    save(['~/data/all_motion_feature_data/sma/sma' folder_of_interest(30:31) '.mat'],'SMA','-v7.3');
+    save(['~/data/all_motion_feature_data/wavelets/wavelets' folder_of_interest(30:31) '.mat'],'wavelets','-v7.3');
+    disp(['Patient No. ' folder_of_interest(30:31) ' completed.']);
+    
     toc
 end
 
 %% Collection of Motion Features into consolidated files:
 
-cd ../all_motion_feature_data/
+cd ~/data/all_motion_feature_data/
 directory = dir;
 dirNames = string({directory.name});
 no_feature_logicals=([directory.isdir] & dirNames ~= "." & ...
@@ -325,7 +298,6 @@ times = times.times;
 formatted_times = cellfun(@(x) string(x'),times,'UniformOutput',false);
 indexed_times = cell2table(cell(0,2),'VariableNames',{'times','ptIdx'});
 
-
 for i = 1:length(formatted_times)
    curr_cell = formatted_times{i}; 
    new_cell = [curr_cell,i*ones(length(curr_cell),1)];
@@ -336,14 +308,14 @@ indexed_times.ptIdx = str2double(indexed_times.ptIdx);
 
 writetable(indexed_times,'indexed_times.csv');
 
-cd ../scripts/
+cd ~/work/nims/scripts/
 
 license('inuse')
 
 %% Characterization of Missing Data
 
-load('../all_motion_feature_data/complete_sensor_data.mat')
-load('../all_motion_feature_data/formatted_times.mat')
+load('~/data/all_motion_feature_data/complete_sensor_data.mat')
+load('~/data/all_motion_feature_data/formatted_times.mat')
 addpath('functions/')
 
 [~,sensors] = get_totallyMissingIdxs(sensors);
@@ -400,7 +372,7 @@ for row = 1:size(sensors,1)
     end 
 end
 
-d = dir('../accel_sensor_data/data*');
+d = dir('~/data/accel_sensor_data/data*');
 
 studyPatients = str2double(cellfun(@(x) (string(x(5:6))),{d.name}'));
 studyPatients = array2table(studyPatients);
@@ -413,4 +385,3 @@ table2 = cell2table(recording_time);
 table2.Properties.VariableNames = {'Start Timestamp','End Timestamp','Recording Duration'};
 
 finalTable = [studyPatients,table1,table2];
-%writetable(finalTable,'../all_motion_feature_data/MissingPercentTables.xlsx');

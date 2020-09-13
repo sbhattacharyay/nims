@@ -1,6 +1,4 @@
 #### Master Script 3: Multiple Imputation of Missing Accelerometery Values ####
-# Decoding Quantitative Motor Features for Classification and Prediction
-# in Severe Acquired Brain Injury
 #
 # Shubhayu Bhattacharyay, Matthew Wang, Eshan Joshi
 # Department of Biomedical Engineering
@@ -35,10 +33,9 @@ if(.Platform$OS.type == "unix") {
 }
 
 source('./functions/load_patient_clinical_data.R')
+source('./functions/get_motion_features.R')
 
 patient_clinical_data = load_patient_clinical_data('../clinical_data/patient_clinical_data.csv')
-
-source('./functions/get_motion_features.R')
 
 # Load Motion Features (all)
 if (!exists("all_motion_features")) {
@@ -52,8 +49,8 @@ if (!exists("all_motion_features")) {
 n <- length(all_motion_features)/length(featureLabels)
 
 source('./functions/mf_to_dataframe.R')
-# Recode all missing values to NA, find "totally missing" data-streams, and store all feature values in single DF:
 
+# Recode all missing values to NA, find "totally missing" data-streams, and store all feature values in single DF:
 out.MF2DF <- mf_to_dataframe(all_motion_features,n,verbose = TRUE) 
 completeFeatureSet <- out.MF2DF[[1]]
 totallyMissingSet <- out.MF2DF[[2]]
@@ -71,8 +68,6 @@ completeFeatureSet <- inner_join(completeFeatureSet,complete_timestamps,by=c("pt
 
 rm(all_motion_features,all_sensors,out.MF2DF,complete_timestamps,all_mf_times)
 gc()
-# From the totallyMissingSet dataframe, we see that the only incident in which a patient had more than one sensor completely missing was patient 6, who
-# had sensors 2 (LA) and 6 (RE) missing.
 
 # First separate out missing UE indices:
 totallyMissingUE <- totallyMissingSet %>% filter(srIdx%in%c(3,4,6,7))
@@ -149,29 +144,8 @@ for (i in 1:nrow(totallyMissingBed)){
   completeFeatureSet[currRows,1] <- sample(x =filtered_bedSet$Bed,size = length(currRows),replace = TRUE)
 }
 rm(filtered_bedSet)
-# Focus on exploratory analysis of prediction of ankle regression:
-# smaFilter <- completeFeatureSet %>% filter(featureType == "sma")
-# LA_bxcx <- boxcox(smaFilter$LA,standardize = TRUE)
-# LE_bxcx <- boxcox(smaFilter$LE,standardize = TRUE)
-# LW_bxcx <- boxcox(smaFilter$LW,standardize = TRUE)
-# RA_bxcx <- boxcox(smaFilter$RA,standardize = TRUE)
-# RE_bxcx <- boxcox(smaFilter$RE,standardize = TRUE)
-# RW_bxcx <- boxcox(smaFilter$RW,standardize = TRUE)
-# 
-# smaFilter$LA <- predict(LA_bxcx,newdata = smaFilter$LA) 
-# smaFilter$LE <- predict(LE_bxcx,newdata = smaFilter$LE) 
-# smaFilter$LW <- predict(LW_bxcx,newdata = smaFilter$LW) 
-# smaFilter$RA <- predict(RA_bxcx,newdata = smaFilter$RA) 
-# smaFilter$RE <- predict(RE_bxcx,newdata = smaFilter$RE) 
-# smaFilter$RW <- predict(RW_bxcx,newdata = smaFilter$RW) 
-# 
-# tempMdl1 <- lm(LA ~ RA,smaFilter)
-# tempMdl2 <- lm(LA ~ LE + LW + LE:LW,smaFilter)
 
-# Based on this analysis, I will use the other available Ankle to impute missing ankle values
-
-# First separate out missing Lower Extremity indices:
-
+# Train box-cox filter to normalize dataset
 totallyMissingLE <- totallyMissingSet %>% filter(srIdx%in%c(2,5))
 uniqLECombos <- unique(totallyMissingLE[,c('srIdx','ftIdx')])
 LEmdls <- vector(mode = "list")
@@ -193,6 +167,7 @@ for (i in 1:nrow(uniqLECombos)){
   print(paste('combination no',i,'complete'))
 }
 
+# Apply box-cox filter to normalize dataset
 for (i in 1:nrow(totallyMissingLE)){
   currRows <- which(completeFeatureSet$ptIdx == totallyMissingLE$ptIdx[i] & completeFeatureSet$featureType == featureLabels[[totallyMissingLE$ftIdx[i]]])
   currDF <- completeFeatureSet %>% filter(ptIdx == totallyMissingLE$ptIdx[i] & featureType == featureLabels[[totallyMissingLE$ftIdx[i]]])
@@ -213,9 +188,9 @@ for (i in 1:nrow(totallyMissingLE)){
 }
 rm(LEmdls,LEmdl,LEbxcx,curr_LA_bxcx,curr_RA_bxcx,curr_mdl,LA_bxcx,RA_bxcx,filteredSet)
 
+# Amelia II for multiple time-series normal missing data imputation
 stored_amelias <- vector(mode = "list")
 stored_bxcx <- vector(mode = "list")
-
 for (i in 1:length(featureLabels)){
   curr_amelia_DF <- data.frame(matrix(ncol = ncol(completeFeatureSet), nrow = 0))
   names(curr_amelia_DF) <- names(completeFeatureSet)
@@ -238,7 +213,6 @@ for (i in 1:length(featureLabels)){
   stored_bxcx[[i]] <- amelia_bxcx
   print(paste('Feature no.',i,'complete'))
 }
-
 dir.create('../all_motion_feature_data/imputed_features',showWarnings = FALSE)
 
 for (i in 1:length(stored_amelias)){

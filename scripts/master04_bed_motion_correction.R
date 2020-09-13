@@ -1,6 +1,4 @@
 #### Master Script 4: Bed Motion Correction and Collection of Multiple Imputations ####
-# Decoding Quantitative Motor Features for Classification and Prediction
-# in Severe Acquired Brain Injury
 #
 # Shubhayu Bhattacharyay, Matthew Wang, Eshan Joshi
 # Department of Biomedical Engineering
@@ -36,6 +34,7 @@ for (i in 1:m){
 }
 
 sma_thresh <- .135
+
 # Based on the SMA threshold, find corresponding thresholds for the other feature spaces. Note we only use the first imputation to do so since, when testing, we found that the thresholds are the same for all imputations
 feature_thresholds <- find_thresholds(compiledImputations[[1]],sma_thresh)
 featRanges <-

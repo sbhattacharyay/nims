@@ -1,6 +1,4 @@
-#### Master Script 8: Multiple Imputation of Missing Accelerometery Values ####
-# Decoding Quantitative Motor Features for Classification and Prediction
-# in Severe Acquired Brain Injury
+#### Master Script 6: Multiple Imputation of Missing Accelerometery Values ####
 #
 # Shubhayu Bhattacharyay, Matthew Wang, Eshan Joshi
 # Department of Biomedical Engineering
