@@ -29,7 +29,7 @@ toc
 for patIdx = 1:length(studyDirs)
     tic
     
-    folder_of_interest = ['~/data/accel_sensor_data/' studyDirs{patIdx}];
+    folder_of_interest = ['~/scratch/accel_sensor_data/' studyDirs{patIdx}];
     disp(['Patient No. ' folder_of_interest(30:31) ' initiated.']);
     curr_AccelPatientNo = str2double(folder_of_interest(30:31));
 
@@ -200,7 +200,7 @@ for patIdx = 1:length(studyDirs)
         
         freqEnt = [freqEnt {curr_freqEnt;times;lens}];
         %wavelets
-        cd('~/data/accel_sensor_data')
+        cd('~/scratch/accel_sensor_data')
 
         curr_wvlt = NaN(binCount,1);
         curr_wvlt(superMask)=cellfun(@(x,y,z) get_wavelets(x,y,z), ...
@@ -209,12 +209,12 @@ for patIdx = 1:length(studyDirs)
         wavelets = [wavelets {curr_wvlt;times;lens}];
     end
     
-    save(['~/data/all_motion_feature_data/band_power/band_power' folder_of_interest(30:31) '.mat'],'bandPower','-v7.3');
-    save(['~/data/all_motion_feature_data/freq_entropy/freq_entropy' folder_of_interest(30:31) '.mat'],'freqEnt','-v7.3');
-    save(['~/data/all_motion_feature_data/freq_pairs/freq_pairs' folder_of_interest(30:31) '.mat'],'freqPairs','-v7.3');
-    save(['~/data/all_motion_feature_data/med_freq/med_freq' folder_of_interest(30:31) '.mat'],'medF','-v7.3');
-    save(['~/data/all_motion_feature_data/sma/sma' folder_of_interest(30:31) '.mat'],'SMA','-v7.3');
-    save(['~/data/all_motion_feature_data/wavelets/wavelets' folder_of_interest(30:31) '.mat'],'wavelets','-v7.3');
+    save(['~/scratch/all_motion_feature_data/band_power/band_power' folder_of_interest(30:31) '.mat'],'bandPower','-v7.3');
+    save(['~/scratch/all_motion_feature_data/freq_entropy/freq_entropy' folder_of_interest(30:31) '.mat'],'freqEnt','-v7.3');
+    save(['~/scratch/all_motion_feature_data/freq_pairs/freq_pairs' folder_of_interest(30:31) '.mat'],'freqPairs','-v7.3');
+    save(['~/scratch/all_motion_feature_data/med_freq/med_freq' folder_of_interest(30:31) '.mat'],'medF','-v7.3');
+    save(['~/scratch/all_motion_feature_data/sma/sma' folder_of_interest(30:31) '.mat'],'SMA','-v7.3');
+    save(['~/scratch/all_motion_feature_data/wavelets/wavelets' folder_of_interest(30:31) '.mat'],'wavelets','-v7.3');
     disp(['Patient No. ' folder_of_interest(30:31) ' completed.']);
     
     toc
@@ -222,7 +222,7 @@ end
 
 %% Collection of Motion Features into consolidated files:
 
-cd ~/data/all_motion_feature_data/
+cd ~/scratch/all_motion_feature_data/
 directory = dir;
 dirNames = string({directory.name});
 no_feature_logicals=([directory.isdir] & dirNames ~= "." & ...
@@ -314,8 +314,8 @@ license('inuse')
 
 %% Characterization of Missing Data
 
-load('~/data/all_motion_feature_data/complete_sensor_data.mat')
-load('~/data/all_motion_feature_data/formatted_times.mat')
+load('~/scratch/all_motion_feature_data/complete_sensor_data.mat')
+load('~/scratch/all_motion_feature_data/formatted_times.mat')
 addpath('functions/')
 
 [~,sensors] = get_totallyMissingIdxs(sensors);
@@ -372,7 +372,7 @@ for row = 1:size(sensors,1)
     end 
 end
 
-d = dir('~/data/accel_sensor_data/data*');
+d = dir('~/scratch/accel_sensor_data/data*');
 
 studyPatients = str2double(cellfun(@(x) (string(x(5:6))),{d.name}'));
 studyPatients = array2table(studyPatients);
