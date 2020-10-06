@@ -1,6 +1,4 @@
 #### Master Script 4: Bed Motion Correction and Collection of Multiple Imputations ####
-# Decoding Quantitative Motor Features for Classification and Prediction
-# in Severe Acquired Brain Injury
 #
 # Shubhayu Bhattacharyay, Matthew Wang, Eshan Joshi
 # Department of Biomedical Engineering
@@ -12,6 +10,7 @@
 m <- 9
 
 library(tidyverse)
+library(readxl)
 source('./functions/find_thresholds.R')
 
 featureLabels <- read.csv('../all_motion_feature_data/feature_names.csv',header = FALSE)
@@ -35,6 +34,7 @@ for (i in 1:m){
 }
 
 sma_thresh <- .135
+
 # Based on the SMA threshold, find corresponding thresholds for the other feature spaces. Note we only use the first imputation to do so since, when testing, we found that the thresholds are the same for all imputations
 feature_thresholds <- find_thresholds(compiledImputations[[1]],sma_thresh)
 featRanges <-
@@ -79,11 +79,28 @@ for (i in 1:length(compiledImputations)){
   print(paste("Imputation No.",i,"Complete"))
 }
 
-
 for (i in 1:length(compiledImputations)){
   currDF <- compiledImputations[[i]]
   currDF$ImputNum <- i
   compiledImputations[[i]] <- currDF
 }
 
-saveRDS(compiledImputations,file = "../all_motion_feature_data/bc_i_c_dataset.rds")
+# Load timestamps:
+indexedTimes <- read.csv('~/data/all_motion_feature_data/indexed_times.csv') %>% mutate(times = as.POSIXct(times, format = "%d-%b-%Y %H:%M:%S",tz = "America/New_York"))
+
+# Load complete bed-corrected, imputed feature set and add corresponding timestamps to accelerometry data:
+for (imp in 1:length(compiledImputations)){
+  currImp <- compiledImputations[[imp]] %>% select(-Bed, -ImputNum)
+  currImp$TakenInstant <- ""
+  for (patIdx in unique(indexedTimes$ptIdx)){
+    currPtIdx <- currImp$ptIdx == patIdx
+    currTimes <- indexedTimes %>% filter(ptIdx == patIdx) %>% rename(TakenInstant = times) %>% mutate(timeCount = 1:(sum(currPtIdx)/7)) %>% slice(rep(1:n(), times = 7))
+    currTimes$TakenInstant <- as.character(currTimes$TakenInstant)
+    currImp[currPtIdx,c("TakenInstant","ptIdx","timeCount")] <- currTimes
+  }
+  currImp$TakenInstant <- as.POSIXct(currImp$TakenInstant, tz = "America/New_York")
+  save(currImp,file = file.path('~/data/all_motion_feature_data/final_imputed_features',paste0('imp',imp,'.RData')))
+}
+
+rm(compiledImputations,currPtIdx,currTimes,indexedTimes)
+gc()
