@@ -7,6 +7,7 @@
 # email address: shubhayu@jhu.edu
 
 .libPaths(c("~/Rpackages" , .libPaths()))
+setwd("~/work/nims/scripts")
 
 library(tidyverse)
 library(forecast)
@@ -38,37 +39,36 @@ patient_clinical_data <- load_patient_clinical_data('../clinical_data/patient_cl
 
 accel_data_files <- sort(list.files('~/scratch/pure_accel_data/',pattern = "*.csv"))
 
-compiledData <- as.data.frame(matrix(ncol = 23, nrow = 0))
+# compiledData <- as.data.frame(matrix(ncol = 23, nrow = 0))
 
 op <- options(digits.secs=3)
 
-for (i in 1:length(accel_data_files)){
-  
-  curr_pt <- read_csv(file.path('~/scratch/pure_accel_data',accel_data_files[i]))
-  substring(curr_pt$timeStamps,21,21) <- "."
-  curr_pt$timeStamps <- strptime(curr_pt$timeStamps,format = "%d-%b-%Y %H:%M:%OS",tz = "America/New_York")
-  compiledData <- rbind(compiledData,curr_pt)
-  print(paste("Patient Idx No.",i,"Complete"))
-}
+# for (i in 1:length(accel_data_files)){
+#   curr_pt <- read_csv(file.path('~/scratch/pure_accel_data',accel_data_files[i]))
+#   substring(curr_pt$timeStamps,21,21) <- "."
+#   curr_pt$timeStamps <- strptime(curr_pt$timeStamps,format = "%d-%b-%Y %H:%M:%OS",tz = "America/New_York")
+#   compiledData <- rbind(compiledData,curr_pt)
+#   print(paste("Patient Idx No.",i,"Complete"))
+# }
 n <- length(accel_data_files)
 
-totallyMissingSet <- data.frame(matrix(ncol = 2, nrow = 0))
-names(totallyMissingSet) <- c("ptIdx","axIdx")
-for (ptIdx in 1:length(accel_data_files)){
-  currPtIdx <- compiledData$ptIdx == ptIdx
-  currPt <- compiledData[currPtIdx,]
-  for (axIdx in 1:ncol(currPt)) {
-    if (all(currPt[,axIdx] == 0,na.rm = TRUE)){
-      currPt[,axIdx] <- rep(NA, nrow(currPt[,axIdx]))
-    }
-    if (all(is.na(currPt[,axIdx]))) {
-      totallyMissingSet<-rbind(totallyMissingSet,data.frame(ptIdx,axIdx))
-    } 
-  }
-  compiledData[currPtIdx,] <- currPt
-  print(paste("Patient Idx No.",ptIdx,"Complete"))
-}
-save(compiledData, totallyMissingSet, file = "~/scratch/pure_accel_data/compiledData.RData")
+# totallyMissingSet <- data.frame(matrix(ncol = 2, nrow = 0))
+# names(totallyMissingSet) <- c("ptIdx","axIdx")
+# for (ptIdx in 1:length(accel_data_files)){
+#   currPtIdx <- compiledData$ptIdx == ptIdx
+#   currPt <- compiledData[currPtIdx,]
+#   for (axIdx in 1:ncol(currPt)) {
+#     if (all(currPt[,axIdx] == 0,na.rm = TRUE)){
+#       currPt[,axIdx] <- rep(NA, nrow(currPt[,axIdx]))
+#     }
+#     if (all(is.na(currPt[,axIdx]))) {
+#       totallyMissingSet<-rbind(totallyMissingSet,data.frame(ptIdx,axIdx))
+#     } 
+#   }
+#   compiledData[currPtIdx,] <- currPt
+#   print(paste("Patient Idx No.",ptIdx,"Complete"))
+# }
+# save(compiledData, totallyMissingSet, file = "~/scratch/pure_accel_data/compiledData.RData")
 
 ## Checkpoint 1
 
@@ -309,12 +309,8 @@ rm(LEmdls,LEmdl,LEbxcx,curr_mdl)
 # Amelia II for multiple time-series normal missing data imputation
 stored_amelias <- vector(mode = "list")
 stored_bxcx <- vector(mode = "list")
-
 curr_amelia_DF <- data.frame(matrix(ncol = ncol(compiledData), nrow = 0))
 names(curr_amelia_DF) <- names(compiledData)
-
-amelia_bxcx <- vector(mode = "list")
-
 for (j in 1:n){
   currDF <- compiledData %>% filter(ptIdx == j)
   temp_bxcx <- vector(mode = "list")
@@ -324,14 +320,32 @@ for (j in 1:n){
     currDF[,k] <- curr_bxcx$x.t
     temp_bxcx[[k]] <- curr_bxcx
   }
-  amelia_bxcx[[j]] <- temp_bxcx
+  stored_bxcx[[j]] <- temp_bxcx
   curr_amelia_DF <- rbind(curr_amelia_DF,currDF)
+  print(paste('Patient no.',j,'complete'))
 }
+curr_amelia_DF <- curr_amelia_DF[,1:20]
+stored_amelias <- amelia(curr_amelia_DF, m = 5, ts = "timeStamps", cs ="ptIdx",polytime=2,intercs = FALSE, p2s = 2)
+dir.create('~/scratch/pure_accel_data/imputed_features',showWarnings = FALSE)
 
-curr_amelia_DF <- curr_amelia_DF %>% dplyr::select(-featureType)
-curr_amelia <- amelia(curr_amelia_DF, m = 9, ts = "timeStamps", cs ="ptIdx",polytime=2,intercs = FALSE, p2s = 2)
-stored_amelias[[i]] <- curr_amelia
-stored_bxcx[[i]] <- amelia_bxcx
-print(paste('Feature no.',i,'complete'))
-
-dir.create('../all_motion_feature_data/imputed_features',showWarnings = FALSE)
+# Invert boxcox transformations and save Amelia II imputations
+for(l in 1:stored_amelias$m){
+  curr_imp <- stored_amelias$imputations[[l]]
+  for (j in 1:n){
+    curr_imp_pt <- curr_imp %>% filter(ptIdx == j)
+    rows_for_change <- which(curr_imp$ptIdx == j)
+    temp_bxcx <- curr_bxcx[[j]]
+    for (k in 1:length(curr_bxcx[[j]])){
+      curr_vec <- predict(temp_bxcx[[k]],newdata = curr_imp_pt[,k],inverse = TRUE)
+      if (sum(is.na(curr_vec)) > 0){
+        curr_vec <- na_interpolation(curr_vec, option = "linear")
+      }
+      curr_imp_pt[,k] <- curr_vec
+    }
+    curr_imp[rows_for_change,] <- curr_imp_pt
+    print(paste('Patient no.',j,'complete'))
+  }
+  fileName <- paste0("imp_no","_",l,".csv")
+  write.csv(curr_imp,file.path("~/scratch/pure_accel_data/imputed_features",fileName))
+  print(paste('Imputation no.',l,'complete'))
+}
