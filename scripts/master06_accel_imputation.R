@@ -305,6 +305,10 @@ for (i in 1:nrow(totallyMissingLE)){
   compiledData[currRows,totallyMissingLE$axIdx[i]] <- outs
 }
 rm(LEmdls,LEmdl,LEbxcx,curr_mdl)
+save(compiledData, totallyMissingSet, file = "~/scratch/pure_accel_data/checkpoint2.RData")
+
+# CHECKPOINT 2
+print("Checkpoint 2 reached")
 
 # Amelia II for multiple time-series normal missing data imputation
 stored_amelias <- vector(mode = "list")
