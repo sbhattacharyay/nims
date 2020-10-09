@@ -39,36 +39,36 @@ patient_clinical_data <- load_patient_clinical_data('../clinical_data/patient_cl
 
 accel_data_files <- sort(list.files('~/scratch/pure_accel_data/',pattern = "*.csv"))
 
-# compiledData <- as.data.frame(matrix(ncol = 23, nrow = 0))
+compiledData <- as.data.frame(matrix(ncol = 23, nrow = 0))
 
 op <- options(digits.secs=3)
 
-# for (i in 1:length(accel_data_files)){
-#   curr_pt <- read_csv(file.path('~/scratch/pure_accel_data',accel_data_files[i]))
-#   substring(curr_pt$timeStamps,21,21) <- "."
-#   curr_pt$timeStamps <- strptime(curr_pt$timeStamps,format = "%d-%b-%Y %H:%M:%OS",tz = "America/New_York")
-#   compiledData <- rbind(compiledData,curr_pt)
-#   print(paste("Patient Idx No.",i,"Complete"))
-# }
+for (i in 1:length(accel_data_files)){
+  curr_pt <- read_csv(file.path('~/scratch/pure_accel_data',accel_data_files[i]))
+  substring(curr_pt$timeStamps,21,21) <- "."
+  curr_pt$timeStamps <- strptime(curr_pt$timeStamps,format = "%d-%b-%Y %H:%M:%OS",tz = "America/New_York")
+  compiledData <- rbind(compiledData,curr_pt)
+  print(paste("Patient Idx No.",i,"Complete"))
+}
 n <- length(accel_data_files)
 
-# totallyMissingSet <- data.frame(matrix(ncol = 2, nrow = 0))
-# names(totallyMissingSet) <- c("ptIdx","axIdx")
-# for (ptIdx in 1:length(accel_data_files)){
-#   currPtIdx <- compiledData$ptIdx == ptIdx
-#   currPt <- compiledData[currPtIdx,]
-#   for (axIdx in 1:ncol(currPt)) {
-#     if (all(currPt[,axIdx] == 0,na.rm = TRUE)){
-#       currPt[,axIdx] <- rep(NA, nrow(currPt[,axIdx]))
-#     }
-#     if (all(is.na(currPt[,axIdx]))) {
-#       totallyMissingSet<-rbind(totallyMissingSet,data.frame(ptIdx,axIdx))
-#     } 
-#   }
-#   compiledData[currPtIdx,] <- currPt
-#   print(paste("Patient Idx No.",ptIdx,"Complete"))
-# }
-# save(compiledData, totallyMissingSet, file = "~/scratch/pure_accel_data/compiledData.RData")
+totallyMissingSet <- data.frame(matrix(ncol = 2, nrow = 0))
+names(totallyMissingSet) <- c("ptIdx","axIdx")
+for (ptIdx in 1:length(accel_data_files)){
+  currPtIdx <- compiledData$ptIdx == ptIdx
+  currPt <- compiledData[currPtIdx,]
+  for (axIdx in 1:ncol(currPt)) {
+    if (all(currPt[,axIdx] == 0,na.rm = TRUE)){
+      currPt[,axIdx] <- rep(NA, nrow(currPt[,axIdx]))
+    }
+    if (all(is.na(currPt[,axIdx]))) {
+      totallyMissingSet<-rbind(totallyMissingSet,data.frame(ptIdx,axIdx))
+    }
+  }
+  compiledData[currPtIdx,] <- currPt
+  print(paste("Patient Idx No.",ptIdx,"Complete"))
+}
+save(compiledData, totallyMissingSet, file = "~/scratch/pure_accel_data/compiledData.RData")
 
 ## Checkpoint 1
 
@@ -307,7 +307,7 @@ for (i in 1:nrow(totallyMissingLE)){
 rm(LEmdls,LEmdl,LEbxcx,curr_mdl)
 save(compiledData, totallyMissingSet, file = "~/scratch/pure_accel_data/checkpoint2.RData")
 
-# CHECKPOINT 2
+## Checkpoint 2
 print("Checkpoint 2 reached")
 
 # Amelia II for multiple time-series normal missing data imputation
