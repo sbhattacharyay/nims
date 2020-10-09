@@ -41,7 +41,8 @@ stored_bxcx <- vector(mode = "list")
 curr_amelia_DF <- data.frame(matrix(ncol = ncol(compiledData), nrow = 0))
 names(curr_amelia_DF) <- names(compiledData)
 for (j in 1:n){
-  currDF <- compiledData %>% filter(ptIdx == j)
+  currRows <- which(compiledData$ptIdx == j)
+  currDF <- compiledData[currRows,]
   temp_bxcx <- vector(mode = "list")
   # transform each stream with univariate boxcox
   for (k in 1:18) {
@@ -61,8 +62,8 @@ dir.create('~/scratch/pure_accel_data/imputed_features',showWarnings = FALSE)
 for(l in 1:stored_amelias$m){
   curr_imp <- stored_amelias$imputations[[l]]
   for (j in 1:n){
-    curr_imp_pt <- curr_imp %>% filter(ptIdx == j)
     rows_for_change <- which(curr_imp$ptIdx == j)
+    curr_imp_pt <- curr_imp[rows_for_change,]
     temp_bxcx <- curr_bxcx[[j]]
     for (k in 1:length(curr_bxcx[[j]])){
       curr_vec <- predict(temp_bxcx[[k]],newdata = curr_imp_pt[,k],inverse = TRUE)
