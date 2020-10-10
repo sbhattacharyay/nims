@@ -46,7 +46,7 @@ for (j in 1:n){
   temp_bxcx <- vector(mode = "list")
   # transform each stream with univariate boxcox
   for (k in 1:18) {
-    curr_bxcx <- boxcox(currDF[,k],standardize = TRUE)
+    curr_bxcx <- boxcox(pull(currDF,k),standardize = TRUE)
     currDF[,k] <- curr_bxcx$x.t
     temp_bxcx[[k]] <- curr_bxcx
   }
