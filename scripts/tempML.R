@@ -14,8 +14,6 @@ library(tidyverse)
 library(R.matlab)
 library(readxl)
 library(caret)
-library(lolR)
-library(reticulate)
 
 # Load clinical patient data:
 source('./functions/load_patient_clinical_data.R')
@@ -28,7 +26,7 @@ missingTimeInfo <- read_xlsx('~/data/all_motion_feature_data/MissingPercentTable
 gcs_data <- read.csv('../clinical_data/clean_auto_GCS_table.csv') %>% select(-X) %>% mutate(TakenInstant = as.POSIXct(TakenInstant, tz = "America/New_York"))
 
 # Load imputation 1:
-load('~/data/all_motion_feature_data/final_imputed_features/imp1.RData')
+load('~/scratch/all_motion_feature_data/final_imputed_features/imp1.RData')
 imp1 <- currImp
 rm(currImp)
 gc()
