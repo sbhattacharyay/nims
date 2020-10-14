@@ -46,7 +46,7 @@ for (j in 1:n){
   temp_bxcx <- vector(mode = "list")
   # transform each stream with univariate boxcox
   for (k in 1:18) {
-    curr_bxcx <- boxcox(currDF[,k],standardize = TRUE)
+    curr_bxcx <- boxcox(pull(currDF,k),standardize = TRUE)
     currDF[,k] <- curr_bxcx$x.t
     temp_bxcx[[k]] <- curr_bxcx
   }
@@ -55,7 +55,8 @@ for (j in 1:n){
   print(paste('Patient no.',j,'complete'))
 }
 curr_amelia_DF <- curr_amelia_DF[,1:20]
-stored_amelias <- amelia(curr_amelia_DF, m = 5, ts = "timeStamps", cs ="ptIdx",polytime=2,intercs = FALSE, p2s = 2)
+curr_amelia_DF$timeStamps <- as.numeric(curr_amelia_DF$timeStamps) 
+stored_amelias <- amelia(as.data.frame(curr_amelia_DF), m = 5, ts = "timeStamps", cs ="ptIdx",polytime=2,intercs = FALSE, p2s = 2)
 dir.create('~/scratch/pure_accel_data/imputed_features',showWarnings = FALSE)
 
 # Invert boxcox transformations and save Amelia II imputations
@@ -64,8 +65,8 @@ for(l in 1:stored_amelias$m){
   for (j in 1:n){
     rows_for_change <- which(curr_imp$ptIdx == j)
     curr_imp_pt <- curr_imp[rows_for_change,]
-    temp_bxcx <- curr_bxcx[[j]]
-    for (k in 1:length(curr_bxcx[[j]])){
+    temp_bxcx <- stored_bxcx[[j]]
+    for (k in 1:length(stored_bxcx[[j]])){
       curr_vec <- predict(temp_bxcx[[k]],newdata = curr_imp_pt[,k],inverse = TRUE)
       if (sum(is.na(curr_vec)) > 0){
         curr_vec <- na_interpolation(curr_vec, option = "linear")
