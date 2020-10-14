@@ -80,3 +80,5 @@ for(l in 1:stored_amelias$m){
   write.csv(curr_imp,file.path("~/scratch/pure_accel_data/imputed_features",fileName))
   print(paste('Imputation no.',l,'complete'))
 }
+
+saveRDS(currImp,paste0('../all_motion_feature_data/final_imputed_features/imp',i,'.rds'))
