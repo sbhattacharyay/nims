@@ -1,4 +1,4 @@
-#### Master Script 8: Embedding and Over-Sampling ####
+#### Master Script 8: LOL Embedding and SMOTE for class imbalance ####
 #
 # Shubhayu Bhattacharyay, Matthew Wang, Eshan Joshi
 # Department of Biomedical Engineering
@@ -15,6 +15,7 @@ library(tidyverse)
 library(readxl)
 library(caret)
 library(lolR)
+library(UBL)
 
 # Load clinical patient data:
 source('./functions/load_patient_clinical_data.R')
@@ -224,30 +225,79 @@ for (i in 1:length(impDirs)){
     
     curr_label_set <- det_gcs_labels[[curr_window_idx]]
     
-    curr_motor_train_labels <- curr_label_set$Best.Motor.Response[det_motor_train_idx[[curr_window_idx]]]
+    tryCatch({
+      curr_motor_train_labels <- curr_label_set$Best.Motor.Response[det_motor_train_idx[[curr_window_idx]]]
+      
+      curr_motor_train_matrix <- readRDS(file.path(detection_folders[j],'motor_train_matrix.rds'))
+      curr_motor_test_matrix <- readRDS(file.path(detection_folders[j],'motor_test_matrix.rds'))
+      
+      curr_motor_lol <- lol.project.lol(abs(curr_motor_train_matrix),curr_motor_train_labels,r = 200)
+      
+      saveRDS(curr_motor_lol,file.path(detection_folders[j],'motor_lol.rds'))
+      saveRDS(curr_motor_lol$Xr,file.path(detection_folders[j],'motor_train_matrix_lol.rds'))
+      saveRDS(curr_motor_test_matrix %*% curr_motor_lol$A,file.path(detection_folders[j],'motor_test_matrix_lol.rds'))
+      
+    }, error=function(e){cat("ERROR ON MOTOR, WINDOW SIZE", curr_window_size,"HOURS:",conditionMessage(e), "\n")})
 
-    curr_motor_train_matrix <- readRDS(file.path(detection_folders[j],'motor_train_matrix.rds'))
-    curr_motor_test_matrix <- readRDS(file.path(detection_folders[j],'motor_test_matrix.rds'))
-
-    curr_motor_lol <- lol.project.lol(curr_motor_train_matrix,curr_motor_train_labels,r = 200)
-
-    saveRDS(curr_motor_lol,file.path(detection_folders[j],'motor_lol.rds'))
-    saveRDS(curr_motor_lol$Xr,file.path(detection_folders[j],'motor_train_matrix_lol.rds'))
-    saveRDS(curr_motor_test_matrix %*% curr_motor_lol$A,file.path(detection_folders[j],'motor_test_matrix_lol.rds'))
-
-    curr_eye_train_labels <- curr_label_set$Eye.Opening[det_eye_train_idx[[curr_window_idx]]]
-    
-    curr_eye_train_matrix <- readRDS(file.path(detection_folders[j],'eye_train_matrix.rds'))
-    curr_eye_test_matrix <- readRDS(file.path(detection_folders[j],'eye_test_matrix.rds'))
-    
-    curr_eye_lol <- lol.project.lol(curr_eye_train_matrix,curr_eye_train_labels,r = 200)
-    
-    saveRDS(curr_eye_lol,file.path(detection_folders[j],'eye_lol.rds'))
-    saveRDS(curr_eye_lol$Xr,file.path(detection_folders[j],'eye_train_matrix_lol.rds'))
-    saveRDS(curr_eye_test_matrix %*% curr_eye_lol$A,file.path(detection_folders[j],'eye_test_matrix_lol.rds'))
+    tryCatch({
+      curr_eye_train_labels <- curr_label_set$Eye.Opening[det_eye_train_idx[[curr_window_idx]]]
+      
+      curr_eye_train_matrix <- readRDS(file.path(detection_folders[j],'eye_train_matrix.rds'))
+      curr_eye_test_matrix <- readRDS(file.path(detection_folders[j],'eye_test_matrix.rds'))
+      
+      curr_eye_lol <- lol.project.lol(abs(curr_eye_train_matrix),curr_eye_train_labels,r = 200)
+      
+      saveRDS(curr_eye_lol,file.path(detection_folders[j],'eye_lol.rds'))
+      saveRDS(curr_eye_lol$Xr,file.path(detection_folders[j],'eye_train_matrix_lol.rds'))
+      saveRDS(curr_eye_test_matrix %*% curr_eye_lol$A,file.path(detection_folders[j],'eye_test_matrix_lol.rds'))
+      
+    }, error=function(e){cat("ERROR ON EYE, WINDOW SIZE", curr_window_size,"HOURS:",conditionMessage(e), "\n")})
     
     print(paste("Detection folder no.",j,"out of",length(detection_folders),"completed."))
   }
   print(paste("Imputation no.",i,"out of",length(impDirs),"completed."))
 }
 
+### Perform SMOTE to repair class imbalances
+rm(list = ls())
+gc()
+
+impDirs <- list.files('~/scratch/all_motion_feature_data/formatted_matrices',include.dirs = TRUE, full.names = TRUE)
+
+# Load detection labels and partitions
+load('~/scratch/all_motion_feature_data/gcs_labels/detection_labels.RData')
+load('~/scratch/all_motion_feature_data/gcs_labels/detection_partitions.RData')
+
+for (i in 1:length(impDirs)){
+  print(paste("Imputation no.",i,"out of",length(impDirs),"started."))
+  currImpDir <- impDirs[i]
+  detection_folders <- list.files(path = currImpDir,pattern = 'detection_*',include.dirs = TRUE, full.names = TRUE)
+  for (j in 1:length(detection_folders)){
+    
+    gc()
+    
+    print(paste("Detection folder no.",j,"out of",length(detection_folders),"started."))
+    
+    curr_window_size <- as.numeric(sub(".*window_", "", detection_folders[j]))
+    curr_window_idx <- which(det_parameters$obs_windows == curr_window_size)
+    
+    curr_label_set <- det_gcs_labels[[curr_window_idx]]
+    
+    tryCatch({
+      curr_motor_train_matrix_lol <- as.data.frame(readRDS(file.path(detection_folders[j],'motor_train_matrix_lol.rds')))
+      curr_motor_train_matrix_lol$labels <- as.factor(curr_label_set$Best.Motor.Response[det_motor_train_idx[[curr_window_idx]]])
+      curr_motor_train_smote <- SmoteClassif(labels ~., dat = curr_motor_train_matrix_lol)
+      saveRDS(curr_motor_train_smote,file.path(detection_folders[j],'motor_train_smote.rds'))
+    }, error=function(e){cat("ERROR ON MOTOR, WINDOW SIZE", curr_window_size,"HOURS:",conditionMessage(e), "\n")})
+    
+    tryCatch({
+      curr_eye_train_matrix_lol <- as.data.frame(readRDS(file.path(detection_folders[j],'eye_train_matrix_lol.rds')))
+      curr_eye_train_matrix_lol$labels <- as.factor(curr_label_set$Eye.Opening[det_eye_train_idx[[curr_window_idx]]])
+      curr_eye_train_smote <- SmoteClassif(labels ~., dat = curr_eye_train_matrix_lol)
+      saveRDS(curr_eye_train_smote,file.path(detection_folders[j],'eye_train_smote.rds'))
+    }, error=function(e){cat("ERROR ON EYE, WINDOW SIZE", curr_window_size,"HOURS:",conditionMessage(e), "\n")})
+    
+    print(paste("Detection folder no.",j,"out of",length(detection_folders),"completed."))
+  }
+  print(paste("Imputation no.",i,"out of",length(impDirs),"completed."))
+}
