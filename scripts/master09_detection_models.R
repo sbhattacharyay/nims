@@ -123,6 +123,9 @@ for (i in 1:length(impDirs)){
       
       cat("ML ON MOTOR, WINDOW SIZE", curr_window_size,"HOURS STARTED.","\n")
       
+      # Create directory for motor GCS detection results
+      dir.create(paste0('~/scratch/all_motion_feature_data/detection_results/imp',i,'/detection_window_',curr_window_size,"/motor"),showWarnings = FALSE)
+      
       tuneDetectionMLModels(
         curr_SMOTE = curr_motor_train_smote,
         inner_fold_count = inner_fold_count,
@@ -139,6 +142,9 @@ for (i in 1:length(impDirs)){
       curr_eye_ordinal_labels <- multinomial_to_ordinal(curr_eye_train_smote$labels)
       
       cat("ML ON EYE, WINDOW SIZE", curr_window_size,"HOURS STARTED.","\n")
+      
+      # Create directory for eye GCS detection results
+      dir.create(paste0('~/scratch/all_motion_feature_data/detection_results/imp',i,'/detection_window_',curr_window_size,"/eye"),showWarnings = FALSE)
       
       tuneDetectionMLModels(
         curr_SMOTE = curr_eye_train_smote,
