@@ -160,3 +160,179 @@ for (i in rev(1:length(impDirs))){
   }
   print(paste("Imputation no.",i,"out of",length(impDirs),"completed."))
 }
+
+# Produce model predictions on training and testing sets
+rm(list = ls())
+gc()
+
+# Directories of imputations
+impDirs <- list.files('~/scratch/all_motion_feature_data/detection_results',include.dirs = TRUE, full.names = TRUE, pattern = "imp*")
+
+source("./functions/test_detection_model.R")
+dir.create('~/scratch/all_motion_feature_data/detection_results/test_results',showWarnings = FALSE)
+dir.create('~/scratch/all_motion_feature_data/detection_results/train_results',showWarnings = FALSE)
+classifier_choice <- c("kknn","adaboost","glmnet", "parRF", "svmRadialWeights","lda")
+
+# Load detection model labels and partitions
+load('~/scratch/all_motion_feature_data/gcs_labels/detection_labels.RData')
+load('~/scratch/all_motion_feature_data/gcs_labels/detection_partitions.RData')
+
+for (i in 1:length(det_parameters$obs_windows)){
+  
+  curr_obs_window <- det_parameters$obs_windows[i]
+  
+  curr_labels <- det_gcs_labels[[i]]
+  
+  motor_indices <- which(!is.na(curr_labels$Best.Motor.Response))
+  eye_indices <- which(!is.na(curr_labels$Eye.Opening))
+  
+  curr_det_motor_train_idx <- det_motor_train_idx[[i]]
+  curr_det_eye_train_idx <- det_eye_train_idx[[i]]
+  
+  curr_det_motor_test_idx <- setdiff(motor_indices,curr_det_motor_train_idx)
+  curr_det_eye_test_idx <- setdiff(eye_indices,curr_det_eye_train_idx)
+  
+  curr_det_motor_train_labels <- curr_labels$Best.Motor.Response[curr_det_motor_train_idx]
+  curr_det_eye_train_labels <-  curr_labels$Eye.Opening[curr_det_eye_train_idx]
+  
+  curr_det_motor_test_labels <- curr_labels$Best.Motor.Response[curr_det_motor_test_idx]
+  curr_det_eye_test_labels <-  curr_labels$Eye.Opening[curr_det_eye_test_idx]
+  
+  dir.create(paste0('~/scratch/all_motion_feature_data/detection_results/test_results/detection_window_',curr_obs_window),showWarnings = FALSE)
+  dir.create(paste0('~/scratch/all_motion_feature_data/detection_results/train_results/detection_window_',curr_obs_window),showWarnings = FALSE)
+  
+  dir.create(paste0('~/scratch/all_motion_feature_data/detection_results/test_results/detection_window_',curr_obs_window,'/motor'),showWarnings = FALSE)
+  dir.create(paste0('~/scratch/all_motion_feature_data/detection_results/test_results/detection_window_',curr_obs_window,'/eye'),showWarnings = FALSE)
+  
+  dir.create(paste0('~/scratch/all_motion_feature_data/detection_results/train_results/detection_window_',curr_obs_window,'/motor'),showWarnings = FALSE)
+  dir.create(paste0('~/scratch/all_motion_feature_data/detection_results/train_results/detection_window_',curr_obs_window,'/eye'),showWarnings = FALSE)
+  
+  for (modelType in classifier_choice){
+    
+    motor_test_results <- as.data.frame(matrix(ncol = 3,nrow = 0))
+    motor_train_results <- as.data.frame(matrix(ncol = 3,nrow = 0))
+    eye_test_results <- as.data.frame(matrix(ncol = 3,nrow = 0))
+    eye_train_results <- as.data.frame(matrix(ncol = 3,nrow = 0))
+    
+    for (impNo in 1:length(impDirs)){
+      tryCatch({
+        curr_motor_mdl <- readRDS(paste0("~/scratch/all_motion_feature_data/detection_results/imp",impNo,"/detection_window_",curr_obs_window,"/motor/",modelType,".rds"))
+        
+        curr_motor_test_lol <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/detection_window_",curr_obs_window,"/","motor_test_matrix_lol.rds")))
+        curr_motor_train_smote <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/detection_window_",curr_obs_window,"/","motor_train_smote.rds")))
+        curr_motor_train_smote <- curr_motor_train_smote[,1:(length(curr_motor_train_smote)-1)]
+        
+        curr_motor_train_predictions <- test_detection_model(modelOutput = curr_motor_mdl, predictor_matrix = curr_motor_train_smote, trueLabels = curr_det_motor_train_labels)
+        curr_motor_train_predictions$imp <- impNo
+        
+        curr_motor_test_predictions <- test_detection_model(modelOutput = curr_motor_mdl, predictor_matrix = curr_motor_test_lol, trueLabels = curr_det_motor_test_labels)
+        curr_motor_test_predictions$imp <- impNo
+        
+        motor_train_results <- rbind(motor_train_results,curr_motor_train_predictions)
+        motor_test_results <- rbind(motor_test_results,curr_motor_test_predictions)
+        
+      }, error=function(e){cat("ERROR ON MOTOR, WINDOW SIZE", curr_obs_window,"HOURS, IMPUTATION NO",impNo,conditionMessage(e), "\n")})
+      
+      tryCatch({
+        curr_eye_mdl <- readRDS(paste0("~/scratch/all_motion_feature_data/detection_results/imp",impNo,"/detection_window_",curr_obs_window,"/eye/",modelType,".rds"))
+        
+        curr_eye_test_lol <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/detection_window_",curr_obs_window,"/","eye_test_matrix_lol.rds")))
+        curr_eye_train_smote <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/detection_window_",curr_obs_window,"/","eye_train_smote.rds")))
+        curr_eye_train_smote <- curr_eye_train_smote[,1:(length(curr_eye_train_smote)-1)]
+        
+        curr_eye_train_predictions <- test_detection_model(modelOutput = curr_eye_mdl, predictor_matrix = curr_eye_train_smote, trueLabels = curr_det_eye_train_labels)
+        curr_eye_train_predictions$imp <- impNo
+        
+        curr_eye_test_predictions <- test_detection_model(modelOutput = curr_eye_mdl, predictor_matrix = curr_eye_test_lol, trueLabels = curr_det_eye_test_labels)
+        curr_eye_test_predictions$imp <- impNo
+        
+        eye_train_results <- rbind(eye_train_results,curr_eye_train_predictions)
+        eye_test_results <- rbind(eye_test_results,curr_eye_test_predictions)
+      }, error=function(e){cat("ERROR ON EYE, WINDOW SIZE", curr_obs_window,"HOURS, IMPUTATION NO",impNo,conditionMessage(e), "\n")})
+    }
+    
+    saveRDS(motor_test_results,paste0('~/scratch/all_motion_feature_data/detection_results/test_results/detection_window_',curr_obs_window,'/motor/',modelType,'_results.rds'))
+    saveRDS(motor_train_results,paste0('~/scratch/all_motion_feature_data/detection_results/train_results/detection_window_',curr_obs_window,'/motor/',modelType,'_results.rds'))
+    
+    saveRDS(eye_test_results,paste0('~/scratch/all_motion_feature_data/detection_results/test_results/detection_window_',curr_obs_window,'/eye/',modelType,'_results.rds'))
+    saveRDS(eye_train_results,paste0('~/scratch/all_motion_feature_data/detection_results/train_results/detection_window_',curr_obs_window,'/eye/',modelType,'_results.rds'))
+  }
+  
+}
+
+# Produce confusion matrices for model results:
+rm(list = ls())
+gc()
+
+# Directories of imputations
+impDirs <- list.files('~/scratch/all_motion_feature_data/detection_results',include.dirs = TRUE, full.names = TRUE, pattern = "imp*")
+
+dir.create('~/scratch/all_motion_feature_data/detection_results/test_results',showWarnings = FALSE)
+dir.create('~/scratch/all_motion_feature_data/detection_results/train_results',showWarnings = FALSE)
+classifier_choice <- c("kknn","adaboost","glmnet", "parRF", "svmRadialWeights","lda")
+
+for (i in 1:length(det_parameters$obs_windows)){
+  
+  curr_obs_window <- det_parameters$obs_windows[i]
+  
+  for (modelType in classifier_choice){
+    
+    for (impNo in 1:length(impDirs)){
+      tryCatch({
+        curr_motor_mdl <- readRDS(paste0("~/scratch/all_motion_feature_data/detection_results/imp",impNo,"/detection_window_",curr_obs_window,"/motor/",modelType,".rds"))
+        
+        curr_motor_test_lol <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/detection_window_",curr_obs_window,"/","motor_test_matrix_lol.rds")))
+        curr_motor_train_smote <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/detection_window_",curr_obs_window,"/","motor_train_smote.rds")))
+        curr_motor_train_smote <- curr_motor_train_smote[,1:(length(curr_motor_train_smote)-1)]
+        
+        curr_motor_train_predictions <- test_detection_model(modelOutput = curr_motor_mdl, predictor_matrix = curr_motor_train_smote, trueLabels = curr_det_motor_train_labels)
+        curr_motor_train_predictions$imp <- impNo
+        
+        curr_motor_test_predictions <- test_detection_model(modelOutput = curr_motor_mdl, predictor_matrix = curr_motor_test_lol, trueLabels = curr_det_motor_test_labels)
+        curr_motor_test_predictions$imp <- impNo
+        
+        motor_train_results <- rbind(motor_train_results,curr_motor_train_predictions)
+        motor_test_results <- rbind(motor_test_results,curr_motor_test_predictions)
+        
+      }, error=function(e){cat("ERROR ON MOTOR, WINDOW SIZE", curr_obs_window,"HOURS, IMPUTATION NO",impNo,conditionMessage(e), "\n")})
+      
+      tryCatch({
+        curr_eye_mdl <- readRDS(paste0("~/scratch/all_motion_feature_data/detection_results/imp",impNo,"/detection_window_",curr_obs_window,"/eye/",modelType,".rds"))
+        
+        curr_eye_test_lol <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/detection_window_",curr_obs_window,"/","eye_test_matrix_lol.rds")))
+        curr_eye_train_smote <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/detection_window_",curr_obs_window,"/","eye_train_smote.rds")))
+        curr_eye_train_smote <- curr_eye_train_smote[,1:(length(curr_eye_train_smote)-1)]
+        
+        curr_eye_train_predictions <- test_detection_model(modelOutput = curr_eye_mdl, predictor_matrix = curr_eye_train_smote, trueLabels = curr_det_eye_train_labels)
+        curr_eye_train_predictions$imp <- impNo
+        
+        curr_eye_test_predictions <- test_detection_model(modelOutput = curr_eye_mdl, predictor_matrix = curr_eye_test_lol, trueLabels = curr_det_eye_test_labels)
+        curr_eye_test_predictions$imp <- impNo
+        
+        eye_train_results <- rbind(eye_train_results,curr_eye_train_predictions)
+        eye_test_results <- rbind(eye_test_results,curr_eye_test_predictions)
+      }, error=function(e){cat("ERROR ON EYE, WINDOW SIZE", curr_obs_window,"HOURS, IMPUTATION NO",impNo,conditionMessage(e), "\n")})
+    }
+    
+    saveRDS(motor_test_results,paste0('~/scratch/all_motion_feature_data/detection_results/test_results/detection_window_',curr_obs_window,'/motor/',modelType,'_results.rds'))
+    saveRDS(motor_train_results,paste0('~/scratch/all_motion_feature_data/detection_results/train_results/detection_window_',curr_obs_window,'/motor/',modelType,'_results.rds'))
+    
+    saveRDS(eye_test_results,paste0('~/scratch/all_motion_feature_data/detection_results/test_results/detection_window_',curr_obs_window,'/eye/',modelType,'_results.rds'))
+    saveRDS(eye_train_results,paste0('~/scratch/all_motion_feature_data/detection_results/train_results/detection_window_',curr_obs_window,'/eye/',modelType,'_results.rds'))
+  }
+  
+}
+
+
+Prediction: 24 hours
+Lead Tme: 1 hour
+Obs: test different possibilites (0.5 --- 1)
+
+
+
+
+
+
+
+trialResults <- readRDS("../all_motion_feature_data/detection_results/test_results/detection_window_1/motor/glmnet_results.rds")
+confusionMatrix(factor(trialResults$predLabels),factor(trialResults$trueLabels))
