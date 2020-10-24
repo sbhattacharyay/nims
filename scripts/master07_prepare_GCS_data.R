@@ -181,3 +181,4 @@ for (i in 1:length(pre_gcs_labels)){
   pre_eye_train_idx[[i]] <- eye_nonmissingIdx[currGCSe_trainIdx]
 }
 save(pre_motor_train_idx, pre_eye_train_idx, file = '~/scratch/all_motion_feature_data/gcs_labels/prediction_partitions.RData')
+
