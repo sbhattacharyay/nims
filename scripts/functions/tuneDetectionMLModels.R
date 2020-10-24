@@ -30,7 +30,7 @@ tuneDetectionMLModels <- function(curr_SMOTE, inner_fold_count, classifier_choic
                               label_balance[[1]],
                               label_balance[[2]])
       
-      train.control <- trainControl(method="repeatedcv",
+      train.control <- caret::trainControl(method="repeatedcv",
                                     number=inner_fold_count,
                                     repeats=1,
                                     summaryFunction = twoClassSummary, 

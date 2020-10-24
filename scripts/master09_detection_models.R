@@ -11,13 +11,13 @@
 setwd('~/work/nims/scripts')
 
 # Load necessary packages
+library(caret)
 library(tidyverse)
 library(readxl)
 library(caret)
 library(lolR)
 library(UBL)
 library(glmnet)
-library(caret)
 library(keras)
 library(caTools)
 library(kernlab)
@@ -74,7 +74,6 @@ tune.grid.kknn <- expand.grid(kmax = seq(3,15,by = 2),distance = 2, kernel = "op
 nTunes <- max(as.numeric(lapply(
   list(
     tune.grid.adaboost,
-    tune.grid.avNNet,
     tune.grid.glmnet,
     tune.grid.parRF,
     tune.grid.svmRadialWeights
@@ -95,7 +94,7 @@ dir.create(path = "~/scratch/all_motion_feature_data/detection_results",showWarn
 # Load ML tuning function
 source("./functions/tuneDetectionMLModels.R")
 
-for (i in 1:length(impDirs)){
+for (i in rev(1:length(impDirs))){
   print(paste("Imputation no.",i,"out of",length(impDirs),"started."))
   currImpDir <- impDirs[i]
   detection_folders <- list.files(path = currImpDir,pattern = 'detection_*',include.dirs = TRUE, full.names = TRUE)
