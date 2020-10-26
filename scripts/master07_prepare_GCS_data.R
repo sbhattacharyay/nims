@@ -71,9 +71,11 @@ default_det_idx <- 2
 
 # Future GCS prediction model parameters:
 pre_obs_windows <- c(.5, 1, 3, 6) #in hours
-pre_lead_times <- c(1,2,6) #in hours
+pre_lead_times <- c(0,1,2,6) #in hours
+pre_pre_window <- 24 #in hours
 pre_secs_windows <- pre_obs_windows*3600
 pre_secs_leads <- pre_lead_times*3600
+pre_secs_pred <- pre_pre_window*3600
 pre_no_pts <- pre_obs_windows*60*12 + 1
 default_pre_window_idx <- 2
 default_pre_leads_idx <- 1
@@ -109,8 +111,8 @@ save(det_parameters, det_gcs_labels, file = '~/scratch/all_motion_feature_data/g
 
 pre_parameters <- as.data.frame(matrix(nrow = length(pre_obs_windows)*length(pre_lead_times),ncol = 0))
 pre_gcs_labels <- vector(mode = "list")
-
 counter <- 0
+
 for (i in 1:length(pre_lead_times)){
   curr_secs_lead <- pre_secs_leads[i]
   for (j in 1:length(pre_obs_windows)) {
@@ -119,7 +121,7 @@ for (i in 1:length(pre_lead_times)){
     pre_parameters$obs_windows[counter] <- pre_obs_windows[j]
     print(paste("Observation Lead Time:",pre_lead_times[i],"hours, Window Size:",pre_obs_windows[j],"hours started"))
     curr_secs_window <- pre_secs_windows[j]
-    gcsLabels <- as.data.frame(matrix(nrow = 0,ncol = 8))
+    gcsLabels <- as.data.frame(matrix(nrow = 0,ncol = 14))
     for (patIdx in unique(patient_clinical_data$ptIdx)) {
       print(paste("Patient no.",patIdx,"started"))
       currStudyNo <- patient_clinical_data$StudyPatientNo_[patIdx]
@@ -128,7 +130,68 @@ for (i in 1:length(pre_lead_times)){
       currEndTm <- missingTimeInfo$End.Timestamp[missingTimeInfo$Accel.Patient.No. == currAccelNo]
       currGCS <- gcs_data %>% filter(StudyPatientNo_ == currStudyNo, AccelPatientNo_ == currAccelNo)
       gcsFilter <- currGCS$TakenInstant >= currStartTm+curr_secs_window+curr_secs_lead & currGCS$TakenInstant <= currEndTm+curr_secs_lead
-      gcsLabels <- rbind(gcsLabels,currGCS[gcsFilter,])
+      
+      if (all(!gcsFilter)){
+        print(paste("Patient no.",patIdx,"Empty: completed"))
+        next
+      }
+      
+      currFiltGCS <- currGCS[gcsFilter,]
+      predWindowLabels <- as.data.frame(matrix(nrow = 0,ncol = 6),stringsAsFactors = FALSE)
+      for (l in 1:nrow(currFiltGCS)){
+        currTimeStamp <- currFiltGCS$TakenInstant[l]
+        startGCSm <- currFiltGCS$Best.Motor.Response[l]
+        startGCSe <- currFiltGCS$Eye.Opening[l]
+        predWindowFilter <- currGCS$TakenInstant >= currTimeStamp & currGCS$TakenInstant <= currTimeStamp+pre_secs_pred
+        currPredWindowGCS <- currGCS[predWindowFilter,]
+        
+        if (!is.na(startGCSm)) {
+          maxPosGCSm <- -min(startGCSm - currPredWindowGCS$Best.Motor.Response, na.rm = TRUE)
+          maxNegGCSm <- -max(startGCSm - currPredWindowGCS$Best.Motor.Response, na.rm = TRUE)
+          
+          if (is.na(maxPosGCSm) & is.na(maxNegGCSm)){
+            GCSm_change <- NA
+          } else if (maxPosGCSm == maxNegGCSm & maxNegGCSm == 0){
+            GCSm_change <- "no.change"
+          } else if (abs(maxPosGCSm) == abs(maxNegGCSm)){
+            GCSm_change <- "decrease" # tiebreaker case: assume decrease is more significant
+          } else if (abs(maxPosGCSm) > abs(maxNegGCSm)){
+            GCSm_change <- "increase"
+          } else if (abs(maxPosGCSm) < abs(maxNegGCSm)){
+            GCSm_change <- "decrease"
+          }
+        } else {
+          maxPosGCSm <- NA
+          maxNegGCSm <- NA
+          GCSm_change <- NA
+        }
+        
+        if (!is.na(startGCSe)) {
+          maxPosGCSe <- -min(startGCSe - currPredWindowGCS$Eye.Opening, na.rm = TRUE)
+          maxNegGCSe <- -max(startGCSe - currPredWindowGCS$Eye.Opening, na.rm = TRUE)
+          if (is.na(maxPosGCSe) & is.na(maxNegGCSe)){
+            GCSe_change <- NA
+          } else if (maxPosGCSe == maxNegGCSe & maxNegGCSe == 0){
+            GCSe_change <- "no.change"
+          } else if (abs(maxPosGCSe) == abs(maxNegGCSe)){
+            GCSe_change <- "decrease" # tiebreaker case: assume decrease is more significant
+          } else if (abs(maxPosGCSe) > abs(maxNegGCSe)){
+            GCSe_change <- "increase"
+          } else if (abs(maxPosGCSe) < abs(maxNegGCSe)){
+            GCSe_change <- "decrease"
+          }
+        } else {
+          maxPosGCSe <- NA
+          maxNegGCSe <- NA
+          GCSe_change <- NA
+        }
+        
+        predWindowLabels <- rbind(predWindowLabels,list(maxPosGCSm,maxNegGCSm,maxPosGCSe,maxNegGCSe,GCSm_change,GCSe_change))
+        predWindowLabels[,5] <- as.character(predWindowLabels[,5])
+        predWindowLabels[,6] <- as.character(predWindowLabels[,6])
+      }
+      names(predWindowLabels) <- c("Max.GCSm.Increase","Max.GCSm.Decrease","Max.GCSe.Increase","Max.GCSe.Decrease","Net.GCSm.Change","Net.GCSe.Change")
+      gcsLabels <- rbind(gcsLabels,cbind(currFiltGCS,predWindowLabels))
     }
     pre_gcs_labels[[counter]] <- gcsLabels
   }
@@ -136,12 +199,20 @@ for (i in 1:length(pre_lead_times)){
 save(pre_parameters, pre_gcs_labels, file = '~/scratch/all_motion_feature_data/gcs_labels/prediction_labels.RData')
 
 # Partition data into training, validation, and testing sets based on preserving class imbalance:
+rm(list = ls())
+gc()
+
 p_train <- 0.8 # set proportion of observations in training (including validation) sets
 
 # (a) Detection GCS labels:
 
+load('~/scratch/all_motion_feature_data/gcs_labels/detection_labels.RData')
+
 det_motor_train_idx <- vector(mode = "list")
 det_eye_train_idx <- vector(mode = "list")
+
+det_motor_test_idx <- vector(mode = "list")
+det_eye_test_idx <- vector(mode = "list")
 
 set.seed(2020)
 for (i in 1:length(det_gcs_labels)){
@@ -150,35 +221,47 @@ for (i in 1:length(det_gcs_labels)){
   motor_nonmissingIdx <- which(!is.na(currGCS$Best.Motor.Response))
   eye_nonmissingIdx <- which(!is.na(currGCS$Eye.Opening))
   
-  currGCSm <- currGCS %>% drop_na(Best.Motor.Response)
-  currGCSe <- currGCS %>% drop_na(Eye.Opening)
+  currGCSm <- currGCS[motor_nonmissingIdx,]
+  currGCSe <- currGCS[eye_nonmissingIdx,]
+  
   currGCSm_trainIdx <- createDataPartition(currGCSm$Best.Motor.Response,p=p_train,list = FALSE,times = 1)
   currGCSe_trainIdx <- createDataPartition(currGCSe$Eye.Opening,p=p_train,list = FALSE,times = 1)
   
   det_motor_train_idx[[i]] <- motor_nonmissingIdx[currGCSm_trainIdx]
   det_eye_train_idx[[i]] <- eye_nonmissingIdx[currGCSe_trainIdx]
+  
+  det_motor_test_idx[[i]] <- motor_nonmissingIdx[!motor_nonmissingIdx %in% motor_nonmissingIdx[currGCSm_trainIdx]]
+  det_eye_test_idx[[i]] <- eye_nonmissingIdx[!eye_nonmissingIdx %in% eye_nonmissingIdx[currGCSe_trainIdx]]
 }
-save(det_motor_train_idx, det_eye_train_idx, file = '~/scratch/all_motion_feature_data/gcs_labels/detection_partitions.RData')
+save(det_motor_train_idx, det_eye_train_idx,det_motor_test_idx,det_eye_test_idx, file = '~/scratch/all_motion_feature_data/gcs_labels/detection_partitions.RData')
 
 # (b) Prediction GCS labels:
 
+load('~/scratch/all_motion_feature_data/gcs_labels/prediction_labels.RData')
+
 pre_motor_train_idx <- vector(mode = "list")
 pre_eye_train_idx <- vector(mode = "list")
+
+pre_motor_test_idx <- vector(mode = "list")
+pre_eye_test_idx <- vector(mode = "list")
 
 set.seed(2020)
 for (i in 1:length(pre_gcs_labels)){
   currGCS <- pre_gcs_labels[[i]]
   
-  motor_nonmissingIdx <- which(!is.na(currGCS$Best.Motor.Response))
-  eye_nonmissingIdx <- which(!is.na(currGCS$Eye.Opening))
+  motor_nonmissingIdx <- which(!is.na(currGCS$Net.GCSm.Change))
+  eye_nonmissingIdx <- which(!is.na(currGCS$Net.GCSe.Change))
   
-  currGCSm <- currGCS %>% drop_na(Best.Motor.Response)
-  currGCSe <- currGCS %>% drop_na(Eye.Opening)
-  currGCSm_trainIdx <- createDataPartition(currGCSm$Best.Motor.Response,p=p_train,list = FALSE,times = 1)
-  currGCSe_trainIdx <- createDataPartition(currGCSe$Eye.Opening,p=p_train,list = FALSE,times = 1)
+  currGCSm <- currGCS[motor_nonmissingIdx,]
+  currGCSe <- currGCS[eye_nonmissingIdx,]
+  
+  currGCSm_trainIdx <- createDataPartition(currGCSm$Net.GCSm.Change,p=p_train,list = FALSE,times = 1)
+  currGCSe_trainIdx <- createDataPartition(currGCSe$Net.GCSe.Change,p=p_train,list = FALSE,times = 1)
   
   pre_motor_train_idx[[i]] <- motor_nonmissingIdx[currGCSm_trainIdx]
   pre_eye_train_idx[[i]] <- eye_nonmissingIdx[currGCSe_trainIdx]
+  
+  pre_motor_test_idx[[i]] <- motor_nonmissingIdx[!motor_nonmissingIdx %in% motor_nonmissingIdx[currGCSm_trainIdx]]
+  pre_eye_test_idx[[i]] <- eye_nonmissingIdx[!eye_nonmissingIdx %in% eye_nonmissingIdx[currGCSe_trainIdx]]
 }
-save(pre_motor_train_idx, pre_eye_train_idx, file = '~/scratch/all_motion_feature_data/gcs_labels/prediction_partitions.RData')
-
+save(pre_motor_train_idx, pre_eye_train_idx,pre_motor_test_idx,pre_eye_test_idx, file = '~/scratch/all_motion_feature_data/gcs_labels/prediction_partitions.RData')

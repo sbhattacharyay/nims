@@ -47,8 +47,8 @@ for (impNo in 1:length(impFiles)){
     eye_indices <- which(!is.na(curr_det_gcs_labels$Eye.Opening))
     curr_det_motor_train_idx <- det_motor_train_idx[[i]]
     curr_det_eye_train_idx <- det_eye_train_idx[[i]]
-    curr_det_motor_test_idx <- setdiff(motor_indices,curr_det_motor_train_idx)
-    curr_det_eye_test_idx <- setdiff(eye_indices,curr_det_eye_train_idx)
+    curr_det_motor_test_idx <- det_motor_test_idx[[i]]
+    curr_det_eye_test_idx <- det_eye_test_idx[[i]]
     dir.create(paste0('~/scratch/all_motion_feature_data/formatted_matrices/imp',impNo,'/detection_window_',curr_obs_window),showWarnings = FALSE)
     
     # Motor train matrix:
@@ -107,7 +107,7 @@ for (impNo in 1:length(impFiles)){
     }
     saveRDS(curr_eye_test_matrix,file = paste0('~/scratch/all_motion_feature_data/formatted_matrices/imp',impNo,'/detection_window_',curr_obs_window,'/eye_test_matrix.rds'))
     
-    print(paste("Parameter combination no.",i,"out of",length(det_gcs_labels),"started."))
+    print(paste("Parameter combination no.",i,"out of",length(det_gcs_labels),"completed."))
   }
   print(paste("Imputation no.",impNo,"out of",length(impFiles),"completed."))
 }
@@ -135,8 +135,9 @@ for (impNo in 1:length(impFiles)){
     eye_indices <- which(!is.na(curr_pre_gcs_labels$Eye.Opening))
     curr_pre_motor_train_idx <- pre_motor_train_idx[[i]]
     curr_pre_eye_train_idx <- pre_eye_train_idx[[i]]
-    curr_pre_motor_test_idx <- setdiff(motor_indices,curr_pre_motor_train_idx)
-    curr_pre_eye_test_idx <- setdiff(eye_indices,curr_pre_eye_train_idx)
+    curr_pre_motor_test_idx <- pre_motor_test_idx[[i]]
+    curr_pre_eye_test_idx <- pre_eye_test_idx[[i]]
+    
     dir.create(paste0('~/scratch/all_motion_feature_data/formatted_matrices/imp',impNo,'/prediction_window_',curr_obs_window,'_lead_',curr_lead_time),showWarnings = FALSE)
     
     # Motor train matrix:
@@ -195,7 +196,7 @@ for (impNo in 1:length(impFiles)){
     }
     saveRDS(curr_eye_test_matrix,file = paste0('~/scratch/all_motion_feature_data/formatted_matrices/imp',impNo,'/prediction_window_',curr_obs_window,'_lead_',curr_lead_time,'/eye_test_matrix.rds'))
     
-    print(paste("Parameter combination no.",i,"out of",length(pre_gcs_labels),"started."))
+    print(paste("Parameter combination no.",i,"out of",length(pre_gcs_labels),"completed"))
   }
   print(paste("Imputation no.",impNo,"out of",length(impFiles),"completed."))
 }
