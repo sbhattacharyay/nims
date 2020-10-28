@@ -201,11 +201,13 @@ for (impNo in 1:length(impFiles)){
   print(paste("Imputation no.",impNo,"out of",length(impFiles),"completed."))
 }
 
-### Train linear optimal low-rank projection on detection matrices:
+### Train and perform linear optimal low-rank projection:
 rm(list = ls())
 gc()
 
 impDirs <- list.files('~/scratch/all_motion_feature_data/formatted_matrices',include.dirs = TRUE, full.names = TRUE)
+
+# (a) LOL on Detection Cases
 
 # Load detection labels and partitions
 load('~/scratch/all_motion_feature_data/gcs_labels/detection_labels.RData')
@@ -259,11 +261,70 @@ for (i in 1:length(impDirs)){
   print(paste("Imputation no.",i,"out of",length(impDirs),"completed."))
 }
 
+# (b) LOL on Prediction Cases
+
+# Load prediction labels and partitions
+load('~/scratch/all_motion_feature_data/gcs_labels/prediction_labels.RData')
+load('~/scratch/all_motion_feature_data/gcs_labels/prediction_partitions.RData')
+
+for (i in 1:length(impDirs)){
+  print(paste("Imputation no.",i,"out of",length(impDirs),"started."))
+  currImpDir <- impDirs[i]
+  prediction_folders <- list.files(path = currImpDir,pattern = 'prediction_*',include.dirs = TRUE, full.names = TRUE)
+  for (j in 1:length(prediction_folders)){
+    
+    gc()
+    
+    print(paste("Prediction folder no.",j,"out of",length(prediction_folders),"started."))
+    
+    pattern <- "window_\\s*(.*?)\\s*_lead"
+    curr_window_size <- as.numeric(regmatches(prediction_folders[j], regexec(pattern, prediction_folders[j]))[[1]][2])
+    curr_lead_time <- as.numeric(sub(".*lead_", "", prediction_folders[j]))
+      
+    curr_window_idx <- which(pre_parameters$obs_windows == curr_window_size & pre_parameters$lead_times == curr_lead_time)
+    
+    curr_label_set <- pre_gcs_labels[[curr_window_idx]]
+    
+    tryCatch({
+      curr_motor_train_labels <- curr_label_set$Net.GCSm.Change[pre_motor_train_idx[[curr_window_idx]]]
+      
+      curr_motor_train_matrix <- readRDS(file.path(prediction_folders[j],'motor_train_matrix.rds'))
+      curr_motor_test_matrix <- readRDS(file.path(prediction_folders[j],'motor_test_matrix.rds'))
+      
+      curr_motor_lol <- lol.project.lol(abs(curr_motor_train_matrix),curr_motor_train_labels,r = 200)
+      
+      saveRDS(curr_motor_lol,file.path(prediction_folders[j],'motor_lol.rds'))
+      saveRDS(curr_motor_lol$Xr,file.path(prediction_folders[j],'motor_train_matrix_lol.rds'))
+      saveRDS(curr_motor_test_matrix %*% curr_motor_lol$A,file.path(prediction_folders[j],'motor_test_matrix_lol.rds'))
+      
+    }, error=function(e){cat("ERROR ON MOTOR, WINDOW SIZE", curr_window_size,"HOURS:",conditionMessage(e), "\n")})
+    
+    tryCatch({
+      curr_eye_train_labels <- curr_label_set$Net.GCSe.Change[pre_eye_train_idx[[curr_window_idx]]]
+      
+      curr_eye_train_matrix <- readRDS(file.path(prediction_folders[j],'eye_train_matrix.rds'))
+      curr_eye_test_matrix <- readRDS(file.path(prediction_folders[j],'eye_test_matrix.rds'))
+      
+      curr_eye_lol <- lol.project.lol(abs(curr_eye_train_matrix),curr_eye_train_labels,r = 200)
+      
+      saveRDS(curr_eye_lol,file.path(prediction_folders[j],'eye_lol.rds'))
+      saveRDS(curr_eye_lol$Xr,file.path(prediction_folders[j],'eye_train_matrix_lol.rds'))
+      saveRDS(curr_eye_test_matrix %*% curr_eye_lol$A,file.path(prediction_folders[j],'eye_test_matrix_lol.rds'))
+      
+    }, error=function(e){cat("ERROR ON EYE, WINDOW SIZE", curr_window_size,"HOURS:",conditionMessage(e), "\n")})
+    
+    print(paste("Prediction folder no.",j,"out of",length(prediction_folders),"completed."))
+  }
+  print(paste("Imputation no.",i,"out of",length(impDirs),"completed."))
+}
+
 ### Perform SMOTE to repair class imbalances
 rm(list = ls())
 gc()
 
 impDirs <- list.files('~/scratch/all_motion_feature_data/formatted_matrices',include.dirs = TRUE, full.names = TRUE)
+
+# (a) SMOTE on detection cases
 
 # Load detection labels and partitions
 load('~/scratch/all_motion_feature_data/gcs_labels/detection_labels.RData')
@@ -299,6 +360,50 @@ for (i in 1:length(impDirs)){
     }, error=function(e){cat("ERROR ON EYE, WINDOW SIZE", curr_window_size,"HOURS:",conditionMessage(e), "\n")})
     
     print(paste("Detection folder no.",j,"out of",length(detection_folders),"completed."))
+  }
+  print(paste("Imputation no.",i,"out of",length(impDirs),"completed."))
+}
+
+# (b) SMOTE on prediction cases
+
+# Load prediction labels and partitions
+load('~/scratch/all_motion_feature_data/gcs_labels/prediction_labels.RData')
+load('~/scratch/all_motion_feature_data/gcs_labels/prediction_partitions.RData')
+
+for (i in 1:length(impDirs)){
+  print(paste("Imputation no.",i,"out of",length(impDirs),"started."))
+  currImpDir <- impDirs[i]
+  prediction_folders <- list.files(path = currImpDir,pattern = 'prediction_*',include.dirs = TRUE, full.names = TRUE)
+  for (j in 1:length(prediction_folders)){
+    
+    gc()
+    
+    print(paste("prediction folder no.",j,"out of",length(prediction_folders),"started."))
+ 
+    pattern <- "window_\\s*(.*?)\\s*_lead"
+    curr_window_size <- as.numeric(regmatches(prediction_folders[j], regexec(pattern, prediction_folders[j]))[[1]][2])
+    curr_lead_time <- as.numeric(sub(".*lead_", "", prediction_folders[j]))
+    curr_window_idx <- which(pre_parameters$obs_windows == curr_window_size & pre_parameters$lead_times == curr_lead_time)
+    
+    curr_label_set <- pre_gcs_labels[[curr_window_idx]]
+    
+    tryCatch({
+      curr_motor_train_matrix_lol <- as.data.frame(readRDS(file.path(prediction_folders[j],'motor_train_matrix_lol.rds')))
+      curr_motor_train_matrix_lol$GCS.m <- curr_label_set$Best.Motor.Response[pre_motor_train_idx[[curr_window_idx]]]
+      curr_motor_train_matrix_lol$labels <- as.factor(curr_label_set$Net.GCSm.Change[pre_motor_train_idx[[curr_window_idx]]])
+      curr_motor_train_smote <- SmoteClassif(labels ~., dat = curr_motor_train_matrix_lol)
+      saveRDS(curr_motor_train_smote,file.path(prediction_folders[j],'motor_train_smote.rds'))
+    }, error=function(e){cat("ERROR ON MOTOR, WINDOW SIZE", curr_window_size,"HOURS:",conditionMessage(e), "\n")})
+    
+    tryCatch({
+      curr_eye_train_matrix_lol <- as.data.frame(readRDS(file.path(prediction_folders[j],'eye_train_matrix_lol.rds')))
+      curr_eye_train_matrix_lol$GCS.e <- curr_label_set$Eye.Opening[pre_eye_train_idx[[curr_window_idx]]]
+      curr_eye_train_matrix_lol$labels <- as.factor(curr_label_set$Net.GCSe.Change[pre_eye_train_idx[[curr_window_idx]]])
+      curr_eye_train_smote <- SmoteClassif(labels ~., dat = curr_eye_train_matrix_lol)
+      saveRDS(curr_eye_train_smote,file.path(prediction_folders[j],'eye_train_smote.rds'))
+    }, error=function(e){cat("ERROR ON EYE, WINDOW SIZE", curr_window_size,"HOURS:",conditionMessage(e), "\n")})
+    
+    print(paste("Prediction folder no.",j,"out of",length(prediction_folders),"completed."))
   }
   print(paste("Imputation no.",i,"out of",length(impDirs),"completed."))
 }

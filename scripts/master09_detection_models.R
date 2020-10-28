@@ -323,16 +323,5 @@ for (i in 1:length(det_parameters$obs_windows)){
   
 }
 
-
-Prediction: 24 hours
-Lead Tme: 1 hour
-Obs: test different possibilites (0.5 --- 1)
-
-
-
-
-
-
-
 trialResults <- readRDS("../all_motion_feature_data/detection_results/test_results/detection_window_1/motor/glmnet_results.rds")
 confusionMatrix(factor(trialResults$predLabels),factor(trialResults$trueLabels))
