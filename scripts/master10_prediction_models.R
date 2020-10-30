@@ -145,7 +145,7 @@ for (i in 1:length(impDirs)){
       curr_eye_ordinal_labels <- multinomial_to_ordinal(curr_eye_train_smote$labels)
       
       cat("IMPUTATION NO:",i,"EYE, WINDOW SIZE", curr_window_size,"LEAD TIME",curr_lead_time,"HOURS STARTED.","\n")
-
+      
       # Create directory for eye GCS prediction results
       dir.create(paste0('~/scratch/all_motion_feature_data/prediction_results/imp',i,'/prediction_window_',curr_window_size,'_lead_',curr_lead_time,"/eye"),showWarnings = FALSE)
       
@@ -224,10 +224,16 @@ for (i in 1:length(pre_parameters$obs_windows)){
         curr_motor_test_lol <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/prediction_window_",curr_obs_window,'_lead_',curr_lead_time,"/","motor_test_matrix_lol.rds")))
         curr_motor_train_lol <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/prediction_window_",curr_obs_window,'_lead_',curr_lead_time,"/","motor_train_matrix_lol.rds")))
         
-        curr_motor_train_predictions <- test_prediction_model(modelOutput = curr_motor_mdl, predictor_matrix = curr_motor_train_lol, trueLabels = curr_pre_motor_train_labels)
+        names(curr_motor_train_lol) <- paste(paste0(rep("MF.",ncol(curr_motor_train_lol)),1:ncol(curr_motor_train_lol)))
+        names(curr_motor_test_lol) <- paste(paste0(rep("MF.",ncol(curr_motor_test_lol)),1:ncol(curr_motor_test_lol)))
+        
+        curr_motor_predictors_train <- cbind(curr_motor_train_lol,GCS.m = curr_labels$Best.Motor.Response[curr_pre_motor_train_idx])
+        curr_motor_predictors_test <- cbind(curr_motor_test_lol,GCS.m = curr_labels$Best.Motor.Response[curr_pre_motor_test_idx])
+        
+        curr_motor_train_predictions <- test_prediction_model(modelOutput = curr_motor_mdl, predictor_matrix = curr_motor_predictors_train, trueLabels = curr_pre_motor_train_labels)
         curr_motor_train_predictions$imp <- impNo
         
-        curr_motor_test_predictions <- test_prediction_model(modelOutput = curr_motor_mdl, predictor_matrix = curr_motor_test_lol, trueLabels = curr_pre_motor_test_labels)
+        curr_motor_test_predictions <- test_prediction_model(modelOutput = curr_motor_mdl, predictor_matrix = curr_motor_predictors_test, trueLabels = curr_pre_motor_test_labels)
         curr_motor_test_predictions$imp <- impNo
         
         motor_train_results <- rbind(motor_train_results,curr_motor_train_predictions)
@@ -236,16 +242,21 @@ for (i in 1:length(pre_parameters$obs_windows)){
       }, error=function(e){cat("ERROR ON MOTOR, WINDOW SIZE", curr_obs_window,"HOURS, IMPUTATION NO",impNo,conditionMessage(e), "\n")})
       
       tryCatch({
-        curr_eye_mdl <- readRDS(paste0("~/scratch/all_motion_feature_data/prediction_results/imp",impNo,"/prediction_window_",curr_obs_window,"/eye/",modelType,".rds"))
+        curr_eye_mdl <- readRDS(paste0("~/scratch/all_motion_feature_data/prediction_results/imp",impNo,"/prediction_window_",curr_obs_window,'_lead_',curr_lead_time,"/eye/",modelType,".rds"))
         
-        curr_eye_test_lol <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/prediction_window_",curr_obs_window,"/","eye_test_matrix_lol.rds")))
-        curr_eye_train_smote <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/prediction_window_",curr_obs_window,"/","eye_train_smote.rds")))
-        curr_eye_train_smote <- curr_eye_train_smote[,1:(length(curr_eye_train_smote)-1)]
+        curr_eye_test_lol <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/prediction_window_",curr_obs_window,'_lead_',curr_lead_time,"/","eye_test_matrix_lol.rds")))
+        curr_eye_train_lol <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/prediction_window_",curr_obs_window,'_lead_',curr_lead_time,"/","eye_train_matrix_lol.rds")))
         
-        curr_eye_train_predictions <- test_prediction_model(modelOutput = curr_eye_mdl, predictor_matrix = curr_eye_train_smote, trueLabels = curr_pre_eye_train_labels)
+        names(curr_eye_train_lol) <- paste(paste0(rep("MF.",ncol(curr_eye_train_lol)),1:ncol(curr_eye_train_lol)))
+        names(curr_eye_test_lol) <- paste(paste0(rep("MF.",ncol(curr_eye_test_lol)),1:ncol(curr_eye_test_lol)))
+        
+        curr_eye_predictors_train <- cbind(curr_eye_train_lol,GCS.e = curr_labels$Eye.Opening[curr_pre_eye_train_idx])
+        curr_eye_predictors_test <- cbind(curr_eye_test_lol,GCS.e = curr_labels$Eye.Opening[curr_pre_eye_test_idx])
+        
+        curr_eye_train_predictions <- test_prediction_model(modelOutput = curr_eye_mdl, predictor_matrix = curr_eye_predictors_train, trueLabels = curr_pre_eye_train_labels)
         curr_eye_train_predictions$imp <- impNo
         
-        curr_eye_test_predictions <- test_prediction_model(modelOutput = curr_eye_mdl, predictor_matrix = curr_eye_test_lol, trueLabels = curr_pre_eye_test_labels)
+        curr_eye_test_predictions <- test_prediction_model(modelOutput = curr_eye_mdl, predictor_matrix = curr_eye_predictors_test, trueLabels = curr_pre_eye_test_labels)
         curr_eye_test_predictions$imp <- impNo
         
         eye_train_results <- rbind(eye_train_results,curr_eye_train_predictions)
@@ -253,11 +264,11 @@ for (i in 1:length(pre_parameters$obs_windows)){
       }, error=function(e){cat("ERROR ON EYE, WINDOW SIZE", curr_obs_window,"HOURS, IMPUTATION NO",impNo,conditionMessage(e), "\n")})
     }
     
-    saveRDS(motor_test_results,paste0('~/scratch/all_motion_feature_data/prediction_results/test_results/prediction_window_',curr_obs_window,'/motor/',modelType,'_results.rds'))
-    saveRDS(motor_train_results,paste0('~/scratch/all_motion_feature_data/prediction_results/train_results/prediction_window_',curr_obs_window,'/motor/',modelType,'_results.rds'))
+    saveRDS(motor_test_results,paste0('~/scratch/all_motion_feature_data/prediction_results/test_results/prediction_window_',curr_obs_window,'_lead_',curr_lead_time,'/motor/',modelType,'_results.rds'))
+    saveRDS(motor_train_results,paste0('~/scratch/all_motion_feature_data/prediction_results/train_results/prediction_window_',curr_obs_window,'_lead_',curr_lead_time,'/motor/',modelType,'_results.rds'))
     
-    saveRDS(eye_test_results,paste0('~/scratch/all_motion_feature_data/prediction_results/test_results/prediction_window_',curr_obs_window,'/eye/',modelType,'_results.rds'))
-    saveRDS(eye_train_results,paste0('~/scratch/all_motion_feature_data/prediction_results/train_results/prediction_window_',curr_obs_window,'/eye/',modelType,'_results.rds'))
+    saveRDS(eye_test_results,paste0('~/scratch/all_motion_feature_data/prediction_results/test_results/prediction_window_',curr_obs_window,'_lead_',curr_lead_time,'/eye/',modelType,'_results.rds'))
+    saveRDS(eye_train_results,paste0('~/scratch/all_motion_feature_data/prediction_results/train_results/prediction_window_',curr_obs_window,'_lead_',curr_lead_time,'/eye/',modelType,'_results.rds'))
   }
   
 }

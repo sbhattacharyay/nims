@@ -1,7 +1,7 @@
-tunePredictionMLModels <- function(curr_SMOTE, inner_fold_count, classifier_choice, save.path, seed.list, ordinalLabels) {
+tunePredictionMLModels <- function(curr_SMOTE, inner_fold_count, classifier_choice, save.path, seed.list, ordinalLabels, motorLogical = TRUE) {
   
   # Rename variables of dataframes to fit formula
-  names(curr_SMOTE)[1:(ncol(curr_SMOTE)-1)] <- paste(paste0(rep("MF.",(ncol(curr_SMOTE)-1)),1:(ncol(curr_SMOTE)-1)))
+  names(curr_SMOTE)[1:(ncol(curr_SMOTE)-2)] <- paste(paste0(rep("MF.",(ncol(curr_SMOTE)-2)),1:(ncol(curr_SMOTE)-2)))
   curr_SMOTE <- curr_SMOTE[1:(ncol(curr_SMOTE)-1)]
   names(ordinalLabels) <- paste(paste0(rep("label.",ncol(ordinalLabels)),1:ncol(ordinalLabels)))
   curr_SMOTE <- cbind(curr_SMOTE,ordinalLabels)
@@ -22,7 +22,11 @@ tunePredictionMLModels <- function(curr_SMOTE, inner_fold_count, classifier_choi
       print(paste("Ordinal label:",labelIdx,"initiated ..."))
       curr_label <- names(ordinalLabels)[labelIdx]
       
-      ML_formula <- as.formula(paste(curr_label,"~",paste(paste0(rep("MF.",ncol(curr_SMOTE)-ncol(ordinalLabels)),1:(ncol(curr_SMOTE)-ncol(ordinalLabels))),collapse = " + ")))
+      if (motorLogical == TRUE){
+        ML_formula <- as.formula(paste(paste(curr_label,"~",paste(paste0(rep("MF.",ncol(curr_SMOTE)-ncol(ordinalLabels)-1),1:(ncol(curr_SMOTE)-ncol(ordinalLabels)-1)),collapse = " + ")),"+ GCS.m"))
+      } else {
+        ML_formula <- as.formula(paste(paste(curr_label,"~",paste(paste0(rep("MF.",ncol(curr_SMOTE)-ncol(ordinalLabels)-1),1:(ncol(curr_SMOTE)-ncol(ordinalLabels)-1)),collapse = " + ")),"+ GCS.e"))
+      }
       
       label_balance <- prop.table(table(ordinalLabels[,labelIdx]))
       lower_class <- names(label_balance)[which.min(label_balance)]
