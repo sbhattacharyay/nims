@@ -176,7 +176,7 @@ impDirs <- list.files('~/scratch/all_motion_feature_data/prediction_results',inc
 source("./functions/test_prediction_model.R")
 dir.create('~/scratch/all_motion_feature_data/prediction_results/test_results',showWarnings = FALSE)
 dir.create('~/scratch/all_motion_feature_data/prediction_results/train_results',showWarnings = FALSE)
-classifier_choice <- c("kknn","adaboost","glmnet", "parRF", "svmRadialWeights","lda")
+classifier_choice <- c("kknn","lda","glmnet","parRF","svmRadialWeights","adaboost")
 
 # Load prediction model labels and partitions
 load('~/scratch/all_motion_feature_data/gcs_labels/prediction_labels.RData')
@@ -188,17 +188,14 @@ for (i in 1:length(pre_parameters$obs_windows)){
   
   curr_labels <- pre_gcs_labels[[i]]
   
-  motor_indices <- which(!is.na(curr_labels$Best.Motor.Response))
-  eye_indices <- which(!is.na(curr_labels$Eye.Opening))
-  
   curr_pre_motor_train_idx <- pre_motor_train_idx[[i]]
   curr_pre_eye_train_idx <- pre_eye_train_idx[[i]]
   
-  curr_pre_motor_test_idx <- setdiff(motor_indices,curr_pre_motor_train_idx)
-  curr_pre_eye_test_idx <- setdiff(eye_indices,curr_pre_eye_train_idx)
+  curr_pre_motor_train_idx <- pre_motor_test_idx[[i]]
+  curr_pre_eye_train_idx <- pre_eye_test_idx[[i]]
   
-  curr_pre_motor_train_labels <- curr_labels$Best.Motor.Response[curr_pre_motor_train_idx]
-  curr_pre_eye_train_labels <-  curr_labels$Eye.Opening[curr_pre_eye_train_idx]
+  curr_pre_motor_train_labels <- curr_labels$Net.GCSm.Change[curr_pre_motor_train_idx]
+  curr_pre_eye_train_labels <-  curr_labels$Net.GCSe.Change[curr_pre_eye_train_idx]
   
   curr_pre_motor_test_labels <- curr_labels$Best.Motor.Response[curr_pre_motor_test_idx]
   curr_pre_eye_test_labels <-  curr_labels$Eye.Opening[curr_pre_eye_test_idx]
