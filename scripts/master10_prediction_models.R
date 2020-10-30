@@ -133,7 +133,8 @@ for (i in 1:length(impDirs)){
         classifier_choice = classifier_choice,
         save.path = paste0('~/scratch/all_motion_feature_data/prediction_results/imp',i,'/prediction_window_',curr_window_size,'_lead_',curr_lead_time,"/motor"),
         seed.list = seed.list,
-        ordinalLabels = curr_motor_ordinal_labels
+        ordinalLabels = curr_motor_ordinal_labels, 
+        motorLogical = TRUE
       )
       
     }, error=function(e){cat("ERROR ON IMPUTATION NO:",i,"MOTOR, WINDOW SIZE", curr_window_size,"LEAD TIME",curr_lead_time,"HOURS.","\n")})
@@ -154,7 +155,8 @@ for (i in 1:length(impDirs)){
         classifier_choice = classifier_choice,
         save.path = paste0('~/scratch/all_motion_feature_data/prediction_results/imp',i,'/prediction_window_',curr_window_size,'_lead_',curr_lead_time,"/eye"),
         seed.list = seed.list,
-        ordinalLabels = curr_eye_ordinal_labels
+        ordinalLabels = curr_eye_ordinal_labels,
+        motorLogical = FALSE
       )
       
     }, error=function(e){cat("ERROR ON IMPUTATION NO:",i,"EYE, WINDOW SIZE", curr_window_size,"LEAD TIME",curr_lead_time,"HOURS.","\n")})
