@@ -185,29 +185,30 @@ load('~/scratch/all_motion_feature_data/gcs_labels/prediction_partitions.RData')
 for (i in 1:length(pre_parameters$obs_windows)){
   
   curr_obs_window <- pre_parameters$obs_windows[i]
+  curr_lead_time <- pre_parameters$lead_times[i]
   
   curr_labels <- pre_gcs_labels[[i]]
   
   curr_pre_motor_train_idx <- pre_motor_train_idx[[i]]
   curr_pre_eye_train_idx <- pre_eye_train_idx[[i]]
   
-  curr_pre_motor_train_idx <- pre_motor_test_idx[[i]]
-  curr_pre_eye_train_idx <- pre_eye_test_idx[[i]]
+  curr_pre_motor_test_idx <- pre_motor_test_idx[[i]]
+  curr_pre_eye_test_idx <- pre_eye_test_idx[[i]]
   
   curr_pre_motor_train_labels <- curr_labels$Net.GCSm.Change[curr_pre_motor_train_idx]
   curr_pre_eye_train_labels <-  curr_labels$Net.GCSe.Change[curr_pre_eye_train_idx]
   
-  curr_pre_motor_test_labels <- curr_labels$Best.Motor.Response[curr_pre_motor_test_idx]
-  curr_pre_eye_test_labels <-  curr_labels$Eye.Opening[curr_pre_eye_test_idx]
+  curr_pre_motor_test_labels <- curr_labels$Net.GCSm.Change[curr_pre_motor_test_idx]
+  curr_pre_eye_test_labels <-  curr_labels$Net.GCSe.Change[curr_pre_eye_test_idx]
   
-  dir.create(paste0('~/scratch/all_motion_feature_data/prediction_results/test_results/prediction_window_',curr_obs_window),showWarnings = FALSE)
-  dir.create(paste0('~/scratch/all_motion_feature_data/prediction_results/train_results/prediction_window_',curr_obs_window),showWarnings = FALSE)
+  dir.create(paste0('~/scratch/all_motion_feature_data/prediction_results/test_results/prediction_window_',curr_obs_window,'_lead_',curr_lead_time),showWarnings = FALSE)
+  dir.create(paste0('~/scratch/all_motion_feature_data/prediction_results/train_results/prediction_window_',curr_obs_window,'_lead_',curr_lead_time),showWarnings = FALSE)
   
-  dir.create(paste0('~/scratch/all_motion_feature_data/prediction_results/test_results/prediction_window_',curr_obs_window,'/motor'),showWarnings = FALSE)
-  dir.create(paste0('~/scratch/all_motion_feature_data/prediction_results/test_results/prediction_window_',curr_obs_window,'/eye'),showWarnings = FALSE)
+  dir.create(paste0('~/scratch/all_motion_feature_data/prediction_results/train_results/prediction_window_',curr_obs_window,'_lead_',curr_lead_time,'/motor'),showWarnings = FALSE)
+  dir.create(paste0('~/scratch/all_motion_feature_data/prediction_results/train_results/prediction_window_',curr_obs_window,'_lead_',curr_lead_time,'/eye'),showWarnings = FALSE)
   
-  dir.create(paste0('~/scratch/all_motion_feature_data/prediction_results/train_results/prediction_window_',curr_obs_window,'/motor'),showWarnings = FALSE)
-  dir.create(paste0('~/scratch/all_motion_feature_data/prediction_results/train_results/prediction_window_',curr_obs_window,'/eye'),showWarnings = FALSE)
+  dir.create(paste0('~/scratch/all_motion_feature_data/prediction_results/test_results/prediction_window_',curr_obs_window,'_lead_',curr_lead_time,'/motor'),showWarnings = FALSE)
+  dir.create(paste0('~/scratch/all_motion_feature_data/prediction_results/test_results/prediction_window_',curr_obs_window,'_lead_',curr_lead_time,'/eye'),showWarnings = FALSE)
   
   for (modelType in classifier_choice){
     
@@ -218,13 +219,12 @@ for (i in 1:length(pre_parameters$obs_windows)){
     
     for (impNo in 1:length(impDirs)){
       tryCatch({
-        curr_motor_mdl <- readRDS(paste0("~/scratch/all_motion_feature_data/prediction_results/imp",impNo,"/prediction_window_",curr_obs_window,"/motor/",modelType,".rds"))
+        curr_motor_mdl <- readRDS(paste0("~/scratch/all_motion_feature_data/prediction_results/imp",impNo,"/prediction_window_",curr_obs_window,'_lead_',curr_lead_time,"/motor/",modelType,".rds"))
         
-        curr_motor_test_lol <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/prediction_window_",curr_obs_window,"/","motor_test_matrix_lol.rds")))
-        curr_motor_train_smote <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/prediction_window_",curr_obs_window,"/","motor_train_smote.rds")))
-        curr_motor_train_smote <- curr_motor_train_smote[,1:(length(curr_motor_train_smote)-1)]
+        curr_motor_test_lol <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/prediction_window_",curr_obs_window,'_lead_',curr_lead_time,"/","motor_test_matrix_lol.rds")))
+        curr_motor_train_lol <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/prediction_window_",curr_obs_window,'_lead_',curr_lead_time,"/","motor_train_matrix_lol.rds")))
         
-        curr_motor_train_predictions <- test_prediction_model(modelOutput = curr_motor_mdl, predictor_matrix = curr_motor_train_smote, trueLabels = curr_pre_motor_train_labels)
+        curr_motor_train_predictions <- test_prediction_model(modelOutput = curr_motor_mdl, predictor_matrix = curr_motor_train_lol, trueLabels = curr_pre_motor_train_labels)
         curr_motor_train_predictions$imp <- impNo
         
         curr_motor_test_predictions <- test_prediction_model(modelOutput = curr_motor_mdl, predictor_matrix = curr_motor_test_lol, trueLabels = curr_pre_motor_test_labels)
