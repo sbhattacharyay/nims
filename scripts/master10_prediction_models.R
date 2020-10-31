@@ -278,63 +278,174 @@ rm(list = ls())
 gc()
 
 # Directories of imputations
-impDirs <- list.files('~/scratch/all_motion_feature_data/prediction_results',include.dirs = TRUE, full.names = TRUE, pattern = "imp*")
+### Initialize training results output files:
+# Eye output file
+sink('~/scratch/all_motion_feature_data/prediction_results/train_results/GCSe_training_results.txt')
+cat("=============================\n")
+cat("=============================\n")
+cat("=============================\n")
+cat("EYE TRAINING RESULTS BY MODEL: \n")
+cat("=============================\n")
+cat("=============================\n")
+cat("=============================\n")
+sink()
 
-dir.create('~/scratch/all_motion_feature_data/prediction_results/test_results',showWarnings = FALSE)
-dir.create('~/scratch/all_motion_feature_data/prediction_results/train_results',showWarnings = FALSE)
-classifier_choice <- c("kknn","adaboost","glmnet", "parRF", "svmRadialWeights","lda")
+## Motor output file
+sink('~/scratch/all_motion_feature_data/prediction_results/train_results/GCSm_training_results.txt')
+cat("=============================\n")
+cat("=============================\n")
+cat("=============================\n")
+cat("MOTOR TRAINING RESULTS BY MODEL: \n")
+cat("=============================\n")
+cat("=============================\n")
+cat("=============================\n")
+sink()
 
-for (i in 1:length(pre_parameters$obs_windows)){
+### Initialize testing results output files:
+## Eye output file
+sink('~/scratch/all_motion_feature_data/prediction_results/test_results/GCSe_testing_results.txt')
+cat("=============================\n")
+cat("=============================\n")
+cat("=============================\n")
+cat("EYE TESTING RESULTS BY MODEL: \n")
+cat("=============================\n")
+cat("=============================\n")
+cat("=============================\n")
+sink()
+
+## Motor output file
+sink('~/scratch/all_motion_feature_data/prediction_results/test_results/GCSm_testing_results.txt')
+cat("=============================\n")
+cat("=============================\n")
+cat("=============================\n")
+cat("MOTOR TESTING RESULTS BY MODEL: \n")
+cat("=============================\n")
+cat("=============================\n")
+cat("=============================\n")
+sink()
+
+# Produce confusion matrices for model results:
+rm(list = ls())
+gc()
+
+# Procure list of prediction parameters in results
+trainDirs <- list.files('~/scratch/all_motion_feature_data/prediction_results/train_results',include.dirs = TRUE, full.names = TRUE, pattern = "prediction_window*")
+testDirs <- list.files('~/scratch/all_motion_feature_data/prediction_results/test_results',include.dirs = TRUE, full.names = TRUE, pattern = "prediction_window*")
+
+# Iterate through training results
+for (i in 1:length(trainDirs)){
+  pattern <- "window_\\s*(.*?)\\s*_lead"
+  curr_window_size <- as.numeric(regmatches(trainDirs[i], regexec(pattern, trainDirs[i]))[[1]][2])
+  curr_lead_time <- as.numeric(sub(".*lead_", "", trainDirs[i]))
   
-  curr_obs_window <- pre_parameters$obs_windows[i]
+  currMotorDirs <- list.files(file.path(trainDirs[i],'motor'),include.dirs = TRUE, full.names = TRUE, pattern = "*results.rds")
+  currEyeDirs <- list.files(file.path(trainDirs[i],'eye'),include.dirs = TRUE, full.names = TRUE, pattern = "*results.rds")
   
-  for (modelType in classifier_choice){
+  sink('~/scratch/all_motion_feature_data/prediction_results/train_results/GCSm_training_results.txt',append = TRUE)
+  cat("\n")
+  cat("\n")
+  cat("=============================\n")
+  cat("=============================\n")
+  cat("OBSERVATION WINDOW",curr_window_size,"HOURS, LEAD TIME",curr_lead_time,"HOURS, PREDICTION WINDOW 24 HOURS\n")
+  cat("=============================\n")
+  cat("=============================\n")
+  
+  for (j in 1:length(currMotorDirs)){
+    temp_pattern <- "motor/\\s*(.*?)\\s*_results"
+    curr_model_type <- regmatches(currMotorDirs[j], regexec(temp_pattern, currMotorDirs[j]))[[1]][2]
     
-    for (impNo in 1:length(impDirs)){
-      tryCatch({
-        curr_motor_mdl <- readRDS(paste0("~/scratch/all_motion_feature_data/prediction_results/imp",impNo,"/prediction_window_",curr_obs_window,"/motor/",modelType,".rds"))
-        
-        curr_motor_test_lol <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/prediction_window_",curr_obs_window,"/","motor_test_matrix_lol.rds")))
-        curr_motor_train_smote <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/prediction_window_",curr_obs_window,"/","motor_train_smote.rds")))
-        curr_motor_train_smote <- curr_motor_train_smote[,1:(length(curr_motor_train_smote)-1)]
-        
-        curr_motor_train_predictions <- test_prediction_model(modelOutput = curr_motor_mdl, predictor_matrix = curr_motor_train_smote, trueLabels = curr_pre_motor_train_labels)
-        curr_motor_train_predictions$imp <- impNo
-        
-        curr_motor_test_predictions <- test_prediction_model(modelOutput = curr_motor_mdl, predictor_matrix = curr_motor_test_lol, trueLabels = curr_pre_motor_test_labels)
-        curr_motor_test_predictions$imp <- impNo
-        
-        motor_train_results <- rbind(motor_train_results,curr_motor_train_predictions)
-        motor_test_results <- rbind(motor_test_results,curr_motor_test_predictions)
-        
-      }, error=function(e){cat("ERROR ON MOTOR, WINDOW SIZE", curr_obs_window,"HOURS, IMPUTATION NO",impNo,conditionMessage(e), "\n")})
-      
-      tryCatch({
-        curr_eye_mdl <- readRDS(paste0("~/scratch/all_motion_feature_data/prediction_results/imp",impNo,"/prediction_window_",curr_obs_window,"/eye/",modelType,".rds"))
-        
-        curr_eye_test_lol <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/prediction_window_",curr_obs_window,"/","eye_test_matrix_lol.rds")))
-        curr_eye_train_smote <- as.data.frame(readRDS(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo,"/prediction_window_",curr_obs_window,"/","eye_train_smote.rds")))
-        curr_eye_train_smote <- curr_eye_train_smote[,1:(length(curr_eye_train_smote)-1)]
-        
-        curr_eye_train_predictions <- test_prediction_model(modelOutput = curr_eye_mdl, predictor_matrix = curr_eye_train_smote, trueLabels = curr_pre_eye_train_labels)
-        curr_eye_train_predictions$imp <- impNo
-        
-        curr_eye_test_predictions <- test_prediction_model(modelOutput = curr_eye_mdl, predictor_matrix = curr_eye_test_lol, trueLabels = curr_pre_eye_test_labels)
-        curr_eye_test_predictions$imp <- impNo
-        
-        eye_train_results <- rbind(eye_train_results,curr_eye_train_predictions)
-        eye_test_results <- rbind(eye_test_results,curr_eye_test_predictions)
-      }, error=function(e){cat("ERROR ON EYE, WINDOW SIZE", curr_obs_window,"HOURS, IMPUTATION NO",impNo,conditionMessage(e), "\n")})
-    }
+    cat("\n")
+    cat("\n")
+    cat("=============================\n")
+    cat(curr_model_type,"RESULTS\n")
+    cat("=============================\n")
     
-    saveRDS(motor_test_results,paste0('~/scratch/all_motion_feature_data/prediction_results/test_results/prediction_window_',curr_obs_window,'/motor/',modelType,'_results.rds'))
-    saveRDS(motor_train_results,paste0('~/scratch/all_motion_feature_data/prediction_results/train_results/prediction_window_',curr_obs_window,'/motor/',modelType,'_results.rds'))
-    
-    saveRDS(eye_test_results,paste0('~/scratch/all_motion_feature_data/prediction_results/test_results/prediction_window_',curr_obs_window,'/eye/',modelType,'_results.rds'))
-    saveRDS(eye_train_results,paste0('~/scratch/all_motion_feature_data/prediction_results/train_results/prediction_window_',curr_obs_window,'/eye/',modelType,'_results.rds'))
+    currMotorResults <- readRDS(currMotorDirs[j])
+    currMotorCM <- confusionMatrix((currMotorResults$predLabels),(currMotorResults$trueLabels))
+    print(currMotorCM)  
   }
+  sink()
   
+  sink('~/scratch/all_motion_feature_data/prediction_results/train_results/GCSe_training_results.txt',append = TRUE)
+  cat("\n")
+  cat("\n")
+  cat("=============================\n")
+  cat("=============================\n")
+  cat("OBSERVATION WINDOW",curr_window_size,"HOURS, LEAD TIME",curr_lead_time,"HOURS, PREDICTION WINDOW 24 HOURS\n")
+  cat("=============================\n")
+  cat("=============================\n")
+  for (j in 1:length(currEyeDirs)){
+    temp_pattern <- "eye/\\s*(.*?)\\s*_results"
+    curr_model_type <- regmatches(currEyeDirs[j], regexec(temp_pattern, currEyeDirs[j]))[[1]][2]
+    
+    cat("\n")
+    cat("\n")
+    cat("=============================\n")
+    cat(curr_model_type,"RESULTS\n")
+    cat("=============================\n")
+    
+    currEyeResults <- readRDS(currEyeDirs[j])
+    currEyeCM <- confusionMatrix((currEyeResults$predLabels),(currEyeResults$trueLabels))
+    print(currEyeCM)  
+  }
+  sink()
 }
 
-trialResults <- readRDS("../all_motion_feature_data/prediction_results/test_results/prediction_window_1/motor/glmnet_results.rds")
-confusionMatrix(factor(trialResults$predLabels),factor(trialResults$trueLabels))
+# Iterate through testing results
+for (i in 1:length(testDirs)){
+  pattern <- "window_\\s*(.*?)\\s*_lead"
+  curr_window_size <- as.numeric(regmatches(testDirs[i], regexec(pattern, testDirs[i]))[[1]][2])
+  curr_lead_time <- as.numeric(sub(".*lead_", "", testDirs[i]))
+  
+  currMotorDirs <- list.files(file.path(testDirs[i],'motor'),include.dirs = TRUE, full.names = TRUE, pattern = "*results.rds")
+  currEyeDirs <- list.files(file.path(testDirs[i],'eye'),include.dirs = TRUE, full.names = TRUE, pattern = "*results.rds")
+  
+  sink('~/scratch/all_motion_feature_data/prediction_results/test_results/GCSm_testing_results.txt',append = TRUE)
+  cat("\n")
+  cat("\n")
+  cat("=============================\n")
+  cat("=============================\n")
+  cat("OBSERVATION WINDOW",curr_window_size,"HOURS, LEAD TIME",curr_lead_time,"HOURS, PREDICTION WINDOW 24 HOURS\n")
+  cat("=============================\n")
+  cat("=============================\n")
+  
+  for (j in 1:length(currMotorDirs)){
+    temp_pattern <- "motor/\\s*(.*?)\\s*_results"
+    curr_model_type <- regmatches(currMotorDirs[j], regexec(temp_pattern, currMotorDirs[j]))[[1]][2]
+    
+    cat("\n")
+    cat("\n")
+    cat("=============================\n")
+    cat(curr_model_type,"RESULTS\n")
+    cat("=============================\n")
+    
+    currMotorResults <- readRDS(currMotorDirs[j])
+    currMotorCM <- confusionMatrix((currMotorResults$predLabels),(currMotorResults$trueLabels))
+    print(currMotorCM)  
+  }
+  sink()
+  
+  sink('~/scratch/all_motion_feature_data/prediction_results/test_results/GCSe_testing_results.txt',append = TRUE)
+  cat("\n")
+  cat("\n")
+  cat("=============================\n")
+  cat("=============================\n")
+  cat("OBSERVATION WINDOW",curr_window_size,"HOURS, LEAD TIME",curr_lead_time,"HOURS, PREDICTION WINDOW 24 HOURS\n")
+  cat("=============================\n")
+  cat("=============================\n")
+  for (j in 1:length(currEyeDirs)){
+    temp_pattern <- "eye/\\s*(.*?)\\s*_results"
+    curr_model_type <- regmatches(currEyeDirs[j], regexec(temp_pattern, currEyeDirs[j]))[[1]][2]
+    
+    cat("\n")
+    cat("\n")
+    cat("=============================\n")
+    cat(curr_model_type,"RESULTS\n")
+    cat("=============================\n")
+    
+    currEyeResults <- readRDS(currEyeDirs[j])
+    currEyeCM <- confusionMatrix((currEyeResults$predLabels),(currEyeResults$trueLabels))
+    print(currEyeCM)  
+  }
+  sink()
+}
