@@ -159,8 +159,8 @@ for patIdx = 1:length(studyDirs)
         curr_sma(superMask) = ((window)^-1).*cellfun(@(x,y,z,t) trapz(t,abs(x)+abs(y)+abs(z)), ...
             X(superMask),Y(superMask),Z(superMask),T(superMask));
         SMA = [SMA {curr_sma;times;lens}];
-        %Frequency component median pairs
         
+        %Frequency component median pairs
         curr_Med = NaN(binCount,2);
         fc = 2.5;
         fs = 10;
@@ -199,6 +199,7 @@ for patIdx = 1:length(studyDirs)
             X(superMask),Y(superMask),Z(superMask));
         
         freqEnt = [freqEnt {curr_freqEnt;times;lens}];
+        
         %wavelets
         cd('~/scratch/accel_sensor_data')
 
@@ -372,11 +373,13 @@ for row = 1:size(sensors,1)
     end 
 end
 
-d = dir('~/scratch/accel_sensor_data/data*');
+d = dir('../all_motion_feature_data/band_power/');
+dataFileNames = {d.name}';
+dataFileNames = dataFileNames(3:end,:);
 
-studyPatients = str2double(cellfun(@(x) (string(x(5:6))),{d.name}'));
-studyPatients = array2table(studyPatients);
-studyPatients.Properties.VariableNames = {'Study Patient No.'};
+accelPatients = str2double(cellfun(@(x) (string(x(11:12))),dataFileNames));
+accelPatients = array2table(accelPatients);
+accelPatients.Properties.VariableNames = {'Accel Patient No.'};
 
 table1 = array2table(missing_data);
 table1.Properties.VariableNames = {'Bed','LA','LE','LW','RA','RE','RW'};
@@ -384,4 +387,33 @@ table1.Properties.VariableNames = {'Bed','LA','LE','LW','RA','RE','RW'};
 table2 = cell2table(recording_time);
 table2.Properties.VariableNames = {'Start Timestamp','End Timestamp','Recording Duration'};
 
-finalTable = [studyPatients,table1,table2];
+finalTable = [accelPatients,table1,table2];
+
+writetable(finalTable,'../all_motion_feature_data/MissingPercentTable.xlsx')
+
+% Find the fraction of no-motion data
+nomotion_data = zeros(size(sensors,1), size(sensors,2));
+nomotion_thresh = 0.135;
+sma_data = sensors(:,6);
+
+for row = 1:length(sma_data)
+    curr_data = sma_data{row,1};
+    for i = 1:size(curr_data,1)
+        curr_sensor_data = curr_data(i,:);
+        nm_curr_sensor_data = rmmissing(curr_sensor_data);
+        nomotion_data(row,i) = sum(nm_curr_sensor_data>=nomotion_thresh)/length(nm_curr_sensor_data);
+    end 
+end
+
+table1 = array2table(nomotion_data);
+table1.Properties.VariableNames = {'Bed','LA','LE','LW','RA','RE','RW'};
+
+finalTable = [accelPatients,table1];
+
+writetable(finalTable,'../all_motion_feature_data/NoMotionPercentTable.xlsx')
+
+%% Plot of frequncy response of Butterworth Filter
+fc = 0.2;
+fs = 10;
+[b,a] = butter(4,fc/(fs/2),'high');
+freqz(b,a);
