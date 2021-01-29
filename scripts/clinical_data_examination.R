@@ -1,4 +1,4 @@
-#### Master Script 1: Clinical Data Extraction and Examination ####
+#### Clinical Data Extraction and Examination ####
 #
 # Eshan Joshi, Shubhayu Bhattacharyay
 # Department of Biomedical Engineering

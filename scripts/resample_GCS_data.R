@@ -1,4 +1,4 @@
-#### Master Script 7: Resampling of GCS data for classification ####
+#### Resampling of GCS data for classification ####
 #
 # Shubhayu Bhattacharyay, Matthew Wang, Eshan Joshi
 # Department of Biomedical Engineering
@@ -20,7 +20,7 @@ source('./functions/load_patient_clinical_data.R')
 patient.clinical.data <- load_patient_clinical_data('../clinical_data/patient_clinical_data.csv') %>% arrange(AccelPatientNo_) %>% mutate(ptIdx = 1:nrow(.))
 
 # Load missing accelerometry information:
-missingTimeInfo <- read_xlsx('~/scratch/all_motion_feature_data/MissingPercentTable.xlsx',.name_repair = "universal") %>% mutate(Start.Timestamp = as.POSIXct(Start.Timestamp,format = '%d-%b-%Y %H:%M:%S',tz = "America/New_York"), End.Timestamp = as.POSIXct(End.Timestamp,format = '%d-%b-%Y %H:%M:%S',tz = "America/New_York"))
+missing.data.info <- read_xlsx('~/scratch/all_motion_feature_data/MissingPercentTable.xlsx',.name_repair = "universal") %>% mutate(Start.Timestamp = as.POSIXct(Start.Timestamp,format = '%d-%b-%Y %H:%M:%S',tz = "America/New_York"), End.Timestamp = as.POSIXct(End.Timestamp,format = '%d-%b-%Y %H:%M:%S',tz = "America/New_York"))
 
 # Load automatically extracted GCS labels:
 gcs_data <- read.csv('../clinical_data/02_clean_auto_GCS_table.csv') %>% select(-X) %>% mutate(TakenInstant = as.POSIXct(TakenInstant, tz = "America/New_York"))
@@ -44,7 +44,7 @@ default_pre_leads_idx <- 1
 
 # Isolate and save candidate (coincide with accelerometry) GCS observations:
 
-dir.create('~/scratch/all_motion_feature_data/gcs_labels',showWarnings = FALSE)
+dir.create('../validation_resampling',showWarnings = FALSE)
 
 # a) Detection models:
 
@@ -59,15 +59,15 @@ for (i in 1:length(det_obs_windows)) {
     print(paste("Patient no.",patIdx,"started"))
     currStudyNo <- patient.clinical.data$StudyPatientNo_[patIdx]
     currAccelNo <- patient.clinical.data$AccelPatientNo_[patIdx]
-    currStartTm <- missingTimeInfo$Start.Timestamp[missingTimeInfo$Accel.Patient.No. == currAccelNo]
-    currEndTm <- missingTimeInfo$End.Timestamp[missingTimeInfo$Accel.Patient.No. == currAccelNo]
+    currStartTm <- missing.data.info$Start.Timestamp[missing.data.info$Accel.Patient.No. == currAccelNo]
+    currEndTm <- missing.data.info$End.Timestamp[missing.data.info$Accel.Patient.No. == currAccelNo]
     currGCS <- gcs_data %>% filter(StudyPatientNo_ == currStudyNo, AccelPatientNo_ == currAccelNo)
     gcsFilter <- currGCS$TakenInstant >= currStartTm+curr_secs_window & currGCS$TakenInstant <= currEndTm
     gcsLabels <- rbind(gcsLabels,currGCS[gcsFilter,])
   }
   det_gcs_labels[[i]] <- gcsLabels
 }
-save(det_parameters, det_gcs_labels, file = '~/scratch/all_motion_feature_data/gcs_labels/detection_labels.RData')
+save(det_parameters, det_gcs_labels, file = '../validation_resampling/detection_labels.RData')
 
 # b) Prediction models:
 
@@ -88,8 +88,8 @@ for (i in 1:length(pre_lead_times)){
       print(paste("Patient no.",patIdx,"started"))
       currStudyNo <- patient.clinical.data$StudyPatientNo_[patIdx]
       currAccelNo <- patient.clinical.data$AccelPatientNo_[patIdx]
-      currStartTm <- missingTimeInfo$Start.Timestamp[missingTimeInfo$Accel.Patient.No. == currAccelNo]
-      currEndTm <- missingTimeInfo$End.Timestamp[missingTimeInfo$Accel.Patient.No. == currAccelNo]
+      currStartTm <- missing.data.info$Start.Timestamp[missing.data.info$Accel.Patient.No. == currAccelNo]
+      currEndTm <- missing.data.info$End.Timestamp[missing.data.info$Accel.Patient.No. == currAccelNo]
       currGCS <- gcs_data %>% filter(StudyPatientNo_ == currStudyNo, AccelPatientNo_ == currAccelNo)
       gcsFilter <- currGCS$TakenInstant >= currStartTm+curr_secs_window+curr_secs_lead & currGCS$TakenInstant <= currEndTm+curr_secs_lead
       
@@ -158,7 +158,7 @@ for (i in 1:length(pre_lead_times)){
     pre_gcs_labels[[counter]] <- gcsLabels
   }
 }
-save(pre_parameters, pre_gcs_labels, file = '~/scratch/all_motion_feature_data/gcs_labels/prediction_labels.RData')
+save(pre_parameters, pre_gcs_labels, file = '../validation_resampling/prediction_labels.RData')
 
 # Partition data into training, validation, and testing sets based on preserving class imbalance:
 rm(list = ls())
@@ -168,7 +168,7 @@ p_train <- 0.8 # set proportion of observations in training (including validatio
 
 # (a) Detection GCS labels:
 
-load('~/scratch/all_motion_feature_data/gcs_labels/detection_labels.RData')
+load('../validation_resampling/detection_labels.RData')
 
 det_motor_train_idx <- vector(mode = "list")
 det_eye_train_idx <- vector(mode = "list")
@@ -195,11 +195,11 @@ for (i in 1:length(det_gcs_labels)){
   det_motor_test_idx[[i]] <- motor_nonmissingIdx[!motor_nonmissingIdx %in% motor_nonmissingIdx[currGCSm_trainIdx]]
   det_eye_test_idx[[i]] <- eye_nonmissingIdx[!eye_nonmissingIdx %in% eye_nonmissingIdx[currGCSe_trainIdx]]
 }
-save(det_motor_train_idx, det_eye_train_idx,det_motor_test_idx,det_eye_test_idx, file = '~/scratch/all_motion_feature_data/gcs_labels/detection_partitions.RData')
+save(det_motor_train_idx, det_eye_train_idx,det_motor_test_idx,det_eye_test_idx, file = '../validation_resampling/detection_partitions.RData')
 
 # (b) Prediction GCS labels:
 
-load('~/scratch/all_motion_feature_data/gcs_labels/prediction_labels.RData')
+load('../validation_resampling/prediction_labels.RData')
 
 pre_motor_train_idx <- vector(mode = "list")
 pre_eye_train_idx <- vector(mode = "list")
@@ -226,4 +226,4 @@ for (i in 1:length(pre_gcs_labels)){
   pre_motor_test_idx[[i]] <- motor_nonmissingIdx[!motor_nonmissingIdx %in% motor_nonmissingIdx[currGCSm_trainIdx]]
   pre_eye_test_idx[[i]] <- eye_nonmissingIdx[!eye_nonmissingIdx %in% eye_nonmissingIdx[currGCSe_trainIdx]]
 }
-save(pre_motor_train_idx, pre_eye_train_idx,pre_motor_test_idx,pre_eye_test_idx, file = '~/scratch/all_motion_feature_data/gcs_labels/prediction_partitions.RData')
+save(pre_motor_train_idx, pre_eye_train_idx,pre_motor_test_idx,pre_eye_test_idx, file = '../validation_resampling/prediction_partitions.RData')

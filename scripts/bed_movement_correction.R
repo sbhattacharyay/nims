@@ -1,4 +1,4 @@
-#### Master Script 4: Bed Motion Correction and Collection of Multiple Imputations ####
+#### Bed Motion Correction and Collection of Multiple Imputations ####
 #
 # Shubhayu Bhattacharyay, Matthew Wang, Eshan Joshi
 # Department of Biomedical Engineering

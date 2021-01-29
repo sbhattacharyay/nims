@@ -1,4 +1,4 @@
-#### Master Script 8: LOL Embedding and SMOTE for class imbalance ####
+#### LOL Embedding for class imbalance ####
 #
 # Shubhayu Bhattacharyay, Matthew Wang, Eshan Joshi
 # Department of Biomedical Engineering
