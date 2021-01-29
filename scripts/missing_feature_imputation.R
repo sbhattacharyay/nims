@@ -40,10 +40,10 @@ patient_clinical_data = load_patient_clinical_data('../clinical_data/patient_cli
 # Load Motion Features (all)
 if (!exists("all_motion_features")) {
   all_sensors <-
-    readMat('../all_motion_feature_data/complete_sensor_data.mat')$sensors
+    readMat('../all_motion_feature_data/01_features/complete_sensor_data.mat')$sensors
   all_motion_features <- do.call(rbind, all_sensors)
-  featureLabels <- read.csv('../all_motion_feature_data/feature_names.csv',header = FALSE)
-  all_mf_times <- read.csv('../all_motion_feature_data/indexed_times.csv') %>% mutate(times = as.POSIXct(times,tz="America/New_York",format ="%d-%b-%Y %H:%M:%S"))
+  featureLabels <- read.csv('../all_motion_feature_data/01_features/feature_names.csv',header = FALSE)
+  all_mf_times <- read.csv('../all_motion_feature_data/01_features/indexed_times.csv') %>% mutate(times = as.POSIXct(times,tz="America/New_York",format ="%d-%b-%Y %H:%M:%S"))
 }
 
 n <- length(all_motion_features)/length(featureLabels)

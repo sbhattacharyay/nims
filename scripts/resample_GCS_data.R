@@ -1,4 +1,4 @@
-#### Master Script 7: Preparation and resampling of GCS data for classification ####
+#### Master Script 7: Resampling of GCS data for classification ####
 #
 # Shubhayu Bhattacharyay, Matthew Wang, Eshan Joshi
 # Department of Biomedical Engineering
@@ -13,55 +13,17 @@ setwd("~/work/nims/scripts")
 library(tidyverse)
 library(readxl)
 library(caret)
-
 source('./functions/load_patient_clinical_data.R')
-
-# Load automatically extracted GCS data:
-gcs_table <- read_xlsx('../clinical_data/automatic_GCS_table.xlsx') %>% drop_na(Value) %>% pivot_wider(id_cols = c(TakenInstant,PrimaryMrn,BirthDate,LastName,FirstName), names_from = DisplayName, values_from = Value)
-patient_clinical_data <- load_patient_clinical_data('../clinical_data/patient_clinical_data.csv')
-accel_no_match <- patient_clinical_data %>% select(StudyPatientNo_,AccelPatientNo_,DOB)
-id_gcs_table <- left_join(gcs_table,accel_no_match,by = c("BirthDate" = "DOB")) %>% drop_na(StudyPatientNo_)
-missingTable <- read_xlsx('../all_motion_feature_data/MissingPercentTable.xlsx',.name_repair = "universal") %>% mutate(Start.Timestamp = as.POSIXct(Start.Timestamp,format = '%d-%b-%Y %H:%M:%S',tz = "America/New_York"), End.Timestamp = as.POSIXct(End.Timestamp,format = '%d-%b-%Y %H:%M:%S',tz = "America/New_York"))
-
-# Add indicator of whether the data point coincides with accelerometry recording:
-id_gcs_table$Coincide.with.Accel.Recording <- NA
-for (i in 1:nrow(missingTable)){
-  currAccelPatientNo <- missingTable$Study.Patient.No.[i]
-  accelPatientIdx <- which(id_gcs_table$AccelPatientNo_ == currAccelPatientNo)
-  filtGCS <- id_gcs_table[accelPatientIdx,]
-  id_gcs_table$Coincide.with.Accel.Recording[accelPatientIdx] = filtGCS$TakenInstant <= missingTable$End.Timestamp[i] & filtGCS$TakenInstant >= missingTable$Start.Timestamp[i]
-}
-
-finalGCSTable <- id_gcs_table[,c(10,11,1,6,7,8,9,12)]
-names(finalGCSTable) <- make.names(names(finalGCSTable))
-write.csv(finalGCSTable,'../clinical_data/clean_auto_GCS_table.csv')
-
-# Load manually extracted GCS data:
-man_table <- read_xlsx('../clinical_data/manual_GCS_table.xlsx') %>% mutate(Coincide.with.Accel.Recording = `Coincide with accel` == 1,Time...3 = sprintf("%04d", Time...3)) %>% filter(`Study Patient Number` != 1) %>% mutate(combTime = paste(as.character(Date),Time...3)) %>% mutate(TakenInstant = as.POSIXct(combTime,format = '%Y-%m-%d %H%M'))
-man_table <- man_table[,c(1,4:7,10,12)]
-names(man_table)[1:5] <- c("StudyPatientNo_","Eye.Opening","Best.Verbal.Response","Best.Motor.Response","Glasgow.Coma.Scale.Score")
-accel_no_match <- patient_clinical_data %>% select(StudyPatientNo_,AccelPatientNo_)
-
-comb_man_gcs_table <- left_join(man_table,accel_no_match,by = "StudyPatientNo_") %>% drop_na(AccelPatientNo_)
-final_man_gcs_table <- comb_man_gcs_table[,c(1,8,7,5,4,3,2,6)]
-final_man_gcs_table <- final_man_gcs_table[order(final_man_gcs_table$TakenInstant),]
-write.csv(final_man_gcs_table,'../clinical_data/clean_manu_GCS_table.csv')
-
-# Clear all existing variables from environment to begin next step:
-rm(list = ls())
-gc()
-
-# CHECKPOINT 1: beginning of GCS label resampling
 
 # Load clinical patient data:
 source('./functions/load_patient_clinical_data.R')
-patient_clinical_data <- load_patient_clinical_data('../clinical_data/patient_clinical_data.csv') %>% arrange(AccelPatientNo_) %>% mutate(ptIdx = 1:nrow(.))
+patient.clinical.data <- load_patient_clinical_data('../clinical_data/patient_clinical_data.csv') %>% arrange(AccelPatientNo_) %>% mutate(ptIdx = 1:nrow(.))
 
 # Load missing accelerometry information:
 missingTimeInfo <- read_xlsx('~/scratch/all_motion_feature_data/MissingPercentTable.xlsx',.name_repair = "universal") %>% mutate(Start.Timestamp = as.POSIXct(Start.Timestamp,format = '%d-%b-%Y %H:%M:%S',tz = "America/New_York"), End.Timestamp = as.POSIXct(End.Timestamp,format = '%d-%b-%Y %H:%M:%S',tz = "America/New_York"))
 
 # Load automatically extracted GCS labels:
-gcs_data <- read.csv('../clinical_data/clean_auto_GCS_table.csv') %>% select(-X) %>% mutate(TakenInstant = as.POSIXct(TakenInstant, tz = "America/New_York"))
+gcs_data <- read.csv('../clinical_data/02_clean_auto_GCS_table.csv') %>% select(-X) %>% mutate(TakenInstant = as.POSIXct(TakenInstant, tz = "America/New_York"))
 
 # Concurrent GCS detection model parameters:
 det_obs_windows <- c(.5, 1, 3, 6) #in hours
@@ -93,10 +55,10 @@ for (i in 1:length(det_obs_windows)) {
   print(paste("Observation Window Size:",det_obs_windows[i],"hours started"))
   curr_secs_window <- det_secs_windows[i]
   gcsLabels <- as.data.frame(matrix(nrow = 0,ncol = 8))
-  for (patIdx in unique(patient_clinical_data$ptIdx)) {
+  for (patIdx in unique(patient.clinical.data$ptIdx)) {
     print(paste("Patient no.",patIdx,"started"))
-    currStudyNo <- patient_clinical_data$StudyPatientNo_[patIdx]
-    currAccelNo <- patient_clinical_data$AccelPatientNo_[patIdx]
+    currStudyNo <- patient.clinical.data$StudyPatientNo_[patIdx]
+    currAccelNo <- patient.clinical.data$AccelPatientNo_[patIdx]
     currStartTm <- missingTimeInfo$Start.Timestamp[missingTimeInfo$Accel.Patient.No. == currAccelNo]
     currEndTm <- missingTimeInfo$End.Timestamp[missingTimeInfo$Accel.Patient.No. == currAccelNo]
     currGCS <- gcs_data %>% filter(StudyPatientNo_ == currStudyNo, AccelPatientNo_ == currAccelNo)
@@ -122,10 +84,10 @@ for (i in 1:length(pre_lead_times)){
     print(paste("Observation Lead Time:",pre_lead_times[i],"hours, Window Size:",pre_obs_windows[j],"hours started"))
     curr_secs_window <- pre_secs_windows[j]
     gcsLabels <- as.data.frame(matrix(nrow = 0,ncol = 14))
-    for (patIdx in unique(patient_clinical_data$ptIdx)) {
+    for (patIdx in unique(patient.clinical.data$ptIdx)) {
       print(paste("Patient no.",patIdx,"started"))
-      currStudyNo <- patient_clinical_data$StudyPatientNo_[patIdx]
-      currAccelNo <- patient_clinical_data$AccelPatientNo_[patIdx]
+      currStudyNo <- patient.clinical.data$StudyPatientNo_[patIdx]
+      currAccelNo <- patient.clinical.data$AccelPatientNo_[patIdx]
       currStartTm <- missingTimeInfo$Start.Timestamp[missingTimeInfo$Accel.Patient.No. == currAccelNo]
       currEndTm <- missingTimeInfo$End.Timestamp[missingTimeInfo$Accel.Patient.No. == currAccelNo]
       currGCS <- gcs_data %>% filter(StudyPatientNo_ == currStudyNo, AccelPatientNo_ == currAccelNo)
@@ -265,18 +227,3 @@ for (i in 1:length(pre_gcs_labels)){
   pre_eye_test_idx[[i]] <- eye_nonmissingIdx[!eye_nonmissingIdx %in% eye_nonmissingIdx[currGCSe_trainIdx]]
 }
 save(pre_motor_train_idx, pre_eye_train_idx,pre_motor_test_idx,pre_eye_test_idx, file = '~/scratch/all_motion_feature_data/gcs_labels/prediction_partitions.RData')
-
-# Examnine GCS scores of each patient 
-# Load automatically extracted GCS labels:
-gcs_data <- read.csv('../clinical_data/clean_auto_GCS_table.csv') %>% select(-X) %>% mutate(TakenInstant = as.POSIXct(TakenInstant, tz = "America/New_York"))
-
-# Merge GCS.data and patient clinical data
-merged.gcs.data <- left_join(gcs_data, patient_clinical_data, by = "AccelPatientNo_") %>% mutate(TakenDay = as.Date(TakenInstant, tz = "America/New_York")) %>% arrange(AccelPatientNo_,TakenInstant)
-
-## Steps:
-#-calculate number of evals per day per patient
-summ.gcs.stats <- merged.gcs.data %>% filter(TakenDay >= NCCUAdmissionDate & TakenDay <= NCCUDischargeDate) %>% group_by(AccelPatientNo_, TakenDay) %>% summarise(no.evals = n())
-#-filter out GCS scores that coincide with accelerometry recording time
-accel.merged.gcs.data <- left_join(gcs_data, missingTimeInfo, by = "AccelPatientNo_") %>% arrange(AccelPatientNo_,TakenInstant) %>% filter(TakenInstant >= Start.Timestamp & TakenInstant <= End.Timestamp)
-#-worst GCSm within 24 hours of admission
-worst.gcsm.nccu.admission <- merged.gcs.data %>% filter(TakenDay >= NCCUAdmissionDate & TakenDay <= NCCUAdmissionDate+1) %>% group_by(AccelPatientNo_) %>% summarise(worst.GCSm = min(Best.Motor.Response,na.rm = TRUE))

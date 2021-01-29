@@ -13,17 +13,17 @@ library(tidyverse)
 library(readxl)
 source('./functions/find_thresholds.R')
 
-featureLabels <- read.csv('../all_motion_feature_data/feature_names.csv',header = FALSE)
+featureLabels <- read.csv('../all_motion_feature_data/01_features/feature_names.csv',header = FALSE)
 featureLabels <- unlist(featureLabels[1,])
 compiledImputations <- vector(mode = "list")
 
 for (i in 1:m){
   print(paste('Imputation no.',i,'started'))
   currPattern <- paste0('*',i,'.csv')
-  currFileList <- list.files('../all_motion_feature_data/imputed_features/',pattern = currPattern)
+  currFileList <- list.files('../all_motion_feature_data/02_imputed_features/',pattern = currPattern)
   imputationDF <- data.frame(matrix(ncol = 10, nrow = 0))
   for (j in 1:length(featureLabels)){
-    currFilePath <- file.path('../all_motion_feature_data/imputed_features',currFileList[j]) 
+    currFilePath <- file.path('../all_motion_feature_data/02_imputed_features',currFileList[j]) 
     currDF <- read.csv(currFilePath) %>% dplyr::select(-X)
     currDF$featureType <- featureLabels[[j]]
     imputationDF <- rbind(imputationDF,currDF)
@@ -32,7 +32,6 @@ for (i in 1:m){
   compiledImputations[[i]] <- imputationDF
   print(paste('Imputation no.',i,'complete'))
 }
-
 sma_thresh <- .135
 
 # Based on the SMA threshold, find corresponding thresholds for the other feature spaces. Note we only use the first imputation to do so since, when testing, we found that the thresholds are the same for all imputations
@@ -86,7 +85,7 @@ for (i in 1:length(compiledImputations)){
 }
 
 # Load timestamps:
-indexedTimes <- read.csv('~/data/all_motion_feature_data/indexed_times.csv') %>% mutate(times = as.POSIXct(times, format = "%d-%b-%Y %H:%M:%S",tz = "America/New_York"))
+indexedTimes <- read.csv('~/scratch/all_motion_feature_data/01_features/indexed_times.csv') %>% mutate(times = as.POSIXct(times, format = "%d-%b-%Y %H:%M:%S",tz = "America/New_York"))
 
 # Load complete bed-corrected, imputed feature set and add corresponding timestamps to accelerometry data:
 for (imp in 1:length(compiledImputations)){
@@ -99,7 +98,7 @@ for (imp in 1:length(compiledImputations)){
     currImp[currPtIdx,c("TakenInstant","ptIdx","timeCount")] <- currTimes
   }
   currImp$TakenInstant <- as.POSIXct(currImp$TakenInstant, tz = "America/New_York")
-  save(currImp,file = file.path('~/data/all_motion_feature_data/final_imputed_features',paste0('imp',imp,'.RData')))
+  save(currImp,file = file.path('~/scratch/03_bed_corrected_imputed_features/03',paste0('imp',imp,'.RData')))
 }
 
 rm(compiledImputations,currPtIdx,currTimes,indexedTimes)

@@ -23,8 +23,8 @@ patient_clinical_data <- load_patient_clinical_data('../clinical_data/patient_cl
 
 ### Format feature spaces into matrices and save matrices
 
-dir.create("~/scratch/all_motion_feature_data/formatted_matrices",showWarnings = FALSE)
-impFiles <- list.files(path="~/scratch/all_motion_feature_data/final_imputed_features/",pattern = "*.RData")
+dir.create("~/scratch/all_motion_feature_data/04_formatted_predictor_matrices",showWarnings = FALSE)
+impFiles <- list.files(path="~/scratch/all_motion_feature_data/03_bed_corrected_imputed_features/",pattern = "*.RData")
 
 # (a) Detection model matrices
 
@@ -34,8 +34,8 @@ load('~/scratch/all_motion_feature_data/gcs_labels/detection_partitions.RData')
 
 for (impNo in 1:length(impFiles)){
   print(paste("Imputation no.",impNo,"out of",length(impFiles),"started."))
-  dir.create(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo),showWarnings = FALSE)
-  load(paste0('~/scratch/all_motion_feature_data/final_imputed_features/',impFiles[impNo]))
+  dir.create(paste0("~/scratch/all_motion_feature_data/04_formatted_predictor_matrices/imp",impNo),showWarnings = FALSE)
+  load(paste0('~/scratch/all_motion_feature_data/03_bed_corrected_imputed_features/',impFiles[impNo]))
   gc()
   for (i in 1:length(det_gcs_labels)) {
     print(paste("Parameter combination no.",i,"out of",length(det_gcs_labels),"started."))
@@ -49,7 +49,7 @@ for (impNo in 1:length(impFiles)){
     curr_det_eye_train_idx <- det_eye_train_idx[[i]]
     curr_det_motor_test_idx <- det_motor_test_idx[[i]]
     curr_det_eye_test_idx <- det_eye_test_idx[[i]]
-    dir.create(paste0('~/scratch/all_motion_feature_data/formatted_matrices/imp',impNo,'/detection_window_',curr_obs_window),showWarnings = FALSE)
+    dir.create(paste0('~/scratch/all_motion_feature_data/04_formatted_predictor_matrices/imp',impNo,'/detection_window_',curr_obs_window),showWarnings = FALSE)
     
     # Motor train matrix:
     curr_motor_train_matrix <- matrix(nrow = length(curr_det_motor_train_idx), ncol = ((curr_secs_window/5)+1)*7*6)
@@ -63,7 +63,7 @@ for (impNo in 1:length(impFiles)){
       curr_motor_train_matrix[j,] <- tempReshape
       print(paste("Row no.",j,"out of",length(curr_det_motor_train_idx),"complete."))
     }
-    saveRDS(curr_motor_train_matrix,file = paste0('~/scratch/all_motion_feature_data/formatted_matrices/imp',impNo,'/detection_window_',curr_obs_window,'/motor_train_matrix.rds'))
+    saveRDS(curr_motor_train_matrix,file = paste0('~/scratch/all_motion_feature_data/04_formatted_predictor_matrices/imp',impNo,'/detection_window_',curr_obs_window,'/motor_train_matrix.rds'))
     
     # Eye train matrix:
     curr_eye_train_matrix <- matrix(nrow = length(curr_det_eye_train_idx), ncol = ((curr_secs_window/5)+1)*7*6)
@@ -77,7 +77,7 @@ for (impNo in 1:length(impFiles)){
       curr_eye_train_matrix[j,] <- tempReshape
       print(paste("Row no.",j,"out of",length(curr_det_eye_train_idx),"complete."))
     }
-    saveRDS(curr_eye_train_matrix,file = paste0('~/scratch/all_motion_feature_data/formatted_matrices/imp',impNo,'/detection_window_',curr_obs_window,'/eye_train_matrix.rds'))
+    saveRDS(curr_eye_train_matrix,file = paste0('~/scratch/all_motion_feature_data/04_formatted_predictor_matrices/imp',impNo,'/detection_window_',curr_obs_window,'/eye_train_matrix.rds'))
     
     # Motor test matrix:
     curr_motor_test_matrix <- matrix(nrow = length(curr_det_motor_test_idx), ncol = ((curr_secs_window/5)+1)*7*6)
@@ -91,7 +91,7 @@ for (impNo in 1:length(impFiles)){
       curr_motor_test_matrix[j,] <- tempReshape
       print(paste("Row no.",j,"out of",length(curr_det_motor_test_idx),"complete."))
     }
-    saveRDS(curr_motor_test_matrix,file = paste0('~/scratch/all_motion_feature_data/formatted_matrices/imp',impNo,'/detection_window_',curr_obs_window,'/motor_test_matrix.rds'))
+    saveRDS(curr_motor_test_matrix,file = paste0('~/scratch/all_motion_feature_data/04_formatted_predictor_matrices/imp',impNo,'/detection_window_',curr_obs_window,'/motor_test_matrix.rds'))
     
     # Eye test matrix:
     curr_eye_test_matrix <- matrix(nrow = length(curr_det_eye_test_idx), ncol = ((curr_secs_window/5)+1)*7*6)
@@ -105,7 +105,7 @@ for (impNo in 1:length(impFiles)){
       curr_eye_test_matrix[j,] <- tempReshape
       print(paste("Row no.",j,"out of",length(curr_det_eye_test_idx),"complete."))
     }
-    saveRDS(curr_eye_test_matrix,file = paste0('~/scratch/all_motion_feature_data/formatted_matrices/imp',impNo,'/detection_window_',curr_obs_window,'/eye_test_matrix.rds'))
+    saveRDS(curr_eye_test_matrix,file = paste0('~/scratch/all_motion_feature_data/04_formatted_predictor_matrices/imp',impNo,'/detection_window_',curr_obs_window,'/eye_test_matrix.rds'))
     
     print(paste("Parameter combination no.",i,"out of",length(det_gcs_labels),"completed."))
   }
@@ -120,8 +120,8 @@ load('~/scratch/all_motion_feature_data/gcs_labels/prediction_partitions.RData')
 
 for (impNo in 1:length(impFiles)){
   print(paste("Imputation no.",impNo,"out of",length(impFiles),"started."))
-  dir.create(paste0("~/scratch/all_motion_feature_data/formatted_matrices/imp",impNo),showWarnings = FALSE)
-  load(paste0('~/scratch/all_motion_feature_data/final_imputed_features/',impFiles[impNo]))
+  dir.create(paste0("~/scratch/all_motion_feature_data/04_formatted_predictor_matrices/imp",impNo),showWarnings = FALSE)
+  load(paste0('~/scratch/all_motion_feature_data/03_bed_corrected_imputed_features/',impFiles[impNo]))
   gc()
   for (i in 1:length(pre_gcs_labels)) {
     print(paste("Parameter combination no.",i,"out of",length(pre_gcs_labels),"started."))
@@ -138,7 +138,7 @@ for (impNo in 1:length(impFiles)){
     curr_pre_motor_test_idx <- pre_motor_test_idx[[i]]
     curr_pre_eye_test_idx <- pre_eye_test_idx[[i]]
     
-    dir.create(paste0('~/scratch/all_motion_feature_data/formatted_matrices/imp',impNo,'/prediction_window_',curr_obs_window,'_lead_',curr_lead_time),showWarnings = FALSE)
+    dir.create(paste0('~/scratch/all_motion_feature_data/04_formatted_predictor_matrices/imp',impNo,'/prediction_window_',curr_obs_window,'_lead_',curr_lead_time),showWarnings = FALSE)
     
     # Motor train matrix:
     curr_motor_train_matrix <- matrix(nrow = length(curr_pre_motor_train_idx), ncol = ((curr_secs_window/5)+1)*7*6)
@@ -152,7 +152,7 @@ for (impNo in 1:length(impFiles)){
       curr_motor_train_matrix[j,] <- tempReshape
       print(paste("Row no.",j,"out of",length(curr_pre_motor_train_idx),"complete."))
     }
-    saveRDS(curr_motor_train_matrix,file = paste0('~/scratch/all_motion_feature_data/formatted_matrices/imp',impNo,'/prediction_window_',curr_obs_window,'_lead_',curr_lead_time,'/motor_train_matrix.rds'))
+    saveRDS(curr_motor_train_matrix,file = paste0('~/scratch/all_motion_feature_data/04_formatted_predictor_matrices/imp',impNo,'/prediction_window_',curr_obs_window,'_lead_',curr_lead_time,'/motor_train_matrix.rds'))
     
     # Eye train matrix:
     curr_eye_train_matrix <- matrix(nrow = length(curr_pre_eye_train_idx), ncol = ((curr_secs_window/5)+1)*7*6)
@@ -166,7 +166,7 @@ for (impNo in 1:length(impFiles)){
       curr_eye_train_matrix[j,] <- tempReshape
       print(paste("Row no.",j,"out of",length(curr_pre_eye_train_idx),"complete."))
     }
-    saveRDS(curr_eye_train_matrix,file = paste0('~/scratch/all_motion_feature_data/formatted_matrices/imp',impNo,'/prediction_window_',curr_obs_window,'_lead_',curr_lead_time,'/eye_train_matrix.rds'))
+    saveRDS(curr_eye_train_matrix,file = paste0('~/scratch/all_motion_feature_data/04_formatted_predictor_matrices/imp',impNo,'/prediction_window_',curr_obs_window,'_lead_',curr_lead_time,'/eye_train_matrix.rds'))
     
     # Motor test matrix:
     curr_motor_test_matrix <- matrix(nrow = length(curr_pre_motor_test_idx), ncol = ((curr_secs_window/5)+1)*7*6)
@@ -180,7 +180,7 @@ for (impNo in 1:length(impFiles)){
       curr_motor_test_matrix[j,] <- tempReshape
       print(paste("Row no.",j,"out of",length(curr_pre_motor_test_idx),"complete."))
     }
-    saveRDS(curr_motor_test_matrix,file = paste0('~/scratch/all_motion_feature_data/formatted_matrices/imp',impNo,'/prediction_window_',curr_obs_window,'_lead_',curr_lead_time,'/motor_test_matrix.rds'))
+    saveRDS(curr_motor_test_matrix,file = paste0('~/scratch/all_motion_feature_data/04_formatted_predictor_matrices/imp',impNo,'/prediction_window_',curr_obs_window,'_lead_',curr_lead_time,'/motor_test_matrix.rds'))
     
     # Eye test matrix:
     curr_eye_test_matrix <- matrix(nrow = length(curr_pre_eye_test_idx), ncol = ((curr_secs_window/5)+1)*7*6)
@@ -194,7 +194,7 @@ for (impNo in 1:length(impFiles)){
       curr_eye_test_matrix[j,] <- tempReshape
       print(paste("Row no.",j,"out of",length(curr_pre_eye_test_idx),"complete."))
     }
-    saveRDS(curr_eye_test_matrix,file = paste0('~/scratch/all_motion_feature_data/formatted_matrices/imp',impNo,'/prediction_window_',curr_obs_window,'_lead_',curr_lead_time,'/eye_test_matrix.rds'))
+    saveRDS(curr_eye_test_matrix,file = paste0('~/scratch/all_motion_feature_data/04_formatted_predictor_matrices/imp',impNo,'/prediction_window_',curr_obs_window,'_lead_',curr_lead_time,'/eye_test_matrix.rds'))
     
     print(paste("Parameter combination no.",i,"out of",length(pre_gcs_labels),"completed"))
   }
@@ -205,7 +205,7 @@ for (impNo in 1:length(impFiles)){
 rm(list = ls())
 gc()
 
-impDirs <- list.files('~/scratch/all_motion_feature_data/formatted_matrices',include.dirs = TRUE, full.names = TRUE)
+impDirs <- list.files('~/scratch/all_motion_feature_data/04_formatted_predictor_matrices',include.dirs = TRUE, full.names = TRUE)
 
 # (a) LOL on Detection Cases
 
@@ -322,7 +322,7 @@ for (i in 1:length(impDirs)){
 rm(list = ls())
 gc()
 
-impDirs <- list.files('~/scratch/all_motion_feature_data/formatted_matrices',include.dirs = TRUE, full.names = TRUE)
+impDirs <- list.files('~/scratch/all_motion_feature_data/04_formatted_predictor_matrices',include.dirs = TRUE, full.names = TRUE)
 
 # (a) SMOTE on detection cases
 

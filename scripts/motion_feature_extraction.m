@@ -286,11 +286,11 @@ feature_names = [feature_names(1:2),strcat(feature_names(3),"1"),...
     strcat(feature_names(3),"2"),feature_names(4:6)];
 
 %  Saving the data
-save('complete_sensor_data.mat','sensors');
-save('times.mat','times');
-save('lens.mat','lens');
-writematrix(placement_labels,"placement_labels.csv");
-writematrix(feature_names,"feature_names.csv");
+save('01_features/complete_sensor_data.mat','sensors');
+save('01_features/times.mat','times');
+save('01_features/lens.mat','lens');
+writematrix(placement_labels,"01_features/placement_labels.csv");
+writematrix(feature_names,"01_features/feature_names.csv");
 
 %% Correction of Time Formatting
 times = load('times.mat');
