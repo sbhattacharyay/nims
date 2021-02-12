@@ -1,29 +1,27 @@
 #### Resampling of GCS data for classification ####
 #
 # Shubhayu Bhattacharyay, Matthew Wang, Eshan Joshi
-# Department of Biomedical Engineering
-# Department of Applied Mathematics and Statistics
-# Whiting School of Engineering, Johns Hopkins University
-# email address: shubhayu@jhu.edu
-#
-# Load necessary packages
-.libPaths(c("~/Rpackages" , .libPaths()))
-setwd("~/work/nims/scripts")
+# University of Cambridge
+# Johns Hopkins University
+# email address: sb2406@cam.ac.uk
 
+### I. Initialization
+## Import necessary packages
 library(tidyverse)
 library(readxl)
 library(caret)
-source('./functions/load_patient_clinical_data.R')
 
-# Load clinical patient data:
+## Load clinical patient data
 source('./functions/load_patient_clinical_data.R')
 patient.clinical.data <- load_patient_clinical_data('../clinical_data/patient_clinical_data.csv') %>% arrange(AccelPatientNo_) %>% mutate(ptIdx = 1:nrow(.))
 
 # Load missing accelerometry information:
-missing.data.info <- read_xlsx('~/scratch/all_motion_feature_data/MissingPercentTable.xlsx',.name_repair = "universal") %>% mutate(Start.Timestamp = as.POSIXct(Start.Timestamp,format = '%d-%b-%Y %H:%M:%S',tz = "America/New_York"), End.Timestamp = as.POSIXct(End.Timestamp,format = '%d-%b-%Y %H:%M:%S',tz = "America/New_York"))
+missing.data.info <- read_xlsx('~/scratch/all_motion_feature_data/MissingPercentTable.xlsx',.name_repair = "universal") %>% 
+  mutate(Start.Timestamp = as.POSIXct(Start.Timestamp,format = '%d-%b-%Y %H:%M:%S',tz = "America/New_York"), 
+         End.Timestamp = as.POSIXct(End.Timestamp,format = '%d-%b-%Y %H:%M:%S',tz = "America/New_York"))
 
 # Load automatically extracted GCS labels:
-gcs_data <- read.csv('../clinical_data/02_clean_auto_GCS_table.csv') %>% select(-X) %>% mutate(TakenInstant = as.POSIXct(TakenInstant, tz = "America/New_York"))
+gcs.data <- read.csv('../clinical_data/02_clean_auto_GCS_table.csv') %>% select(-X) %>% mutate(TakenInstant = as.POSIXct(TakenInstant, tz = "America/New_York"))
 
 # Concurrent GCS detection model parameters:
 det_obs_windows <- c(.5, 1, 3, 6) #in hours
@@ -61,7 +59,7 @@ for (i in 1:length(det_obs_windows)) {
     currAccelNo <- patient.clinical.data$AccelPatientNo_[patIdx]
     currStartTm <- missing.data.info$Start.Timestamp[missing.data.info$Accel.Patient.No. == currAccelNo]
     currEndTm <- missing.data.info$End.Timestamp[missing.data.info$Accel.Patient.No. == currAccelNo]
-    currGCS <- gcs_data %>% filter(StudyPatientNo_ == currStudyNo, AccelPatientNo_ == currAccelNo)
+    currGCS <- gcs.data %>% filter(StudyPatientNo_ == currStudyNo, AccelPatientNo_ == currAccelNo)
     gcsFilter <- currGCS$TakenInstant >= currStartTm+curr_secs_window & currGCS$TakenInstant <= currEndTm
     gcsLabels <- rbind(gcsLabels,currGCS[gcsFilter,])
   }
@@ -90,7 +88,7 @@ for (i in 1:length(pre_lead_times)){
       currAccelNo <- patient.clinical.data$AccelPatientNo_[patIdx]
       currStartTm <- missing.data.info$Start.Timestamp[missing.data.info$Accel.Patient.No. == currAccelNo]
       currEndTm <- missing.data.info$End.Timestamp[missing.data.info$Accel.Patient.No. == currAccelNo]
-      currGCS <- gcs_data %>% filter(StudyPatientNo_ == currStudyNo, AccelPatientNo_ == currAccelNo)
+      currGCS <- gcs.data %>% filter(StudyPatientNo_ == currStudyNo, AccelPatientNo_ == currAccelNo)
       gcsFilter <- currGCS$TakenInstant >= currStartTm+curr_secs_window+curr_secs_lead & currGCS$TakenInstant <= currEndTm+curr_secs_lead
       
       if (all(!gcsFilter)){

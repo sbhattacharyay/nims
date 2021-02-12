@@ -1,4 +1,4 @@
-#### Master Script 3: Multiple Imputation of Missing Accelerometery Values ####
+#### Multiple Imputation of Missing Accelerometery Values ####
 #
 # Shubhayu Bhattacharyay, Matthew Wang, Eshan Joshi
 # Department of Biomedical Engineering
