@@ -135,19 +135,67 @@ for (i in imp.dirs){
         complete.compiled.wx.p.values <- rbind(complete.compiled.wx.p.values,
                                                curr.compiled.wx.p.values)
       }
-      
     }
   }
-  # Save Wilcoxon test results after each imputation
-  saveRDS(complete.compiled.wx.p.values,'../all_motion_feature_data/04_formatted_predictor_matrices/curr_imp_progress_detection_wilcoxon_test_results.rds')
 }
 
 # Save Wilcoxon test results
 saveRDS(complete.compiled.wx.p.values,'../all_motion_feature_data/04_formatted_predictor_matrices/detection_wilcoxon_test_results.rds')
 
+# Calculate p-values across imputations (Wilcoxon)
+grouped.complete.wx.p.values <- complete.compiled.wx.p.values %>%
+  group_by(observation.window,feature.type,sensor,first.class,second.class,test) %>%
+  mutate(z.norm = qnorm(p.value, lower.tail=FALSE)) %>%
+  summarise(mean.p.value = mean(p.value),
+            std.p.value = sd(p.value),
+            mean.z.norm = mean(z.norm),
+            var.z.norm = 1 + (1 + (1/n()))*var(z.norm),
+            r.m = (1 + (1/n()))*var(z.norm),
+            m = n()) %>%
+  mutate(d.o.f. = (m-1)*((1 + (1/r.m))^2)) %>%
+  mutate(p.m = pt(q = mean.z.norm, df = d.o.f., lower.tail = FALSE)) %>%
+  mutate(p.value.imp = sprintf("%.2f",p.m))
+
+# two-tailed Wilcoxon tests
+two.tailed.non.sig.results <- grouped.complete.wx.p.values %>%
+  filter(test == 'two.tailed',p.m >= 0.05)
+
+combos.two.tailed.non.sig.results <- two.tailed.non.sig.results %>%
+  group_by(first.class, second.class) %>%
+  summarise(n = n())
+
+feature.combos.2.tailed.non.sig <- two.tailed.non.sig.results %>%
+  group_by(feature.type) %>%
+  summarise(n = n())
+
+sensors.combos.2.tailed.non.sig <- two.tailed.non.sig.results %>%
+  group_by(sensor) %>%
+  summarise(n = n())
+
+# one-tailed Wilcoxon tests
+one.tailed.non.sig.results <- grouped.complete.wx.p.values %>%
+  filter(test != 'two.tailed',p.m >= 0.05)
+
+one.tailed.sig.results <- grouped.complete.wx.p.values %>%
+  filter(test != 'two.tailed',p.m <= 0.05 | mean.p.value == 0) %>%
+  group_by(feature.type,test,first.class, second.class) %>%
+  summarise(n = n())
+
+combos.two.tailed.non.sig.results <- two.tailed.non.sig.results %>%
+  group_by(first.class, second.class) %>%
+  summarise(n = n())
+
+feature.combos.2.tailed.non.sig <- two.tailed.non.sig.results %>%
+  group_by(feature.type, first.class, second.class) %>%
+  summarise(n = n())
+
+sensors.combos.2.tailed.non.sig <- two.tailed.non.sig.results %>%
+  group_by(sensor, first.class, second.class) %>%
+  summarise(n = n())
+
 # Load mean results dataframe
 feature.type.mean.results <- readRDS('../all_motion_feature_data/04_formatted_predictor_matrices/detection_feature_means.rds')
-  
+
 # Load Kruskal-Wallis test results
 kruskal.test.results <- readRDS('../all_motion_feature_data/04_formatted_predictor_matrices/detection_kruskal_wallis_test_results.rds')
 
@@ -241,47 +289,133 @@ wvl.means.formatted <- pooled.total.means  %>%
   mutate(formatted = paste0(formatC(pooled.mean,digits = 2,format = 'E'),' (',formatC(pooled.sd,digits = 2,format = 'E'),')'))
 
 ## CARRYOVER FROM OTHER FILES
+# Load missing accelerometry information:
+missing.time.info <- read_xlsx('../all_motion_feature_data/MissingPercentTable.xlsx',.name_repair = "universal") %>% 
+  mutate(Start.Timestamp = as.POSIXct(Start.Timestamp,format = '%d-%b-%Y %H:%M:%S',tz = "America/New_York"), End.Timestamp = as.POSIXct(End.Timestamp,format = '%d-%b-%Y %H:%M:%S',tz = "America/New_York")) %>% 
+  mutate(Recording.Duration = End.Timestamp - Start.Timestamp) %>%
+  rename(AccelPatientNo_=Accel.Patient.No.) %>%
+  mutate(
+    Bed.miss.hours = Bed * Recording.Duration,
+    LA.miss.hours = LA * Recording.Duration,
+    LE.miss.hours = LE * Recording.Duration,
+    LW.miss.hours = LW * Recording.Duration,
+    RA.miss.hours = RA * Recording.Duration,
+    RE.miss.hours = RE * Recording.Duration,
+    RW.miss.hours = RW * Recording.Duration
+  )
 
+# Load patient clinical data
+source('./functions/load_patient_clinical_data.R')
+patient.clinical.data <- load_patient_clinical_data('../clinical_data/patient_clinical_data.csv') %>% arrange(AccelPatientNo_) %>% mutate(ptIdx = 1:nrow(.))
+
+# Load indices of totally missing series to exclude from analysis
+complete.missing.idx <- read.csv('../all_motion_feature_data/complete_missing_idx.csv')
 
 # Load no motion accelerometry information:
-noMotionTimeInfo <- read_xlsx('../all_motion_feature_data/NoMotionPercentTable.xlsx',.name_repair = "universal") %>% 
+static.time.info <- read_xlsx('../all_motion_feature_data/NoMotionPercentTable.xlsx',.name_repair = "universal") %>% 
   mutate(Recording.Duration = missing.time.info$End.Timestamp - missing.time.info$Start.Timestamp) %>%
   rename(AccelPatientNo_=Accel.Patient.No.)
 # Correct Totally Missing Sets in No Motion Info:
-for (i in 1:nrow(myTMS)){
-  currPtIdx <- myTMS$ptIdx[i]
-  currSrIdx <- myTMS$srIdx[i]
-  noMotionTimeInfo[currPtIdx,currSrIdx+1] <- NA
+for (i in 1:nrow(complete.missing.idx)){
+  currPtIdx <- complete.missing.idx$ptIdx[i]
+  currSrIdx <- complete.missing.idx$srIdx[i]
+  static.time.info[currPtIdx,currSrIdx+1] <- NA
 }
-noMotionTimeInfo <- noMotionTimeInfo %>%
-  mutate(Bed.nm.hours = Bed*Recording.Duration,LA.nm.hours = LA*Recording.Duration,LE.nm.hours = LE*Recording.Duration,LW.nm.hours = LW*Recording.Duration,RA.nm.hours = RA*Recording.Duration,RE.nm.hours = RE*Recording.Duration,RW.nm.hours = RW*Recording.Duration)
+
+static.time.info <- static.time.info %>%
+  rowwise() %>%
+  mutate(
+    average.extremity.nm = mean(LA,LE,LW,RA,RE,RW, na.rm = TRUE),
+    Bed.nm.hours = Bed * Recording.Duration,
+    LA.nm.hours = LA * Recording.Duration,
+    LE.nm.hours = LE * Recording.Duration,
+    LW.nm.hours = LW * Recording.Duration,
+    RA.nm.hours = RA * Recording.Duration,
+    RE.nm.hours = RE * Recording.Duration,
+    RW.nm.hours = RW * Recording.Duration
+  )
+
+gose.info <- patient.clinical.data %>%
+  dplyr::select(AccelPatientNo_,GOS_EDischarge,GOS_E12Months)
+
+# Bind GOSE info to no motion data
+static.time.info <- left_join(static.time.info,gose.info,by = 'AccelPatientNo_')
+
+# GOSE-specific static info
+gose.discharge.static <- static.time.info %>%
+  group_by(GOS_EDischarge) %>%
+  summarise(n = sum(!is.na(average.extremity.nm)),
+            mean.extremity.nm = 100*mean(average.extremity.nm,na.rm = TRUE),
+            sd.extremity.nm = 100*sd(average.extremity.nm,na.rm = TRUE),
+            median.extremity.nm = 100*median(average.extremity.nm,na.rm = TRUE),
+            q1.extremity.nm = 100*quantile(average.extremity.nm,.25,na.rm = TRUE),
+            q3.extremity.nm =100*quantile(average.extremity.nm,.75,na.rm = TRUE)) %>%
+  mutate(formatted = sprintf('%0.02f (%0.02f - %0.02f)',median.extremity.nm,q1.extremity.nm,q3.extremity.nm))
+
+gose.12mo.static <- static.time.info %>%
+  group_by(GOS_E12Months) %>%
+  summarise(n = sum(!is.na(average.extremity.nm)),
+            mean.extremity.nm = 100*mean(average.extremity.nm,na.rm = TRUE),
+            sd.extremity.nm = 100*sd(average.extremity.nm,na.rm = TRUE),
+            median.extremity.nm = 100*median(average.extremity.nm,na.rm = TRUE),
+            q1.extremity.nm = 100*quantile(average.extremity.nm,.25,na.rm = TRUE),
+            q3.extremity.nm =100*quantile(average.extremity.nm,.75,na.rm = TRUE)) %>%
+  mutate(formatted = sprintf('%0.02f (%0.02f - %0.02f)',median.extremity.nm,q1.extremity.nm,q3.extremity.nm))
+
+# GCSm-specific static info:
+gcs.data <- read.csv('../clinical_data/03_gcs_data_w_indicators.csv') %>% 
+  mutate(TakenInstant = as.POSIXct(TakenInstant, tz = "America/New_York"))
+
+grouped.gcsm.data <- gcs.data %>%
+  select(AccelPatientNo_,Best.Motor.Response,det.indicator) %>%
+  filter(det.indicator == 'TRUE') %>%
+  group_by(AccelPatientNo_) %>%
+  summarise(med.GCSm = floor(median(Best.Motor.Response,na.rm = TRUE)))
+
+# Bind GCSm info to no motion data
+static.time.info <- left_join(static.time.info,grouped.gcsm.data,by = 'AccelPatientNo_')
+
+gcsm.specific.static <- static.time.info %>%
+  group_by(med.GCSm) %>%
+  summarise(n = sum(!is.na(average.extremity.nm)),
+            mean.extremity.nm = 100*mean(average.extremity.nm,na.rm = TRUE),
+            sd.extremity.nm = 100*sd(average.extremity.nm,na.rm = TRUE),
+            median.extremity.nm = 100*median(average.extremity.nm,na.rm = TRUE),
+            q1.extremity.nm = 100*quantile(average.extremity.nm,.25,na.rm = TRUE),
+            q3.extremity.nm =100*quantile(average.extremity.nm,.75,na.rm = TRUE)) %>%
+  mutate(formatted = sprintf('%0.02f (%0.02f - %0.02f)',median.extremity.nm,q1.extremity.nm,q3.extremity.nm))
+
+# Correlations with median GCSm, GOSE at discharge, and GOSE at 12 months
+gcsm.correlation <-cor.test(static.time.info$average.extremity.nm, static.time.info$med.GCSm,  method = "spearman", exact = FALSE)
+gose.dis.correlation <-cor.test(static.time.info$average.extremity.nm, static.time.info$GOS_EDischarge,  method = "spearman", exact = FALSE)
+gose.12m.correlation <-cor.test(static.time.info$average.extremity.nm, static.time.info$GOS_E12Months,  method = "spearman", exact = FALSE)
 
 # LA percent nomotion
-LA.perc.nomotion <- noMotionTimeInfo %>% drop_na(LA)
+LA.perc.nomotion <- static.time.info %>% drop_na(LA)
 perc.LA.motion <- 100*as.numeric(sum(LA.perc.nomotion$LA.nm.hours))/as.numeric(sum(LA.perc.nomotion$Recording.Duration))
 
 # LE percent nomotion
-LE.perc.nomotion <- noMotionTimeInfo %>% drop_na(LE)
+LE.perc.nomotion <- static.time.info %>% drop_na(LE)
 perc.LE.motion <- 100*as.numeric(sum(LE.perc.nomotion$LE.nm.hours))/as.numeric(sum(LE.perc.nomotion$Recording.Duration))
 
 # LW percent nomotion
-LW.perc.nomotion <- noMotionTimeInfo %>% drop_na(LW)
+LW.perc.nomotion <- static.time.info %>% drop_na(LW)
 perc.LW.motion <- 100*as.numeric(sum(LW.perc.nomotion$LW.nm.hours))/as.numeric(sum(LW.perc.nomotion$Recording.Duration))
 
 # RA percent nomotion
-RA.perc.nomotion <- noMotionTimeInfo %>% drop_na(RA)
+RA.perc.nomotion <- static.time.info %>% drop_na(RA)
 perc.RA.motion <- 100*as.numeric(sum(RA.perc.nomotion$RA.nm.hours))/as.numeric(sum(RA.perc.nomotion$Recording.Duration))
 
 # RE percent nomotion
-RE.perc.nomotion <- noMotionTimeInfo %>% drop_na(RE)
+RE.perc.nomotion <- static.time.info %>% drop_na(RE)
 perc.RE.motion <- 100*as.numeric(sum(RE.perc.nomotion$RE.nm.hours))/as.numeric(sum(RE.perc.nomotion$Recording.Duration))
 
 # RW percent nomotion
-RW.perc.nomotion <- noMotionTimeInfo %>% drop_na(RW)
+RW.perc.nomotion <- static.time.info %>% drop_na(RW)
 perc.RW.motion <- 100*as.numeric(sum(RW.perc.nomotion$RW.nm.hours))/as.numeric(sum(RW.perc.nomotion$Recording.Duration))
 
 # Bed percent nomotion
-Bed.perc.nomotion <- noMotionTimeInfo %>% drop_na(Bed) %>% filter(AccelPatientNo_ != 64)
+Bed.perc.nomotion <- static.time.info %>% drop_na(Bed) %>% filter(AccelPatientNo_ != 64)
 perc.Bed.motion <- 100*as.numeric(sum(Bed.perc.nomotion$Bed.nm.hours))/as.numeric(sum(Bed.perc.nomotion$Recording.Duration))
 
 # Total percent nomotion
@@ -289,14 +423,18 @@ Total.hours.motion <- as.numeric(sum(LA.perc.nomotion$LA.nm.hours)) + as.numeric
 Total.hours.of.set <- as.numeric(sum(LA.perc.nomotion$Recording.Duration)) + as.numeric(sum(LE.perc.nomotion$Recording.Duration)) + as.numeric(sum(LW.perc.nomotion$Recording.Duration)) + as.numeric(sum(RA.perc.nomotion$Recording.Duration)) + as.numeric(sum(RE.perc.nomotion$Recording.Duration)) + as.numeric(sum(RW.perc.nomotion$Recording.Duration))
 perc.total.motion <-  100*Total.hours.motion/Total.hours.of.set
 
-Total.noMotionTimeInfo <- noMotionTimeInfo %>% mutate(num.col = (rowSums(!is.na(.))-2)/2) %>% mutate(total.hours = Recording.Duration*num.col)
-Total.noMotionTimeInfo$Total.Hours.of.Motion <- rowSums(sapply(noMotionTimeInfo[,10:16], as.numeric),na.rm = TRUE)
-Total.noMotionTimeInfo$Total.Percs.of.Motion <- 100*Total.noMotionTimeInfo$Total.Hours.of.Motion/as.numeric(Total.noMotionTimeInfo$total.hours)
+Total.static.time.info <- static.time.info %>% mutate(num.col = (rowSums(!is.na(.))-2)/2) %>% mutate(total.hours = Recording.Duration*num.col)
+Total.static.time.info$Total.Hours.of.Motion <- rowSums(sapply(static.time.info[,10:16], as.numeric),na.rm = TRUE)
+Total.static.time.info$Total.Percs.of.Motion <- 100*Total.static.time.info$Total.Hours.of.Motion/as.numeric(Total.static.time.info$total.hours)
 
 complete.feature.set.long <- completeFeatureSet %>% dplyr::select(-timeCount) %>% pivot_longer(cols = c(Bed,LA,LE,LW,RA,RE,RW),names_to = "sensor") %>% mutate(AccelPatientNo_ = patient.clinical.data$AccelPatientNo_[ptIdx]) %>% dplyr::select(-ptIdx)
 saveRDS(complete.feature.set.long,file='../all_motion_feature_data/long_feature_set.rds')
 
 ## SHUBS CHECKPOINT
+# Load patient clinical data
+source('./functions/load_patient_clinical_data.R')
+patient.clinical.data <- load_patient_clinical_data('../clinical_data/patient_clinical_data.csv') %>% arrange(AccelPatientNo_) %>% mutate(ptIdx = 1:nrow(.))
+
 # Load missing accelerometry information:
 missing.time.info <- read_xlsx('../all_motion_feature_data/MissingPercentTable.xlsx',.name_repair = "universal") %>% 
   mutate(Start.Timestamp = as.POSIXct(Start.Timestamp,format = '%d-%b-%Y %H:%M:%S',tz = "America/New_York"), End.Timestamp = as.POSIXct(End.Timestamp,format = '%d-%b-%Y %H:%M:%S',tz = "America/New_York")) %>% 
@@ -306,7 +444,7 @@ missing.time.info <- read_xlsx('../all_motion_feature_data/MissingPercentTable.x
 
 # Examnine GCS scores of each patient 
 # Load automatically extracted GCS labels:
-gcs_data <- read.csv('../clinical_data/clean_auto_GCS_table.csv') %>% select(-X) %>% mutate(TakenInstant = as.POSIXct(TakenInstant, tz = "America/New_York"))
+gcs_data <- read.csv('../clinical_data/02_clean_auto_GCS_table.csv') %>% select(-X) %>% mutate(TakenInstant = as.POSIXct(TakenInstant, tz = "America/New_York"))
 
 # Merge GCS.data and patient clinical data
 merged.gcs.data <- left_join(gcs_data, patient.clinical.data, by = "AccelPatientNo_") %>% mutate(TakenDay = as.Date(TakenInstant, tz = "America/New_York")) %>% arrange(AccelPatientNo_,TakenInstant)

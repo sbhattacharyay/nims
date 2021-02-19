@@ -47,6 +47,9 @@ out.MF2DF <- mf_to_dataframe(all_motion_features,n,verbose = TRUE)
 completeFeatureSet <- out.MF2DF[[1]]
 totallyMissingSet <- out.MF2DF[[2]]
 
+# Save totally missing set indices
+write.csv(totallyMissingSet,'../all_motion_feature_data/complete_missing_idx.csv',row.names = FALSE)
+
 ## Add corresponding timestamps to compiled motion feature dataset
 featureLabels <- unlist(featureLabels[1,])
 complete_timestamps <- as.data.frame(matrix(ncol = 3, nrow = 0))
