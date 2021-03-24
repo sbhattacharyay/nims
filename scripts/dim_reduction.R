@@ -4,7 +4,16 @@
 # University of Cambridge
 # Johns Hopkins University
 # email address: sb2406@cam.ac.uk
+#
+### Contents:
+# I. Initialization
+# II. Build detection model matrices
+# III. Build prediction model matrices
+# IV. Train and perform linear optimal low-rank projection
+# V. Analyze LOL coefficients for feature importance
+# VI. Test importance across the features
 
+### I. Initialization
 # Add library path for R packages and set working directory:
 .libPaths(c("~/Rpackages" , .libPaths()))
 setwd('~/work/nims/scripts')
@@ -27,6 +36,7 @@ patient_clinical_data <- load_patient_clinical_data('../clinical_data/patient_cl
 dir.create("../all_motion_feature_data/04_formatted_predictor_matrices",showWarnings = FALSE)
 impFiles <- list.files(path="../all_motion_feature_data/03_bed_corrected_imputed_features/",pattern = "*.RData")
 
+### II. Build detection model matrices
 # (a) Detection model matrices
 
 # Load detection labels and partitions
@@ -214,7 +224,7 @@ for (i in 1:length(impDirs)){
   }
 }
 
-
+### III. Build prediction model matrices
 # (b) Prediction model matrices
 
 # Load prediction labels and partitions
@@ -380,7 +390,7 @@ for (impNo in 1:length(impFiles)){
   print(paste("Imputation no.",impNo,"out of",length(impFiles),"completed."))
 }
 
-### Train and perform linear optimal low-rank projection:
+### IV. Train and perform linear optimal low-rank projection
 rm(list = ls())
 gc()
 
@@ -587,7 +597,7 @@ for (i in 1:length(impDirs)){
 #   print(paste("Imputation no.",i,"out of",length(impDirs),"completed."))
 # }
 
-#### Analyzing LOL coefficients for feature importance
+### V. Analyze LOL coefficients for feature importance
 ### Train and perform linear optimal low-rank projection:
 rm(list = ls())
 gc()
@@ -693,7 +703,7 @@ for (imp.no in unique(upper.downer.test.df$imp)){
   p.values.up.lo <- c(p.values.up.lo, curr.wx.test$p.value)
 }
 
-## Test of importance across the features
+### VI. Test importance across the features
 # Paired pairwise wilcoxon tests
 greater.wx.test <- pairwise.wilcox.test(lol.coeff.df$coeff, lol.coeff.df$feature.type,p.adjust.method = "BH",paired = TRUE,alternative = 'greater')
 lesser.wx.test <- pairwise.wilcox.test(lol.coeff.df$coeff, lol.coeff.df$feature.type,p.adjust.method = "BH",paired = TRUE,alternative = 'less')

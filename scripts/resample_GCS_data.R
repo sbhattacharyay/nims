@@ -4,6 +4,11 @@
 # University of Cambridge
 # Johns Hopkins University
 # email address: sb2406@cam.ac.uk
+#
+### Contents:
+# I. Initialization
+# II. Build detection and prediction models
+# III. Partition data into training, validation, and testing sets based on preserving class imbalance
 
 ### I. Initialization
 ## Import necessary packages
@@ -43,6 +48,7 @@ default_pre_leads_idx <- 1
 # Isolate and save candidate (coincide with accelerometry) GCS observations:
 
 dir.create('../validation_resampling',showWarnings = FALSE)
+### II. Build detection and prediction models
 
 # a) Detection models:
 
@@ -158,7 +164,7 @@ for (i in 1:length(pre_lead_times)){
 }
 save(pre_parameters, pre_gcs_labels, file = '../validation_resampling/prediction_labels.RData')
 
-# Partition data into training, validation, and testing sets based on preserving class imbalance:
+### III. Partition data into training, validation, and testing sets based on preserving class imbalance
 rm(list = ls())
 gc()
 

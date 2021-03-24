@@ -4,8 +4,13 @@
 # University of Cambridge
 # Johns Hopkins University
 # email address: sb2406@cam.ac.uk
+#
+### Contents:
+# I. Initialization
+# II. Train and validate ordinal regression models with/without SMOTE
+# III. Loop through optimally tuned model results and calculate a bevy of probability metrics and axes
 
-
+### I. Initialization
 # Load necessary packages
 library(caret)
 library(rms)
@@ -39,6 +44,7 @@ load('../validation_resampling/detection_partitions.RData')
 r <- c(2,3,4,5,10,20,30,40,50)
 source('./functions/macro_average_AUROC.R')
 
+### II. Train and validate ordinal regression models with/without SMOTE
 # Initialize empty dataframe to store compiled tuning results
 compiled.tuning.df <- as.data.frame(matrix(ncol = 5, nrow = 0))
 for (curr.r in r){
@@ -285,7 +291,7 @@ write.csv(super.compiled.metrics.df, '../results/detection_results/regression_re
 grouped.metrics <- super.compiled.metrics.df %>% group_by(obs.window,model,metric) %>%
   summarise(meanValue = mean(value), sdValue = sd(value))
 
-# Loop through optimally tuned model results and calculate a bevy of probability metrics and axes
+### III. Loop through optimally tuned model results and calculate a bevy of probability metrics and axes
 
 # Axes for interpolation
 xq <- seq(from = 0, to = 1, length.out = 4000)

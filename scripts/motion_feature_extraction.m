@@ -1,12 +1,22 @@
 %%%% Master Script 2: Complete Motion Feature Extraction %%%%
 %
-% Shubhayu Bhattacharyay
-% Department of Biomedical Engineering
-% Department of Applied Mathematics and Statistics
-% Whiting School of Engineering, Johns Hopkins University
-% email address: shubhayu@jhu.edu
+% Shubhayu Bhattacharyay, Matthew Wang, Eshan Joshi
+% University of Cambridge
+% Johns Hopkins University
+% email address: sb2406@cam.ac.uk
+%
+%%% Contents:
+% I. Initialization
+% II. Arrange data by time and cut out extraneous times
+% III. Filter Data (bworth 4-th order)
+% IV. Feature Extraction
+% V. Collection of Motion Features into consolidated files
+% VI. Correction of Time Formatting
+% VII. Characterization of Missing Data
+% VIII. Plot of frequncy response of Butterworth Filter
 
-%% Set Directory and Procure File Names
+%% I. Initialization
+% Set Directory and Procure File Names
 tic
 addpath('functions/')
 
@@ -22,7 +32,7 @@ studyPatients = cellfun(@(x) (string(x(5:6))),{d.name}');
 studyDirs = {d.name}';
 
 toc
-%% Arrange data by time and cut out extraneous times
+%% II. Arrange data by time and cut out extraneous times
 %WARNING: Elapsed Time: ~111.286133 seconds per patient.
 %WARNING: Elapsed Time: ~1104.244113 seconds for mega streams.
 
@@ -50,7 +60,7 @@ for patIdx = 1:length(studyDirs)
         data = [C1;C2;C3;C4;C5;C6;C7]';
     end
     toc
-    %% Filter Data (bworth 4-th order)
+    %% III. Filter Data (bworth 4-th order)
     tic
     
     fc = 0.2;
@@ -93,7 +103,7 @@ for patIdx = 1:length(studyDirs)
     data_copy(4:7,:) = [];
     
     toc
-    %% Feature Extraction
+    %% IV. Feature Extraction
     %Warning! Run Time: >937.769720 seconds.
     tic
     
@@ -221,7 +231,7 @@ for patIdx = 1:length(studyDirs)
     toc
 end
 
-%% Collection of Motion Features into consolidated files:
+%% V. Collection of Motion Features into consolidated files
 
 cd ~/scratch/all_motion_feature_data/
 directory = dir;
@@ -292,7 +302,7 @@ save('01_features/lens.mat','lens');
 writematrix(placement_labels,"01_features/placement_labels.csv");
 writematrix(feature_names,"01_features/feature_names.csv");
 
-%% Correction of Time Formatting
+%% VI. Correction of Time Formatting
 times = load('times.mat');
 times = times.times;
 
@@ -313,7 +323,7 @@ cd ~/work/nims/scripts/
 
 license('inuse')
 
-%% Characterization of Missing Data
+%% VII. Characterization of Missing Data
 
 load('~/scratch/all_motion_feature_data/complete_sensor_data.mat')
 load('~/scratch/all_motion_feature_data/formatted_times.mat')
@@ -412,7 +422,7 @@ finalTable = [accelPatients,table1];
 
 writetable(finalTable,'../all_motion_feature_data/NoMotionPercentTable.xlsx')
 
-%% Plot of frequncy response of Butterworth Filter
+%% VIII. Plot of frequncy response of Butterworth Filter
 fc = 0.2;
 fs = 10;
 [b,a] = butter(4,fc/(fs/2),'high');

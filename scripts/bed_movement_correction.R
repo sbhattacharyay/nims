@@ -1,11 +1,17 @@
 #### Bed Motion Correction and Collection of Multiple Imputations ####
 #
 # Shubhayu Bhattacharyay, Matthew Wang, Eshan Joshi
-# Department of Biomedical Engineering
-# Department of Applied Mathematics and Statistics
-# Whiting School of Engineering, Johns Hopkins University
-# email address: shubhayu@jhu.edu
+# University of Cambridge
+# Johns Hopkins University
+# email address: sb2406@cam.ac.uk
+#
+### Contents:
+# I. Initialization
+# II. Impute motion feature data
+# III. Determine feature space thresholds to correct bed motion 
+# IV. Add timestamps to bed-corrected, imputed feature set
 
+### I. Initialization
 # Denote number of imputations
 m <- 9
 
@@ -13,6 +19,7 @@ library(tidyverse)
 library(readxl)
 source('./functions/find_thresholds.R')
 
+### II. Impute motion feature data
 featureLabels <- read.csv('../all_motion_feature_data/01_features/feature_names.csv',header = FALSE)
 featureLabels <- unlist(featureLabels[1,])
 compiledImputations <- vector(mode = "list")
@@ -32,6 +39,8 @@ for (i in 1:m){
   compiledImputations[[i]] <- imputationDF
   print(paste('Imputation no.',i,'complete'))
 }
+
+### III. Determine feature space thresholds to correct bed motion 
 sma_thresh <- .135
 
 # Based on the SMA threshold, find corresponding thresholds for the other feature spaces. Note we only use the first imputation to do so since, when testing, we found that the thresholds are the same for all imputations
@@ -84,6 +93,7 @@ for (i in 1:length(compiledImputations)){
   compiledImputations[[i]] <- currDF
 }
 
+### IV. Add timestamps to bed-corrected, imputed feature set
 # Load timestamps:
 indexedTimes <- read.csv('~/scratch/all_motion_feature_data/01_features/indexed_times.csv') %>% mutate(times = as.POSIXct(times, format = "%d-%b-%Y %H:%M:%S",tz = "America/New_York"))
 
