@@ -1,11 +1,17 @@
 #### Multiple Imputation of Missing Accelerometery Values ####
 #
 # Shubhayu Bhattacharyay, Matthew Wang, Eshan Joshi
-# Department of Biomedical Engineering
-# Department of Applied Mathematics and Statistics
-# Whiting School of Engineering, Johns Hopkins University
-# email address: shubhayu@jhu.edu
+# University of Cambridge
+# Johns Hopkins University
+# email address: sb2406@cam.ac.uk
+#
+### Contents:
+# I. Initialization
+# II. Impute missing feature values
+# III. Train and apply box-cox filter to normalize dataset
+# IV. Perform Amelia II for multiple time-series normal missing data imputation
 
+### I. Initialization
 .libPaths(c("~/Rpackages" , .libPaths()))
 
 library(tidyverse)
@@ -50,6 +56,7 @@ n <- length(all_motion_features)/length(featureLabels)
 
 source('./functions/mf_to_dataframe.R')
 
+### II.Impute missing feature values
 # Recode all missing values to NA, find "totally missing" data-streams, and store all feature values in single DF:
 out.MF2DF <- mf_to_dataframe(all_motion_features,n,verbose = TRUE) 
 completeFeatureSet <- out.MF2DF[[1]]
@@ -145,6 +152,7 @@ for (i in 1:nrow(totallyMissingBed)){
 }
 rm(filtered_bedSet)
 
+### III. Train and apply box-cox filter to normalize dataset
 # Train box-cox filter to normalize dataset
 totallyMissingLE <- totallyMissingSet %>% filter(srIdx%in%c(2,5))
 uniqLECombos <- unique(totallyMissingLE[,c('srIdx','ftIdx')])
@@ -188,7 +196,7 @@ for (i in 1:nrow(totallyMissingLE)){
 }
 rm(LEmdls,LEmdl,LEbxcx,curr_LA_bxcx,curr_RA_bxcx,curr_mdl,LA_bxcx,RA_bxcx,filteredSet)
 
-# Amelia II for multiple time-series normal missing data imputation
+### IV. Perform Amelia II for multiple time-series normal missing data imputation
 stored_amelias <- vector(mode = "list")
 stored_bxcx <- vector(mode = "list")
 for (i in 1:length(featureLabels)){

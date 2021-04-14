@@ -4,8 +4,13 @@
 # University of Cambridge
 # Johns Hopkins University
 # email address: sb2406@cam.ac.uk
+#
+### Contents:
+# I. Initialization
+# II. Compute various statistics
+# III. Work with missing accelerometry data
 
-
+### I. Initialization
 library(tidyverse)
 library(readxl)
 library(R.matlab)
@@ -25,6 +30,7 @@ missing.time.info <- read_xlsx('../all_motion_feature_data/MissingPercentTable.x
     rename(AccelPatientNo_=Accel.Patient.No.) %>%
     mutate(Bed.miss.hours = Bed*Recording.Duration,LA.miss.hours = LA*Recording.Duration,LE.miss.hours = LE*Recording.Duration,LW.miss.hours = LW*Recording.Duration,RA.miss.hours = RA*Recording.Duration,RE.miss.hours = RE*Recording.Duration,RW.miss.hours = RW*Recording.Duration)
 
+### II. Compute various statistics
 # Calculate gross static activity percentages by sensor
 static.activity.percs <- miss.NM.TOD %>%
   group_by(sensor) %>%
@@ -288,6 +294,7 @@ wvl.means.formatted <- pooled.total.means  %>%
   filter(featureType == "wavelets") %>%
   mutate(formatted = paste0(formatC(pooled.mean,digits = 2,format = 'E'),' (',formatC(pooled.sd,digits = 2,format = 'E'),')'))
 
+### III. Work with missing accelerometry data
 ## CARRYOVER FROM OTHER FILES
 # Load missing accelerometry information:
 missing.time.info <- read_xlsx('../all_motion_feature_data/MissingPercentTable.xlsx',.name_repair = "universal") %>% 
