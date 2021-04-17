@@ -24,9 +24,7 @@ patientData = readtable('../clinical_data/patient_clinical_data.xlsx',...
     'TreatAsEmpty',{'.','NA'});
 patientData = sortrows(patientData,'AccelPatientNo_');
 
-cd('~/accel_sensor_data');
-
-d = dir('data*');
+d = dir('../accel_sensor_data/accel_*');
 
 studyPatients = cellfun(@(x) (string(x(5:6))),{d.name}');
 studyDirs = {d.name}';

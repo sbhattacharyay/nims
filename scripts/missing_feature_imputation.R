@@ -38,10 +38,7 @@ if(.Platform$OS.type == "unix") {
   registerDoParallel(cores = no.parallel.cores)
 }
 
-source('./functions/load_patient_clinical_data.R')
 source('./functions/get_motion_features.R')
-
-patient_clinical_data = load_patient_clinical_data('../clinical_data/patient_clinical_data.csv')
 
 # Load Motion Features (all)
 if (!exists("all_motion_features")) {
