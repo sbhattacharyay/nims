@@ -17,7 +17,7 @@ In this `.R` file, we create repeated cross-validation (5 repeats of 5-fold CV) 
 In this `.R` file, we train Linear Optimal Low Rank Projections [(LOL)](https://neurodata.io/lol/) on model training sets and reduce both training and validation sets to low-dimensional spaces prior to model training. Prior to LOL, we normalize feature spaces per the distribution of feature type and sensor combinations. This enables us to use LOL coefficients to compare feature type and sensor significance. 
 
 ### 6. [Train and evaluate prediction models and measure feature significance scores](06_prediction_models.R)
-In this `.R` file, we train and validate logistic regression models (GLM) for threshold-level GCSm detection, threshold-level GOSE detection
+In this `.R` file, we train and validate logistic regression models (GLM) for threshold-level GCSm detection, threshold-level GOSE at discharge prediction, and threshold-level GOSE at 12 months prediction. 
 
 ### 7. [Calculate bootstrapping bias-corrected cross-validation (BBC-CV) area under the receiver operating characteristic curve (AUC) and classification metrics](07_calculate_metrics.ipynb)
 
