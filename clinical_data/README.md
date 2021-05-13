@@ -5,7 +5,7 @@ The data corresponding to this directory can be found at the following citation 
 ### Baseline (within 24 hours of ICU admission) characteristics:
 > Bhattacharyay, Shubhayu; Calvillo, Eusebia; Stevens, Robert David, 2021, "Baseline demographic and clinical characteristics collected within 24 hours of ICU admission for NIMS", https://doi.org/10.7910/DVN/NUQV1X, Harvard Dataverse, V1, UNF:6:qu+XIrNYb3PydIlLNpqLnA== [fileUNF]
 ### Glasgow Coma Scale (GCS) assessments during hospital stay:
-> Bhattacharyay, Shubhayu; Dziedzic, Peter; Stevens, Robert David, 2021, "Neurological assessments during hospital stay (according to the Glasgow Coma Scale) for NIMS", https://doi.org/10.7910/DVN/WEOBLC, Harvard Dataverse, V1, UNF:6:a8t7sC5ETncyJBMqhlb12A== [fileUNF]
+> Bhattacharyay, Shubhayu; Dziedzic, Peter; Stevens, Robert David, 2021, "Neurological assessments during hospital stay (according to the Glasgow Coma Scale) for NIMS", https://doi.org/10.7910/DVN/WEOBLC, Harvard Dataverse, V2, UNF:6:inEk0VddHW3S1g67BxcBBw== [fileUNF]
 ### Temporal clinical metadata of study patients:
 > Bhattacharyay, Shubhayu; Calvillo, Eusebia; Stevens, Robert David, 2021, "Temporal clinical metadata of study patients for NIMS", https://doi.org/10.7910/DVN/FFCSDI, Harvard Dataverse, V1, UNF:6:orJdLqflZ7Zrsm6is5XcMw== [fileUNF]
 ### Clinical outcomes:

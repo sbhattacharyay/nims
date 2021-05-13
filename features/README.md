@@ -2,7 +2,7 @@
 
 ## Data access instructions
 The data corresponding to this directory can be found at the following citation link:
-> Bhattacharyay, Shubhayu, 2021, "Extracted motion features (0.2 Hz) from multisegmental, triaxial accelerometry for NIMS", https://doi.org/10.7910/DVN/FMGE6E, Harvard Dataverse, V1, UNF:6:23lr9m23jmRi/u4PH1LyKQ== [fileUNF]
+> Bhattacharyay, Shubhayu, 2021, "Extracted motion features (0.2 Hz) from multisegmental, triaxial accelerometry for NIMS", https://doi.org/10.7910/DVN/FMGE6E, Harvard Dataverse, V2, UNF:6:fwU1h/kxnsd45tYZZ5qHng== [fileUNF]
 
 You will be asked to submit a request to access the data.
 
