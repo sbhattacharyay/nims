@@ -2,7 +2,7 @@
 All of the code used in this work can be found in this directory as MATLAB (`.m`) files, R (`.R`) files, or Jupyter notebooks (`.ipynb`). Moreover, generalised functions have been saved in the `./functions` sub-directory and `.py` scripts used to record accelerometry data from the bedside are available in the `./accel_recording_scripts` sub-directory.
 
 ### 1. [Complete Motion Feature Extraction](01_motion_feature_extraction.m)
-In this `.m` script, we iterate through compiled triaxial accelerometry information from each patient, filter each axis with a high-pass (f_c = 0.2 Hz) 4th-order Butterworth filter, and extract 7 different motion features from non-overlapping 5 second windows. Outputs are saved as `.csv` feature tables. We also plot short examples of the accelerometry processing pipeline for Figure 1 in this script.
+In this `.m` script, we iterate through compiled triaxial accelerometry information from each patient, filter each axis with a high-pass (_f_c_ = 0.2 Hz) 4th-order Butterworth filter, and extract 7 different motion features from non-overlapping 5 second windows. Outputs are saved as `.csv` feature tables. We also plot short examples of the accelerometry processing pipeline for Figure 1 in this script.
 
 ### 2. [Multiple Imputation of Missing Accelerometery Values](02_missing_feature_imputation.R)
 In this `.R` script, we apply our multiple missing feature imputation algorithm. In the event of totally missing recordings (_n_ = 10/483), we impute upper extremity recordings with linear regression from ipsilateral upper extremity sensors, we impute lower extremity recordings with linear regression from contralateral upper extremity sensors, and bed sensors are imputed with sampling with replacement from the total distribution of bed sensor values. Then, the large majority of missing values were imputed with multiple, normalized time-series imputation with the `Amelia II` package. We create 9 imputations, each stored in a separate `.csv` file.
@@ -17,15 +17,19 @@ In this `.R` file, we create repeated cross-validation (5 repeats of 5-fold CV) 
 In this `.R` file, we train Linear Optimal Low Rank Projections [(LOL)](https://neurodata.io/lol/) on model training sets and reduce both training and validation sets to low-dimensional spaces prior to model training. Prior to LOL, we normalize feature spaces per the distribution of feature type and sensor combinations. This enables us to use LOL coefficients to compare feature type and sensor significance. 
 
 ### 6. [Train and evaluate prediction models and measure feature significance scores](06_prediction_models.R)
-In this `.R` file, we train and validate logistic regression models (GLM) for threshold-level GCSm detection, threshold-level GOSE at discharge prediction, and threshold-level GOSE at 12 months prediction. 
+In this `.R` file, we train and validate logistic regression models (GLM) for threshold-level GCSm detection, threshold-level GOSE at discharge prediction, and threshold-level GOSE at 12 months prediction. We train and evaluate models of varying observation windows and target dimensionalities. In this script, we also calculate our feature significance scores. This is equiavalent to the absolute LOL coefficient weighted by the trained linear coefficients of the corresponding logistic regression model.
 
 ### 7. [Calculate bootstrapping bias-corrected cross-validation (BBC-CV) area under the receiver operating characteristic curve (AUC) and classification metrics](07_calculate_metrics.ipynb)
+In this `.ipynb` notebook, we calculate AUCs, ROC curves, and classification metrics for each observation window based on the validation set predictions returned by our models. We use bias-corrected bootstrapping for repeated cross-validation [(Repeated BBC-CV)](https://doi.org/10.1007/s10994-018-5714-4) to calculate 95% confidence intervals for the metrics and the ROC curve. This script is programmed to perform bootstrapping in parallel on 10 cores.
 
 ### 8. [Calculate model calibration on validation set predictions](08_model_calibration_calculation.R)
+In this `.R` file, we calculate probability calibration curves and associated calibration metrics for each observation window based on the validation set predictions returned by our models. We use bias-corrected bootstrapping for repeated cross-validation [(Repeated BBC-CV)](https://doi.org/10.1007/s10994-018-5714-4) to calculate 95% confidence intervals for the metrics and the calibration curve. This script is programmed to perform bootstrapping in parallel on 10 cores.
 
 ### 9. [Case study exploration](09_case_study_exploration.R)
+In this `.R` file, we retrospectively examine predictions of _Pr_(GCSm > 4) in patients (_n_ = 6) who experienced neurological transitions across this threshold to visually determine potential clinical utility of the accelerometry-based system. For each of the 6 patients, we train optimally discriminating detection models (one with a shorter observation window of 27 minutes and one with a longer observation window of 6 hours) on the remaining patient set and validate predictions on the case study patients specifically over a large, continuously overlapping observation window set. We bootstrap across imputations to produce 95% confidence intervals that account for variation due to imputation on the predictions. Then, we prepare the probability trajectories for plotting.
 
 ### 10. [Create manuscript tables and perform statistical analyses](10_tables_and_statistics.R)
-
+In this `.R` file, we construct manuscript tables and perform miscellaneous statistical analyses for different parts (including figures) of the manuscript and supplementary materials. In addition to the classification metrics calculated in script no. 7, we also calculate classification accuracy with repeated BBC-CV in this script.
 
 ### 11. [Plot figures for the manuscript](11_manuscript_figures.R)
+In this `.R` file, we produce the figures for the manuscript and the supplementary figures. The large majority of the quantitative figures in the manuscript are produced using the `ggplot` package.
