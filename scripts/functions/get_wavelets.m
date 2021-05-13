@@ -1,3 +1,10 @@
+%%%% Supplementary function: Calculate wavelet-domain features %%%% 
+%
+% Shubhayu Bhattacharyay, Matthew Wang, Eshan Joshi
+% University of Cambridge
+% Johns Hopkins University
+% email address: sb2406@cam.ac.uk
+
 function waveOutput = get_wavelets(x,y,z)
 [c1,l1] = wavedec(x,6,'db5');
 [c2,l2] = wavedec(y,6,'db5');
