@@ -7,7 +7,7 @@
 #
 ### Contents:
 # I. Initialization
-# II. Impute motion feature data
+# II. Load imputed motion feature data and collect into one object
 # III. Determine feature space thresholds to correct bed motion 
 # IV. Correct bed motion by identifying time points and patient indices during which SMA exceeds a literature-reviewed threshold
 
