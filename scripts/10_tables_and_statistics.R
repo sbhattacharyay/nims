@@ -9,17 +9,18 @@
 # I. Initialization
 # II. Table 1: Study population characteristics
 # III. Table 2: Classification performance metrics of optimally discriminating models
-# IV. Supplementary Table 1: Count distributions of GCSm scores per observation window
-# V. Supplementary Table 2: Discrimination of threshold-level GCSm detection models per observation window
-# VI. Supplementary Table 3: Count distributions of GOSE scores at hospital discharge per observation window
-# VII. Supplementary Table 4: Discrimination of threshold-level GOSE at hospital discharge prediction models per observation window
-# VIII. Supplementary Table 5: Count distributions of GOSE scores at 12 months post discharge per observation window
-# IX. Supplementary Table 6: Discrimination of threshold-level GOSE at 12 months post discharge prediction models per observation window
-# X. Supplementary Table 7: Percentages of missing accelerometry data per sensor and recording duration of each study participant
-# XI. Metrics for Figure 5: Feature significance matrices of optimally discriminating motor function detection and functional outcome prediction models
-# XII. Metrics for Supplementary Figure 2: Correlation matrices of extracted motion features across different sensor placements
-# XIII. Metrics for Supplementary Figure 4: Mean motion feature trajectories in the six hours preceding GCSm evaluation, stratified by GCSm scores and bilateral sensor placement
-# XIV. Miscellaneous statistics for manuscript
+# IV. Table 3: Probability calibration metrics of optimally discriminating models
+# V. Supplementary Table 1: Count distributions of GCSm scores per observation window
+# VI. Supplementary Table 2: Discrimination of threshold-level GCSm detection models per observation window
+# VII. Supplementary Table 3: Count distributions of GOSE scores at hospital discharge per observation window
+# VIII. Supplementary Table 4: Discrimination of threshold-level GOSE at hospital discharge prediction models per observation window
+# IX. Supplementary Table 5: Count distributions of GOSE scores at 12 months post discharge per observation window
+# X. Supplementary Table 6: Discrimination of threshold-level GOSE at 12 months post discharge prediction models per observation window
+# XI. Supplementary Table 7: Percentages of missing accelerometry data per sensor and recording duration of each study participant
+# XII. Metrics for Figure 5: Feature significance matrices of optimally discriminating motor function detection and functional outcome prediction models
+# XIII. Metrics for Supplementary Figure 2: Correlation matrices of extracted motion features across different sensor placements
+# XIV. Metrics for Supplementary Figure 2: XIII. Metrics for Supplementary Figure 4: Mean motion feature trajectories in the six hours preceding GCSm evaluation, stratified by GCSm scores and bilateral sensor placement
+# XV. Miscellaneous statistics for manuscript
 
 ### I. Initialization
 ## Load necessary libraries
@@ -660,7 +661,29 @@ table.GOSE12m.metrics <- read.csv('../results/GOSE12m_threshold_prediction/compi
   arrange(Threshold) %>%
   relocate(Threshold,ObsWindow,precision,recall,specificity,f1_score)
 
-### IV. Supplementary Table 1: Count distributions of GCSm scores per observation window
+### IV. Table 3: Probability calibration metrics of optimally discriminating models
+
+cal.metrics.GCSm <- read.csv('../results/GCSm_threshold_prediction/calibration_metrics.csv') %>%
+  mutate(Formatted = sprintf('%0.2f (%0.2f–%0.2f)',meanValue,lowerValue,upperValue)) %>%
+  pivot_wider(id_cols = Threshold, names_from = Metric, values_from = Formatted) %>%
+  arrange(Threshold) %>%
+  relocate(Emax, .after = Threshold)
+
+cal.metrics.GOSE <- read.csv('../results/GOSE_threshold_prediction/calibration_metrics.csv') %>%
+  mutate(Formatted = sprintf('%0.2f (%0.2f–%0.2f)',meanValue,lowerValue,upperValue)) %>%
+  pivot_wider(id_cols = Threshold, names_from = Metric, values_from = Formatted) %>%
+  arrange(Threshold) %>%
+  relocate(Emax, .after = Threshold)
+
+cal.metrics.GOSE12m <- read.csv('../results/GOSE12m_threshold_prediction/calibration_metrics.csv') %>%
+  mutate(Formatted = sprintf('%0.2f (%0.2f–%0.2f)',meanValue,lowerValue,upperValue)) %>%
+  pivot_wider(id_cols = Threshold, names_from = Metric, values_from = Formatted) %>%
+  arrange(Threshold) %>%
+  relocate(Emax, .after = Threshold)
+
+cal.metrics.table <- rbind(cal.metrics.GCSm,cal.metrics.GOSE,cal.metrics.GOSE12m)
+
+### V. Supplementary Table 1: Count distributions of GCSm scores per observation window
 
 # Load full matrix keys (one imputation is sufficient) to get GCSm scores per observation
 full.matrix.keys <- list.files('../features/03_formatted_predictor_matrices/full_matrices',
@@ -700,7 +723,7 @@ for (curr.full.matrix.key.file in full.matrix.keys){
 compiled.count.dist.table <- compiled.count.dist.table %>%
   pivot_wider(id_cols = ObsWindow, names_from = Label,values_from = n)
 
-### V. Supplementary Table 2: Discrimination of threshold-level GCSm detection models per observation window
+### VI. Supplementary Table 2: Discrimination of threshold-level GCSm detection models per observation window
 
 GCSm.AUC.table <- read.csv('../results/GCSm_threshold_prediction/compiled_metrics.csv') %>%
   filter(Metrics == 'AUC') %>%
@@ -708,7 +731,7 @@ GCSm.AUC.table <- read.csv('../results/GCSm_threshold_prediction/compiled_metric
   pivot_wider(id_cols = ObsWindow, names_from = Threshold, values_from = FormattedAUC) %>%
   arrange(ObsWindow)
 
-### VI. Supplementary Table 3: Count distributions of GOSE scores at hospital discharge per observation window
+### VII. Supplementary Table 3: Count distributions of GOSE scores at hospital discharge per observation window
 
 # Load full matrix keys (one imputation is sufficient) to get GOSE scores per observation
 full.matrix.keys <- list.files('../features/03_formatted_predictor_matrices/full_matrices',
@@ -752,7 +775,7 @@ for (curr.full.matrix.key.file in full.matrix.keys){
 compiled.count.dist.table <- compiled.count.dist.table %>%
   pivot_wider(id_cols = ObsWindow, names_from = Label,values_from = n)
 
-### VII. Supplementary Table 4: Discrimination of threshold-level GOSE at hospital discharge prediction models per observation window
+### VIII. Supplementary Table 4: Discrimination of threshold-level GOSE at hospital discharge prediction models per observation window
 
 GOSE.AUC.table <- read.csv('../results/GOSE_threshold_prediction/compiled_metrics.csv') %>%
   filter(Metrics == 'AUC') %>%
@@ -760,7 +783,7 @@ GOSE.AUC.table <- read.csv('../results/GOSE_threshold_prediction/compiled_metric
   pivot_wider(id_cols = ObsWindow, names_from = Threshold, values_from = FormattedAUC) %>%
   arrange(ObsWindow)
 
-### VIII. Supplementary Table 5: Count distributions of GOSE scores at 12 months post discharge per observation window
+### IX. Supplementary Table 5: Count distributions of GOSE scores at 12 months post discharge per observation window
 
 # Load full matrix keys (one imputation is sufficient) to get GOSE (12m) scores per observation
 full.matrix.keys <- list.files('../features/03_formatted_predictor_matrices/full_matrices',
@@ -810,7 +833,7 @@ for (curr.full.matrix.key.file in full.matrix.keys){
 compiled.count.dist.table <- compiled.count.dist.table %>%
   pivot_wider(id_cols = ObsWindow, names_from = Label,values_from = n)
 
-### IX. Supplementary Table 6: Discrimination of threshold-level GOSE at 12 months post discharge prediction models per observation window
+### X. Supplementary Table 6: Discrimination of threshold-level GOSE at 12 months post discharge prediction models per observation window
 
 GOSE12m.AUC.table <- read.csv('../results/GOSE12m_threshold_prediction/compiled_metrics.csv') %>%
   filter(Metrics == 'AUC') %>%
@@ -818,7 +841,7 @@ GOSE12m.AUC.table <- read.csv('../results/GOSE12m_threshold_prediction/compiled_
   pivot_wider(id_cols = ObsWindow, names_from = Threshold, values_from = FormattedAUC) %>%
   arrange(ObsWindow)
 
-### X. Supplementary Table 7: Percentages of missing accelerometry data per sensor and recording duration of each study participant
+### XI. Supplementary Table 7: Percentages of missing accelerometry data per sensor and recording duration of each study participant
 ## Calculate patient-specific missing and static activity information
 patient.specific.recording.missing.static.info <- read_csv('../features/all_features.csv') %>%
   filter(Feature == 'SMA') %>%
@@ -833,7 +856,7 @@ missingness.table <- patient.specific.recording.missing.static.info %>%
   dplyr::select(UPI,Sensor,total.duration.hours,total.missing.perc) %>%
   pivot_wider(id_cols = c(UPI,total.duration.hours),names_from = 'Sensor',values_from = total.missing.perc)
 
-### XI. Metrics for Figure 5: Feature significance matrices of optimally discriminating motor function detection and functional outcome prediction models
+### XII. Metrics for Figure 5: Feature significance matrices of optimally discriminating motor function detection and functional outcome prediction models
 
 ## Initialize parallel bootstrapping parameters
 # Number of boostrap resamples
@@ -938,7 +961,7 @@ write.csv(bs.GOSE.feature.sig.values,'../results/GOSE_threshold_prediction/featu
 ## Stop implicit cluster used in parallel processing
 stopImplicitCluster()
 
-### XII. Metrics for Supplementary Figure 2: Correlation matrices of extracted motion features across different sensor placements
+### XIII. Metrics for Supplementary Figure 2: Correlation matrices of extracted motion features across different sensor placements
 
 ## Initialize parallel bootstrapping parameters
 # Number of boostrap resamples
@@ -999,7 +1022,7 @@ sensor.correlations.CI$Feature <- plyr::mapvalues(
 # Save sensor correlation matrix and confidence interval for subsequent plotting
 write.csv(sensor.correlations.CI,'../summary_statistics/sensor_correlations.csv',row.names = F)
 
-### XIII. Metrics for Supplementary Figure 4: Mean motion feature trajectories in the six hours preceding GCSm evaluation, stratified by GCSm scores and bilateral sensor placement
+### XIV. Metrics for Supplementary Figure 2: XIII. Metrics for Supplementary Figure 4: Mean motion feature trajectories in the six hours preceding GCSm evaluation, stratified by GCSm scores and bilateral sensor placement
 
 ## Initialize parallel bootstrapping parameters
 # Number of boostrap resamples
@@ -1096,4 +1119,17 @@ trajectory.means.CI <- curr.bs.means %>%
 # Save feature mean trajectories and associated confidence intervals for subsequent plotting
 write.csv(trajectory.means.CI,'../summary_statistics/feature_mean_trajectories.csv',row.names = F)
 
-### XIV. Miscellaneous statistics for manuscript
+### XV. Miscellaneous statistics for manuscript
+
+## Calculate median time from GCSm observations to hospital discharge for first prediction exercise
+# Load patient temporal info
+patient.temporal.info <- read.csv('../clinical_data/patient_temporal_info.csv')
+
+# Extract 0.05 observation window keys and join hospital discharge information 
+GCSm.obs.keys <- read.csv('../features/03_formatted_predictor_matrices/full_matrices/00.05_h_imputation_1_keys.csv') %>%
+  left_join(patient.temporal.info %>% 
+              dplyr::select(UPI,DaysFromICUAdmissionHospitalDischarge),by = 'UPI') %>%
+  mutate(HoursToHospitalDischarge = (DaysFromICUAdmissionHospitalDischarge*24) - HoursFromICUAdmission)
+
+# Quantiles of HoursToHospitalDischarge from GCSm observation
+round(quantile(GCSm.obs.keys$HoursToHospitalDischarge)/24)

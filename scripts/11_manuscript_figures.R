@@ -20,6 +20,7 @@
 # XII. Supplementary Figure 5: Trajectories of motor component scores of the Glasgow Coma Scale (GCSm) of each study participant during ICU stay
 # XIII. Supplementary Figure 7: Percentages of missing, static, and dynamic accelerometry data by time of day of recording and sensor placement
 # XIV. Supplementary Figure 8: Count histograms of accelerometry recording information
+# XV. Supplementary Figure 9: Precision recall curve and prediction distribution of GOSE (discharge) > 5 prediction
 
 ### I. Initialization
 ## Import necessary packages
@@ -1188,3 +1189,78 @@ supplementary.histograms <- histogram.df %>%
     aspect.ratio = 1,
     panel.spacing = unit(2, "lines")
   )
+
+### XV. Supplementary Figure 9: Precision recall curve and prediction distribution of GOSE (discharge) > 5 prediction
+## Extract precision-recall axis and average precision information
+precision.recall.axes <- read.csv('../results/GOSE_threshold_prediction/GOSE.gt.5_precision_recall_curve.csv')
+AUPRC.values <- read.csv('../results/GOSE_threshold_prediction/GOSE.gt.5_AUPRC.csv')
+
+## Calculate 95% confidence intervals
+precision.recall.CI <- precision.recall.axes %>%
+  group_by(Threshold,ObsWindow,Recall) %>%
+  summarise(meanPrecision = mean(Precision,na.rm=T),
+            medianPrecision = median(Precision,na.rm=T),
+            lowerPrecision = quantile(Precision,.025,na.rm=T),
+            upperPrecision = quantile(Precision,.975,na.rm=T))
+precision.recall.CI[precision.recall.CI$Recall == 0, c('meanPrecision','medianPrecision','lowerPrecision','upperPrecision')] <- 1
+precision.recall.CI[precision.recall.CI$Recall == 1, c('meanPrecision','medianPrecision','lowerPrecision','upperPrecision')] <- 0
+
+AUPRC.values.CI <- AUPRC.values %>%
+  group_by(Threshold,ObsWindow,Metrics) %>%
+  summarise(meanValues = mean(Values,na.rm=T),
+            medianValues = median(Values,na.rm=T),
+            lowerValues = quantile(Values,.025,na.rm=T),
+            upperValues = quantile(Values,.975,na.rm=T)) %>%
+  mutate(Formatted = sprintf('%0.2f (%0.2f – %0.2f)',meanValues,lowerValues,upperValues))
+
+## `ggplot`: Precision Recall curve
+prec.rec.curve <- ggplot(precision.recall.CI,aes(x = Recall)) +
+  geom_line(aes(y = meanPrecision), alpha = 1, size=1.3/.pt,color='red') +
+  geom_ribbon(aes(ymin=lowerPrecision,ymax=lowerPrecision), alpha = 0.1,fill='red',linetype = "dotdash",size=.75/.pt,color='black') +
+  xlab("Recall") +
+  ylab("Precision") +
+  ggtitle('Precision-Recall Curve (GOSE > 5)')+
+  coord_cartesian(ylim = c(0,1),xlim = c(0,1))+
+  theme_classic()+
+  theme(
+    plot.title = element_text(size = 8, color = "black",face = 'bold',hjust = 0.5),
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(size = 5, color = "black"),
+    axis.text.y = element_text(size = 5, color = "black"),
+    axis.title.x = element_text(size = 7, color = "black",face = 'bold'),
+    axis.title.y = element_text(size = 7, color = "black",face = 'bold'),
+    panel.border = element_rect(colour = "black", fill=NA, size = 2/.pt),
+    aspect.ratio = 1,
+    plot.margin=grid::unit(c(0,0,0,0), "mm")
+  )
+dir.create(file.path('../plots',Sys.Date()),showWarnings = F,recursive = T)
+ggsave(file.path('../plots',Sys.Date(),'GOSE.gt.5_PrecRec.svg'),prec.rec.curve,device= svg,units='in',dpi=300,width=3,height = 3)
+
+
+## Load the predictions of the optimal configuration index
+table(AUPRC.values$ConfigIdx)
+curr.pred <- read.csv('../results/GOSE_threshold_prediction/06.00_h_obs_window/GOSE.gt.5_compiled_predictions.csv') %>%
+  filter(ConfigIdx == 19)
+curr.pos.cases <- curr.pred %>% filter(TrueLabel == 1)
+curr.neg.cases <- curr.pred %>% filter(TrueLabel == 0)
+
+## `ggplot`: Prediction probability histograms stratified by true label
+prediction.distribution <- ggplot(data=NULL, aes(Prob)) +
+  geom_histogram(data = curr.pos.cases %>% filter(Prob <= 7.5e-11), aes(y = ..density..),bins = 100,fill='black') +
+  geom_histogram(data = curr.neg.cases %>% filter(Prob <= 7.5e-11), aes(y = -..density..), bins = 100,fill='black') +
+  geom_hline(yintercept = 0,size=.75/.pt, color = 'gray') +
+  xlab("Predicted Probability") +
+  ylab("Density") +
+  ggtitle('Distribution of Predictions')+
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(size = 5, color = "black"),
+    axis.text.y = element_text(size = 5, color = "black"),
+    panel.border = element_rect(colour = "black", fill=NA, size = 2/.pt),
+    axis.title.x = element_text(size = 7, color = "black",face = 'bold'),
+    axis.title.y = element_text(size = 7, color = "black",face = 'bold'),
+    plot.title = element_text(size = 8, color = "black",face = 'bold',hjust = 0.5),
+    plot.margin=grid::unit(c(0,0,0,0), "mm")
+  )
+dir.create(file.path('../plots',Sys.Date()),showWarnings = F,recursive = T)
+ggsave(file.path('../plots',Sys.Date(),'GOSE.gt.5_dist.svg'),prediction.distribution,device= svg,units='in',dpi=300,width=3,height = 2)
