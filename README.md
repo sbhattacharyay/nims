@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/236843680.svg)](https://zenodo.org/badge/latestdoi/236843680)
+
 # Assessing the clinical utility of triaxial accelerometry in severe brain injury monitoring and prognosis
 A pilot study of the Neurological Injury Motion Sensing (NIMS) project
 
