@@ -17,6 +17,8 @@ The code on this repository is commented throughout to provide a description of 
 
 ## Abstract
 
+Motor activity is an important phenotypic variable after severe brain injury (SBI); however, whether quantitative motion monitoring would significantly improve critical SBI care is unknown. Here, we collect 1,701 hours of multisegmental accelerometry from SBI patients (n = 69) and develop models to detect motor function and predict neurological outcomes (discharge and one year) from extracted time-, frequency-, and wavelet-domain features. Detection models of the motor sub-score of the Glasgow Coma Scale (GCSm) achieve significant (AUC: 0.70 \[95% CI: 0.53–0.85\]), consistent (observation windows: 12 min – 9 hours) discrimination of SBI patients capable of purposeful movement (GCSm > 4). Prediction models of the Glasgow Outcome Scale – Extended (GOSE) at discharge discriminate (AUC: 0.82 \[95% CI: 0.75–0.90\]) SBI patients of upper moderate disability or better (GOSE > 5) with 2–6 hours of observation. These results support the utility of accelerometers in certain cases of SBI monitoring and prognosis.
+
 ## Code 
 All of the code used in this work can be found in the `./scripts` directory as MATLAB (`.m`) files, R (`.R`) files, or Jupyter notebooks (`.ipynb`). Moreover, generalised functions have been saved in the `./scripts/functions` sub-directory and `.py` scripts used to record accelerometry data from the bedside are available in the `./scripts/accel_recording_scripts` sub-directory.
 
