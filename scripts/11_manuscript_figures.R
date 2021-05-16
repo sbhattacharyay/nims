@@ -13,14 +13,14 @@
 # V. Figure 4: Probability calibration of optimally discriminating motor function detection and functional outcome prediction models on validation sets
 # VI. Figure 5: Feature significance matrices of optimally discriminating motor function detection and functional outcome prediction models
 # VII. Figure 6: Retrospective case study analysis of accelerometry-based detection of motor function in six patients who experienced relevant transition
-# VIII. Supplementary Figure 1: Discrimination performance of functional outcome at 12 months post discharge prediction models on validation sets
-# IX. Supplementary Figure 2: Correlation matrices of extracted motion features across different sensor placements
-# X. Supplementary Figure 3: Violin plots of extracted motion feature values (30 min observation window), stratified by bilateral sensor placement and GCSm scores
-# XI. Supplementary Figure 4: Mean motion feature trajectories in the six hours preceding GCSm evaluation, stratified by GCSm scores and bilateral sensor placement
-# XII. Supplementary Figure 5: Trajectories of motor component scores of the Glasgow Coma Scale (GCSm) of each study participant during ICU stay
-# XIII. Supplementary Figure 7: Percentages of missing, static, and dynamic accelerometry data by time of day of recording and sensor placement
-# XIV. Supplementary Figure 8: Count histograms of accelerometry recording information
-# XV. Supplementary Figure 9: Precision recall curve and prediction distribution of GOSE (discharge) > 5 prediction
+# VIII. Supplementary Figure 4: Discrimination performance of functional outcome at 12 months post discharge prediction models on validation sets
+# IX. Supplementary Figure 6: Correlation matrices of extracted motion features across different sensor placements
+# X. Supplementary Figure 7: Violin plots of extracted motion feature values (30 min observation window), stratified by bilateral sensor placement and GCSm scores
+# XI. Supplementary Figure 5: Mean motion feature trajectories in the six hours preceding GCSm evaluation, stratified by GCSm scores and bilateral sensor placement
+# XII. Supplementary Figure 2: Trajectories of motor component scores of the Glasgow Coma Scale (GCSm) of each study participant during ICU stay
+# XIII. Supplementary Figure 9: Percentages of missing, static, and dynamic accelerometry data by time of day of recording and sensor placement
+# XIV. Supplementary Figure 1: Count histograms of accelerometry recording information
+# XV. Supplementary Figure 3: Precision recall curve and prediction distribution of GOSE (discharge) > 5 prediction
 
 ### I. Initialization
 ## Import necessary packages

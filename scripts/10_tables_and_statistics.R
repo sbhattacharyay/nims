@@ -18,8 +18,8 @@
 # X. Supplementary Table 6: Discrimination of threshold-level GOSE at 12 months post discharge prediction models per observation window
 # XI. Supplementary Table 7: Percentages of missing accelerometry data per sensor and recording duration of each study participant
 # XII. Metrics for Figure 5: Feature significance matrices of optimally discriminating motor function detection and functional outcome prediction models
-# XIII. Metrics for Supplementary Figure 2: Correlation matrices of extracted motion features across different sensor placements
-# XIV. Metrics for Supplementary Figure 2: XIII. Metrics for Supplementary Figure 4: Mean motion feature trajectories in the six hours preceding GCSm evaluation, stratified by GCSm scores and bilateral sensor placement
+# XIII. Metrics for Supplementary Figure 6: Correlation matrices of extracted motion features across different sensor placements
+# XIV. Metrics for Supplementary Figure 5: Mean motion feature trajectories in the six hours preceding GCSm evaluation, stratified by GCSm scores and bilateral sensor placement
 # XV. Miscellaneous statistics for manuscript
 
 ### I. Initialization
