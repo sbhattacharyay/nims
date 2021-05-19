@@ -1,6 +1,6 @@
 [![DOI](https://zenodo.org/badge/236843680.svg)](https://zenodo.org/badge/latestdoi/236843680)
 
-# Assessing the clinical utility of triaxial accelerometry in severe brain injury monitoring and prognosis
+# Decoding accelerometry for classification and prediction of critically ill patients with severe brain injury
 A pilot study of the Neurological Injury Motion Sensing (NIMS) project
 
 ## Contents
@@ -13,13 +13,13 @@ A pilot study of the Neurological Injury Motion Sensing (NIMS) project
 
 ## Overview
 
-This repository contains the code underlying the article entitled **Assessing the clinical utility of triaxial accelerometry in severe brain injury monitoring and prognosis** from the Johns Hopkins University [Laboratory of Computational Intensive Care Medicine](https://lcicm.jhmi.edu/). In this file, we present the abstract, to outline the motivation for the work and the findings, and then a brief description of the code with which we generate these finding and achieve this objective.\
+This repository contains the code underlying the article entitled **Decoding accelerometry for classification and prediction of critically ill patients with severe brain injury** from the Johns Hopkins University [Laboratory of Computational Intensive Care Medicine](https://lcicm.jhmi.edu/). In this file, we present the abstract, to outline the motivation for the work and the findings, and then a brief description of the code with which we generate these finding and achieve this objective.\
 \
 The code on this repository is commented throughout to provide a description of each step alongside the code which achieves it.
 
 ## Abstract
 
-Motor activity is an important phenotypic variable after severe brain injury (SBI); however, whether quantitative motion monitoring would significantly improve critical SBI care is unknown. Here, we collect 1,701 hours of multisegmental accelerometry from SBI patients (n = 69) and develop models to detect motor function and predict neurological outcomes (discharge and one year) from extracted time-, frequency-, and wavelet-domain features. Detection models of the motor sub-score of the Glasgow Coma Scale (GCSm) achieve significant (AUC: 0.70 \[95% CI: 0.53–0.85\]), consistent (observation windows: 12 min – 9 hours) discrimination of SBI patients capable of purposeful movement (GCSm > 4). Prediction models of the Glasgow Outcome Scale – Extended (GOSE) at discharge discriminate (AUC: 0.82 \[95% CI: 0.75–0.90\]) SBI patients of upper moderate disability or better (GOSE > 5) with 2–6 hours of observation. These results support the utility of accelerometers in certain cases of SBI monitoring and prognosis.
+The goal of this research is to explore quantitative motor features in critically ill patients with severe brain injury (SBI). We hypothesized that computational decoding of these features would yield important information on underlying neurological states and clinical outcomes. Using wearable microsensors placed on all extremities, we recorded 1,701 hours of continuous, high-frequency accelerometry data from a prospective cohort of patients (n = 69) admitted to the ICU with SBI. Models were trained using time-, frequency-, and wavelet-domain motion features and levels of responsiveness and outcome as labels. The two primary tasks were detection of levels of responsiveness assessed by motor sub-score of the Glasgow Coma Scale (GCSm), and prediction of functional outcome at hospital discharge measured with the Glasgow Outcome Scale–Extended (GOSE). Detection models achieved significant (AUC: 0.70 [95% CI: 0.53–0.85]) and consistent (observation windows: 12 min – 9 hours) discrimination of SBI patients capable of purposeful movement (GCSm > 4). Prediction models accurately discriminated SBI patients of upper moderate disability or better (GOSE > 5) with 2–6 hours of observation (AUC: 0.82 [95% CI: 0.75–0.90]). Results suggest that computational analysis of time series motor activity in patients with SBI yields clinically important insights on underlying neurologic states and short-term clinical outcomes.
 
 ## Code 
 All of the code used in this work can be found in the `./scripts` directory as MATLAB (`.m`) files, R (`.R`) files, or Jupyter notebooks (`.ipynb`). Moreover, generalised functions have been saved in the `./scripts/functions` sub-directory and `.py` scripts used to record accelerometry data from the bedside are available in the `./scripts/accel_recording_scripts` sub-directory.
