@@ -1203,7 +1203,7 @@ precision.recall.CI <- precision.recall.axes %>%
             lowerPrecision = quantile(Precision,.025,na.rm=T),
             upperPrecision = quantile(Precision,.975,na.rm=T))
 precision.recall.CI[precision.recall.CI$Recall == 0, c('meanPrecision','medianPrecision','lowerPrecision','upperPrecision')] <- 1
-precision.recall.CI[precision.recall.CI$Recall == 1, c('meanPrecision','medianPrecision','lowerPrecision','upperPrecision')] <- 0
+#precision.recall.CI[precision.recall.CI$Recall == 1, c('meanPrecision','medianPrecision','lowerPrecision','upperPrecision')] <- 0
 
 AUPRC.values.CI <- AUPRC.values %>%
   group_by(Threshold,ObsWindow,Metrics) %>%
@@ -1216,7 +1216,7 @@ AUPRC.values.CI <- AUPRC.values %>%
 ## `ggplot`: Precision Recall curve
 prec.rec.curve <- ggplot(precision.recall.CI,aes(x = Recall)) +
   geom_line(aes(y = meanPrecision), alpha = 1, size=1.3/.pt,color='red') +
-  geom_ribbon(aes(ymin=lowerPrecision,ymax=lowerPrecision), alpha = 0.1,fill='red',linetype = "dotdash",size=.75/.pt,color='black') +
+  geom_ribbon(aes(ymin=lowerPrecision,ymax=upperPrecision), alpha = 0.1,fill='red',linetype = "dotdash",size=.75/.pt,color='black') +
   xlab("Recall") +
   ylab("Precision") +
   ggtitle('Precision-Recall Curve (GOSE > 5)')+
