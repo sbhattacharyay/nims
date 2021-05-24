@@ -1213,6 +1213,14 @@ AUPRC.values.CI <- AUPRC.values %>%
             upperValues = quantile(Values,.975,na.rm=T)) %>%
   mutate(Formatted = sprintf('%0.2f (%0.2f – %0.2f)',meanValues,lowerValues,upperValues))
 
+## Load keys for GOSE > 5, 6-hour observation window to add case distribution line
+patient.outcomes <- read.csv('../clinical_data/patient_outcomes.csv') %>%
+  dplyr::select(UPI,GOSEDischarge) %>%
+  mutate(fav.outcome = as.integer(GOSEDischarge > 5))
+
+curr.case.keys <- read.csv('../features/03_formatted_predictor_matrices/full_matrices/06.00_h_imputation_1_keys.csv') %>%
+  left_join(patient.outcomes, by = 'UPI') 
+
 ## `ggplot`: Precision Recall curve
 prec.rec.curve <- ggplot(precision.recall.CI,aes(x = Recall)) +
   geom_line(aes(y = meanPrecision), alpha = 1, size=1.3/.pt,color='red') +
@@ -1221,6 +1229,7 @@ prec.rec.curve <- ggplot(precision.recall.CI,aes(x = Recall)) +
   ylab("Precision") +
   ggtitle('Precision-Recall Curve (GOSE > 5)')+
   coord_cartesian(ylim = c(0,1),xlim = c(0,1))+
+  geom_segment(x = 0, y = table(curr.case.keys$fav.outcome)[2]/nrow(curr.case.keys), xend = 1, yend = table(curr.case.keys$fav.outcome)[2]/nrow(curr.case.keys) ,alpha = 0.5,linetype = "dashed",size=.75/.pt, color = 'gray')+
   theme_classic()+
   theme(
     plot.title = element_text(size = 8, color = "black",face = 'bold',hjust = 0.5),
