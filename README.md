@@ -3,6 +3,8 @@
 # Decoding accelerometry for classification and prediction of critically ill patients with severe brain injury
 A pilot study of the Neurological Injury Motion Sensing (NIMS) project
 
+Bhattacharyay, S., Rattray, J., Wang, M. _et al._ Decoding accelerometry for classification and prediction of critically ill patients with severe brain injury. _Sci Rep_ 11, 23654 (2021). https://doi.org/10.1038/s41598-021-02974-w
+
 ## Contents
 
 - [Overview](#overview)
@@ -58,4 +60,4 @@ In this `.R` file, we construct manuscript tables and perform miscellaneous stat
 In this `.R` file, we produce the figures for the manuscript and the supplementary figures. The large majority of the quantitative figures in the manuscript are produced using the `ggplot` package.
 
 ## Citation
-TBD
+Bhattacharyay, S., Rattray, J., Wang, M. _et al._ Decoding accelerometry for classification and prediction of critically ill patients with severe brain injury. _Sci Rep_ 11, 23654 (2021). https://doi.org/10.1038/s41598-021-02974-w
