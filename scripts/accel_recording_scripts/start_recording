@@ -1,0 +1,7 @@
+/usr/bin/python  start_recordingLW.py  > LW.out 2>&1 
+/usr/bin/python  start_recordingLE.py  > LE.out 2>&1
+/usr/bin/python  start_recordingRW.py  > RW.out 2>&1
+/usr/bin/python  start_recordingRE.py  > RE.out 2>&1
+/usr/bin/python  start_recordingLA.py  > LA.out 2>&1 
+/usr/bin/python  start_recordingRA.py  > RA.out 2>&1
+/usr/bin/python  start_recordingbed.py > bed.out 2>&1

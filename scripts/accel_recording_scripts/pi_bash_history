@@ -1,0 +1,609 @@
+sudo /etc/interfaces
+sudo nano /etc/interfaces
+sudo raspi -config
+sudo raspi-config
+ping
+ping gooogle.com
+ipconfig
+ifconfig
+sudo hcitool lescan
+gatttool -b B0:B4:48:ED:C5:01 --interactive
+sudo hcitool lescan
+gatttool -b B0:B4:48:ED:C5:01
+gatttool -b B0:B4:48:ED:C5:01 -I
+sudo hcitool lescan
+gatttool -b B0:B4:48:EE:2D:05  -I
+sudo hciconfig hci0 up
+sudo hcitool lescan
+gatttool -b A0:E6:F8:B6:F1:04  interactive
+gatttool-b A0:E6:F8:B6:F1:04  interactive
+gatttool -b A0:E6:F8:B6:F1:04  interactive
+gatttool -b A0:E6:F8:B6:F1:04  --interactive
+gatttool -b B0:B4:48:EE:2D:05  -I
+ls
+gedit sensortag.py &
+nano sensortag.py &
+exit
+vim sensortag.py &
+vi sensortag.py &
+exit
+sudo apt-get install gedit
+ls
+cd Documents/
+cd Research/
+gedit sensortag.py &
+pwd
+ls
+sensortag.py
+python sensortag.py
+cd Documents/Research/
+python sensortag.py
+pid
+python sensortag.py
+ps
+lescan
+hcitool
+ps
+jobs
+ps -aux
+sudo hcitool lescan
+ps -aux
+sudo hcitool lescan &
+ps -aux
+kill 1123
+kill 1130
+sudo kill 1130
+sudo hcitool lescan &
+sudo kill 1388
+sudo kill 1123
+sudo hcitool lescan &
+ps -aux
+hciconfig hci0 down
+sudo hciconfig hci0 down
+sudo hciconfig hci0 up
+sudo hcitool lescan &
+$!
+echo $!
+sudo hcitool lescan &
+sudo hciconfig hci0 up
+sudo hciconfig hci0 down
+sudo hcitool lescan &
+ps -aux
+sudo kill 1494
+sudo kill 2352
+sudo hcitool lescan &
+sudo hciconfig hci0 down
+sudo hciconfig hci0 up
+
+ -aux
+sudo hcitool lescan &
+kill $!
+sudo kill $!
+ps -aux
+cd Documents/Research/
+python sensortag.py
+ps -aux
+python sensortag.py
+ps -aux
+python sensortag.py
+ps- -aux
+ps -aux
+clear
+python sensortag.py
+sudo hcitool lescan
+python sensortag.py
+ps -aux
+sudo dpkg-reconfigure keyboard-configuration
+cd Documents/Research/
+python sensortag.py
+ps -aux
+clear
+python sensortag.py
+ps -aux
+kill 5359
+sudo kill 5359
+ps -aux
+python sensortag.py
+sudo hcitool lescan
+sudo hciconfig down
+sudo hciconfig up
+sudo hciconfig hci0 down
+sudo hciconfig hci0 up
+python sensortag.py
+ps -aux
+kill 6274
+sudo kill 6274
+python sensortag.py
+ps - aux
+ps -aux
+python sensortag.py
+sudo hciconfig hci0 down
+sudo hciconfig hci0 up
+python sensortag.py
+ps -aux
+sudo kill 7240
+sudo hciconfig hci0 down
+sudo hciconfig hci0 up
+python sensortag.py
+sudo kill 7494
+print str(search.pid)
+print(str(search.pid))
+python
+sudo hciconfig hci0 down
+sudo hciconfig hci0 up
+python sensortag.py
+ps -aux
+python sensortag.py
+sudo hcitool lescan
+cd Documents/Research/
+python sensortag.py
+exit
+cd Documents/Research/
+python sensortag.py
+gatttool -b B0:B4:48:EE:2D:05 -I
+python sensortag.py
+gatttool -b B0:B4:48:EE:2D:05 -I
+python sensortag.py
+ls
+chmod 755 sensortag_script
+./sensortag_script
+python sensortag.py
+sudo apt-get update
+sudo apt-get install git build-essential puthon-dev python-pip
+sudo apt-get install git build-essential python-dev python-pip
+sudo pip install pexpect
+pwd
+python sensortag.py
+sudo gatttool -I
+python sensortag.py
+sudo gatttool -I
+python sensortag.py
+cd Documents/Research/
+python sensortag.py
+sudo le scan
+sudo lescan
+sudo hci lescan
+sudo hcitool lescan
+gatttool -b A0:E6:F8:B6:F1:04 -I
+python sensortag.py
+gatttool -I
+python sensortag.py
+sudo hcitool lescan
+python sensortag.py
+cd Documents/Research/
+python sensortag.py
+sudo hcitool lescan
+python sensortag.py
+python convertdata.py
+python sensortag.py
+python convertdata.py
+python sensortag.py
+sudo hcitool lescan
+python sensortag.py
+cd Documents/Research/
+ls
+rm sensortag_script
+ls
+gatttool -I
+python sensortag.py
+cd Documents/Research/
+python sensortag.py
+cd Documents/Research/
+python sensortag.py ls
+pwd
+python sensortag.py
+cd Documents/Research/
+python sensortag.py
+cd Documents/Research/
+gedit sensortag.py &
+python
+python sensortag.py
+python
+sudo pip install getch
+sudo pip install msvcrt
+python
+cd getch-1.0/
+python setup.py
+python setup.py install
+sudo python setup.py install
+cd ..
+python
+python sensortag.py
+python
+python test.py
+python sensortag.py
+cd Documents/Research/
+python sensortag.py
+cd
+pwd
+ls
+cd Documents
+ls
+cd Research
+ls
+python sensortag.py
+ls
+cd Documents/Research/
+ls
+python sensortag.py
+gedit sensortag.py &
+gatttool -I
+gatttool
+gatttool lescan
+sudo hcitool lescan
+hcitool lescan
+cd Documents/Research/
+ls
+python sensortag.py
+ls
+sudo hcitool lescan
+python sensortag.py
+sudo hcitool lescan
+cd Documents/Research/
+ls
+gedit sensortag.py &
+python sensortag.py
+pwd
+cd Documents/Research/
+ls
+sudo hcitool lescan
+python sensortag.py
+exit
+ipconfig
+ifconfig
+ping google.com
+sudo apt-get install wpasupplicant
+sudo gedit /etc/wpa_supplicant/wpa_supplicant.conf
+sudo gedit /etc/network/interfaces
+sudo /etc/init.d/networking restart
+sudo gedit etc/network/interfaces
+sudo gedit /etc/network/interfaces
+sudo /etc/init.d/networking restart
+sudo gedit /etc/wpa_supplicant/wpa_supplicant.conf
+sudo /etc/init.d/networking restart
+sudo wpa_supplicant -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf  -B
+sudo gedit /etc/wpa_supplicant/wpa_supplicant.conf
+sudo wpa_supplicant -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf  -B
+sudo gedit /etc/wpa_supplicant/wpa_supplicant.conf
+sudo wpa_supplicant -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf  -B
+sudo gedit /etc/wpa_supplicant/wpa_supplicant.conf
+sudo wpa_supplicant -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf  -B
+sudo /etc/init.d/networking restart
+sudo wpa_supplicant -i wlan1 -c /etc/wpa_supplicant/wpa_supplicant.conf  -B
+sudo gedit /etc/wpa_supplicant/wpa_supplicant.conf
+sudo wpa_supplicant -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf  -B
+sudo wpa_supplicant -i wlan1 -c /etc/wpa_supplicant/wpa_supplicant.conf  -B
+sudo /etc/init.d/networking restart
+sudo gedit /etc/wpa_supplicant/wpa_supplicant.conf
+sudo wpa_supplicant -i wlan1 -c /etc/wpa_supplicant/wpa_supplicant.conf  -B
+sudo wpa_supplicant -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf  -B
+sudo /etc/init.d/networking restart
+isconfig
+ifconfig
+pip install numpy
+cd Documents/Research/
+ls
+gedit plot.py &
+python plot.py
+sudo pip install matplotlib
+python plot.py
+sudo pip install matplotlib.pyplot
+gedit sensortag.py &
+sudo shutdown now
+^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@^@cd Documents/Research/
+ls
+gedit sensortag.py &
+gatttool -I
+python sensortag.py
+python convertdata.py
+python sensortag.py
+ls
+cd
+ls
+cd ..
+ls
+cd ..
+lsblk
+cd /media/pi/cinema
+ls
+cd
+cd /media/pi/cinema
+cd
+cd Documents/Research/
+ls
+cp data.txt /media/pi/cinema
+unmount /media/pi/cinema
+umount /media/pi/cinema
+cd Documents/Research/
+python sensortag.py
+cp data.txt /media/pi/cinema
+umount /media/pi/cinema
+python sensortag.py
+cp data.txt /media/pi/cinema
+umount /media/pi/cinema
+python sensortag.py
+cp data.txt /media/pi/cinema
+umount /media/pi/cinema
+python sensortag.py
+cp data.txt /media/pi/cinema
+umount /media/pi/cinema
+python sensortag.py
+cp data.txt /media/pi/cinema
+umount /media/pi/cinema
+python sensortag.py
+cp data.txt /media/pi/cinema
+umount /media/pi/cinema
+python sensortag.py
+cp data.txt /media/pi/cinema
+umount /media/pi/cinema
+python sensortag.py
+cp data.txt /media/pi/cinema
+umount /media/pi/cinema
+python sensortag.py
+cp data.txt /media/pi/cinema
+umount /media/pi/cinema
+python sensortag.py
+cp data.txt /media/pi/cinema
+umount /media/pi/cinema
+python sensortag.py
+cp data.txt /media/pi/cinema
+umount /media/pi/cinema
+python sensortag.py
+cp data.txt /media/pi/cinema
+umount /media/pi/cinema
+python convertdata.py
+python sensortag.py
+cp data.txt /media/pi/cinema
+umount /media/pi/cinema
+cd Documents/Research/
+gedit sensortag.py &
+gatttool -I
+python sensortag.py
+le scan
+hcitool lescan
+sudo hcitool lescan
+python sensortag.py
+sudo hcitool lescan
+python sensortag.py
+sudo hcitool lescan
+python sensortag.py
+1
+python sensortag.py
+1
+umount /media/pi/USB\ DISK
+python sensortag.py
+umount /media/pi/USB\ DISK
+python sensortag.py
+umount /media/pi/USB\ DISK
+python sensortag.py
+umount /media/pi/USB\ DISK
+python sensortag.py
+umount /media/pi/USB\ DISK
+cd Documents/Research/
+python sensortag.py
+gedit sensortag.py &
+python sensortag.py
+mv sensortag.py sensortag4.py
+cp sensortag4.py sensortag8.py
+hcitttoollescan
+hcitttool lescan
+hcitool lescan
+sudo hcitool lescan
+python sensortag8.py
+gatttool -I
+python sensortag8.py
+gatttool -I
+python sensortag8.py
+cd Documents/Research/
+python sensortag1.py
+gedit sensortag1.py  &
+python sensortag1.py
+ifconfig
+mount
+ifconfig
+exit
+ssh 10.17.148.30
+ssh 10.17.148.34
+ssh 10.17.148.33
+ssh pol@10.17.148.33
+cd Documents/Research/
+gedit sensortag8.py &
+python sensortag8.py
+cd
+cd Documents/Research/
+python sensortag8.py
+gedit data.txt
+ls
+cd Documents/
+ls
+cd Research/
+ls
+gedit sensortag1.py &
+hcitool lescan
+sudo hcitool lescan
+python sensortag1.py
+gedit sensortag1.py
+python sensortag1.py
+gedit data.txt
+gedit sensortag1.py
+python sensortag1.py
+gedit data.txt
+gedit sensortag1.py
+python sensortag1.py
+gedit data.txt
+gedit sensortag1.py
+python sensortag1.py
+gedit data.txt
+gedit sensortag1.py
+python sensortag1.py
+gedit data.txt
+gedit sensortag1.py &
+python sensortag1.py
+sudo hcitool lescan
+python sensortag1.py
+ls
+sudo hcitool lescan
+pid
+jobs
+kill
+jobs -l
+sudo hcitool lescan
+view pid
+sudo hcitool lescan
+ps
+sudo hcitool lescan
+pkill --signal SIGINT hcitool
+sudo pkill --signal SIGINT hcitool
+sudo hcitool lescan
+cd Documents/Research/
+python sensortag4.py
+chmod u+x sensortag4.py
+python sensortag4.py
+which python
+chmod u+x sensortag4.py
+pip install pyinstaller
+sudo pip install pyinstaller
+pyinstaller sensortag4.py
+ps
+jobs
+pyinstaller sensortag4.py
+jobs
+ps
+sudo hcitool lescan
+python sensortag8.py
+sudo hcitool lescan
+python sensortag8.py
+cd Documents/
+cd Research/
+python sensortag8.py
+python sensortag4.py
+python sensortag.py
+python sensortag1.py
+python sensortag4.py
+python sensortag1.py
+cd Documents/Research/
+gedit sensortag4.py
+sudo hcitool lescan
+gedit sensortag4.py &
+python sensortag4.py
+python sensortag1.py
+sudo hcitool lescan
+python sensortag1.py
+python sensortag4.py
+python sensortag1.py
+python sensortag4.py
+exit
+cd Documents/Research/
+ls
+sudo hcitool lescan
+gedit sensortag4.py &
+python sensortag4.py
+python sensortag1.py
+python sensortag4.py
+python sensortag8.py
+sudo hcitool lescan
+python sensortag1.py
+python sensortag8.py
+exit
+ls
+cd Documents/Research/
+python sensortag8.py
+gedit data.txt
+gedit sensortag8.py
+ifconfig
+cd Documents/Research/
+python sensortag8.py
+roweroff
+poweroff
+cd Documents/Research/
+ls -lat
+ls -lat | more
+who
+last | more
+cd Documents/Research/
+ls -lat | more
+tail -f data.txt
+who
+cd Documents/Research/
+ls -lat | more
+cd Documents/Research/
+ls -lat | more
+who
+last | more
+ls -lat ./Documents/Research/
+ls -lat ./Documents/Research/raw_data.txt
+who
+ls -lat ./Documents/Research/raw_data.txt
+who
+ls -lat ./Documents/Research/crash1312pm.txt
+cat ./Documents/Research/crash1312pm.txt
+cat ./Documents/Research/crash1347pm.txt
+ls -lat ./Documents/Research/crash1312pm.txt
+ls -lat ./Documents/Research/raw_data.txt
+ls -lath ./Documents/Research/raw_data.txt
+ps -ef
+ps -ef | grep python
+ls -lath ./Documents/Research/raw_data.txt
+ls -lat ./Documents/Research/
+cd Documents/Research/
+ls -lat | more
+vi /etc/fstab
+ls -la /etc/fstab
+sudo
+sudo root
+su
+sudo passwd root
+su
+vi /etc/fstab
+cd
+ls
+cd Desktop/
+python StartRecording.py
+python StartRecording.py > log.txt
+python StartRecording.py
+cd Desktop/
+ls
+python convert.py Recordings/raw_data1106am.txt
+python convert.py < Recordings/raw_data1106am.txt
+python convert.py < "Recordings/raw_data1106am.txt"
+python convert.py
+exit
+ls
+cd Desktop
+cd
+cd Desktop
+ls
+ls -la raw_data.txt
+ps -
+ps
+ps -e
+ps -e | grep python
+ps -e | grep start_recording.py
+ps -ef | grep start_recording.py
+exit
+cd Desktop/
+ls -lat
+who
+ls -lat
+who
+ls -la ./Desktop/raw_data.txt
+ls -lat
+ls -la ./Desktop/raw_data.txt
+exit
+who
+ls -la ./Desktop/raw_data.txt
+last | more
+who
+last | more
+ls -la ./Desktop/raw_data.txt
+last | more
+ls -la ./Desktop/raw_data.txt
+tail ./Desktop/raw_data.txt
+last | more
+ls -la ./Desktop/raw_data.txt
+who
+tail ./Desktop/raw_data.txt
+cd Documents/Research/
+ls
+ls -la ./Desktop/raw_data.txt
+
